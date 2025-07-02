@@ -1,2 +1,7 @@
 .venv*
-*.edf
+data/AE129_231121C-A.edf 
+data/MG16.edf
+data/CD28.edf 
+data/MA27.edf 
+data/CS147_240301e-a.edf
+data/MN143_240115E-A.edf 
