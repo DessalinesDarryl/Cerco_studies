@@ -1,3 +1,4 @@
 data/KH113_230412D-A.edf filter=lfs diff=lfs merge=lfs -text
 data/AE129_231121C-A.edf filter=lfs diff=lfs merge=lfs -text
 data/data/CD28.edf filter=lfs diff=lfs merge=lfs -text
+data/CD28.edf filter=lfs diff=lfs merge=lfs -text
