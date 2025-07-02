@@ -4,3 +4,4 @@ data/data/CD28.edf filter=lfs diff=lfs merge=lfs -text
 data/CD28.edf filter=lfs diff=lfs merge=lfs -text
 data/MG16.edf filter=lfs diff=lfs merge=lfs -text
 data/MA27.edf filter=lfs diff=lfs merge=lfs -text
+data/CS147_240301e-a.edf filter=lfs diff=lfs merge=lfs -text
