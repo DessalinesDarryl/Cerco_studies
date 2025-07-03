@@ -1,3 +1,4 @@
 mne
 scikit-learn
 tree
+openpyxl
