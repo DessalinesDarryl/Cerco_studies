@@ -2,3 +2,5 @@ mne
 scikit-learn
 tree
 openpyxl
+notebook
+ipywidgets
