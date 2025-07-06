@@ -4,3 +4,4 @@ tree
 openpyxl
 notebook
 ipywidgets
+streamlit

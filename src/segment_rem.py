@@ -1,81 +1,90 @@
-import os
-import glob
-import pandas as pd
+import streamlit as st
 import mne
+import os
+from utils import get_standard_bands, filter_band
+from segment_rem import load_annotation_file
 
-def load_annotation_file(txt_path):
-    """
-    Charge un fichier .txt d'annotations et extrait les intervalles REM.
-    Suppose les colonnes : start_s, temps, phase, index.
-    """
-    df = pd.read_csv(txt_path, sep="\t", names=["start", "temps", "stage", "index"])
+st.set_page_config(page_title="Visualisation EEG", layout="wide")
+st.title("Visualisation des signaux EEG.")
 
-    # Supprimer les lignes incomplètes
-    df = df.dropna(subset=["start", "stage"])
+# Sélection du dossier contenant les fichiers fif
+fif_dir = st.sidebar.text_input("Dossier contenant les fichiers .fif", "data/preprocessed")
 
-    # Calculer les durées en secondes : diff entre start courant et suivant
-    df["duration"] = df["start"].shift(-1) - df["start"]
-    df = df[:-1]  # retirer la dernière ligne (durée inconnue)
+if not os.path.isdir(fif_dir):
+    st.error("Le dossier spécifié n'existe pas.")
+    st.stop()
 
-    # Filtrer les segments REM
-    rem_df = df[df["stage"].str.upper().str.strip() == "REM"]
-    return rem_df[["start", "duration"]].values  # array (N, 2)
+# Lister les fichiers fif disponibles
+fif_files = sorted([f for f in os.listdir(fif_dir) if f.endswith(".fif")])
+if not fif_files:
+    st.warning("Aucun fichier .fif trouvé dans ce dossier.")
+    st.stop()
 
-def extract_rem_segments(raw, rem_intervals):
-    """
-    Coupe le Raw entre les intervalles REM fournis (en secondes).
-    Renvoie un Raw contenant uniquement les segments REM concaténés.
-    """
-    rem_segments = []
-    for start, dur in rem_intervals:
-        stop = start + dur
+# Sélection du fichier
+selected_file = st.sidebar.selectbox("Sélectionner un patient :", fif_files)
+base_name = selected_file.replace("_eeg_cleaned_raw.fif", "")
+raw_path = os.path.join(fif_dir, selected_file)
+
+# Charger le fichier
+raw = mne.io.read_raw_fif(raw_path, preload=True)
+raw.pick_types(eeg=True)
+
+# Affichage des infos de base
+st.markdown(f"**Patient sélectionné :** `{selected_file}`")
+st.markdown(f"**Canaux EEG détectés :** {len(raw.ch_names)}")
+
+# Ajout d'une option pour tous les canaux
+channel_options = ["Tous les canaux"] + raw.ch_names
+selected_channel = st.selectbox("Canal EEG à visualiser :", channel_options)
+
+# Copie selon le choix
+if selected_channel == "Tous les canaux":
+    raw_display = raw.copy()
+else:
+    raw_display = raw.copy().pick_channels([selected_channel])
+
+# Bande de fréquence
+bands = get_standard_bands()
+band_name = st.selectbox("Filtrer dans une bande EEG :", ["Aucune"] + list(bands.keys()))
+if band_name != "Aucune":
+    l_freq, h_freq = bands[band_name]
+    raw_display = filter_band(raw_display, l_freq, h_freq)
+    st.markdown(f"Filtrage appliqué : **{band_name}**")
+
+# Segment temporel
+duration = st.slider("Durée affichée (secondes) :", 5, 60, 20)
+start_time = st.slider("Début du segment (secondes) :", 0, int(raw.times[-1] - duration), 0)
+
+# ✅ Option d’affichage des périodes REM
+show_rem = st.checkbox("Afficher les périodes REM")
+
+if show_rem:
+    annot_dir = st.text_input("Dossier des fichiers d'annotations (.txt)", "D:/EEG/raw")
+    txt_path = None
+
+    if annot_dir:
+        import glob
+        txt_candidates = glob.glob(os.path.join(annot_dir, "**", f"{base_name}hypnoEXP.txt"), recursive=True)
+        if txt_candidates:
+            txt_path = txt_candidates[0]
+
+    if txt_path and os.path.exists(txt_path):
         try:
-            rem_seg = raw.copy().crop(tmin=start, tmax=stop)
-            rem_segments.append(rem_seg)
+            rem_intervals = load_annotation_file(txt_path)
+            annotations = mne.Annotations(
+                onset=[start for start, _ in rem_intervals],
+                duration=[dur for _, dur in rem_intervals],
+                description=["REM"] * len(rem_intervals),
+            )
+            raw_display.set_annotations(annotations)
+            st.success("Annotations REM chargées et affichées.")
         except Exception as e:
-            print(f" Erreur sur intervalle [{start}-{stop}] : {e}")
-
-    if rem_segments:
-        return mne.concatenate_raws(rem_segments)
+            st.warning(f"Erreur de chargement des REM : {e}")
     else:
-        return None
+        st.warning(f"Aucune annotation trouvée pour {base_name}")
 
-def segment_all_rem(preprocessed_dir=None,
-                    annot_root=None,
-                    save_dir=None):
-    os.makedirs(save_dir, exist_ok=True)
-    fif_files = glob.glob(os.path.join(preprocessed_dir, "*_eeg_cleaned_raw.fif"))
+# Affichage du tracé
+fig = raw_display.plot(start=start_time, duration=duration, show=False)
+st.pyplot(fig=fig, clear_figure=True)
 
-    for fif_path in fif_files:
-        base = os.path.basename(fif_path).replace("_eeg_cleaned_raw.fif", "")
-        out_path = os.path.join(save_dir, f"{base}_REM_raw.fif")
-
-        # Vérifie si le fichier a déjà été traité
-        if os.path.exists(out_path):
-            print(f" Fichier déjà existant pour {base}, on saute.")
-            continue
-
-        raw = mne.io.read_raw_fif(fif_path, preload=True)
-
-        # Recherche d'un fichier .txt d'annotation correspondant (même nom de base)
-        txt_candidates = glob.glob(os.path.join(annot_root, "**", f"{base}hypnoEXP.txt"), recursive=True)
-
-        if not txt_candidates:
-            print(f" Aucun fichier d'annotation trouvé pour {base}")
-            continue
-
-        txt_path = txt_candidates[0]
-        rem_intervals = load_annotation_file(txt_path)
-
-        if len(rem_intervals) == 0:
-            print(f" Pas de phase REM trouvée pour {base}")
-            continue
-
-        rem_raw = extract_rem_segments(raw, rem_intervals)
-        if rem_raw is None:
-            print(f" Impossible d'extraire les segments pour {base}")
-            continue
-
-        rem_raw.save(out_path, overwrite=True)
-        print(f" Segments REM extraits et sauvegardés pour {base}")
-
+st.success("Affichage terminé. Vous pouvez changer les options à gauche pour explorer d'autres segments.")
