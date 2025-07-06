@@ -55,7 +55,7 @@ if band_name != "Aucune":
 duration = st.slider("Durée affichée (secondes) :", 5, 60, 20)
 start_time = st.slider("Début du segment (secondes) :", 0, int(raw.times[-1] - duration), 0)
 
-# ✅ Option d’affichage des périodes REM
+# Option d’affichage des périodes REM
 show_rem = st.checkbox("Afficher les périodes REM")
 
 if show_rem:
