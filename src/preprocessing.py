@@ -19,7 +19,7 @@ def preprocess_eeg_file(file_path, save_dir="../data/preprocessed", n_components
     raw.pick_channels(picks)
     
     # Filtrage passe-haut à 1 Hz
-    raw.filter(l_freq=1., h_freq=None)
+    raw.filter(l_freq=10, h_freq=100)
     
     # ICA
     ica = mne.preprocessing.ICA(n_components=n_components, random_state=42, max_iter='auto')
