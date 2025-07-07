@@ -18,7 +18,7 @@ def preprocess_eeg_file(file_path, save_dir="../data/preprocessed", n_components
     picks = [ch for ch in raw.ch_names if ch.startswith("EEG") or ch.startswith("EOG")]
     raw.pick_channels(picks)
     
-    # Filtrage passe-haut à 1 Hz
+    # Filtrage passe-bande de 10 à 100 Hz 
     raw.filter(l_freq=10, h_freq=100)
     
     # ICA
