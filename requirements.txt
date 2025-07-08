@@ -5,3 +5,5 @@ openpyxl
 notebook
 ipywidgets
 streamlit
+yasa
+numpy==2.2
