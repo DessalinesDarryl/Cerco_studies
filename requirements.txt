@@ -7,3 +7,4 @@ ipywidgets
 streamlit
 yasa
 numpy==2.2
+python-picard
