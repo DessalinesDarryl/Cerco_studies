@@ -1,30 +1,13 @@
 import os
+import pathlib
 import mne
 import numpy as np
-import matplotlib.pyplot as plt
 from mne.preprocessing import ICA
 from pyriemann.utils.mean import mean_riemann
 from pyriemann.utils.distance import distance_riemann
 
-"""
-EEG PREPROCESSING PIPELINE
-==========================
-Filtrage → Référence → ICA (FastICA | Picard) → (optionnel) Rejection by
-Projection on the Riemannian manifold (RPF)
-
-- Compatible gros fichiers (fenêtrage `tstep`, décimation temporaire)
-- Picard multithreadé, FastICA mono‑thread (n_jobs retiré de scikit‑learn)
-- RPF « memory‑safe » : traitement par batchs pour éviter les MemoryError
-
-Version : 2025‑07‑11
-"""
-
-# =================================================
 # 1. FILTRAGE & RÉFÉRENCEMENT
-# =================================================
-
-def preprocess_raw(raw, l_freq: float = 10, h_freq: float = 100, notch: float = 50, ref: str = "A1"):
-    """Band‑pass 10‑100 Hz, notch 50 Hz, référence A1 ou average."""
+def preprocess_raw(raw, l_freq=10, h_freq=100, notch=50, ref="A1"):
     raw_f = raw.copy().filter(l_freq, h_freq, fir_design="firwin")
     raw_f.notch_filter(notch)
     if ref in raw_f.ch_names:
@@ -33,157 +16,121 @@ def preprocess_raw(raw, l_freq: float = 10, h_freq: float = 100, notch: float = 
         raw_f.set_eeg_reference("average", projection=False)
     return raw_f
 
-# =================================================
-# 2. ICA (FASTICA / PICARD)
-# =================================================
-
-def run_ica(
-    raw: mne.io.BaseRaw,
-    method: str = "fastica",
-    n_comp: float | int = 0.99,
-    random_state: int = 42,
-    tstep: float = 30.0,
-    resample_hz: float | None = None,
-):
-    """Retourne raw nettoyé + objet ICA."""
+# 2. ICA
+def run_ica(raw, method="picard", n_comp=0.999, random_state=42, tstep=30.0, resample_hz=150):
     if method not in {"fastica", "picard"}:
         raise ValueError("method doit être 'fastica' ou 'picard'")
-
     raw_fit = raw.copy()
     if resample_hz is not None and resample_hz < raw.info["sfreq"]:
         raw_fit = raw_fit.resample(resample_hz, npad="auto")
-
-    fit_params = {}
-    if method == "picard":
-        fit_params = dict(ortho=False)
-
+    fit_params = dict(ortho=False) if method == "picard" else {}
     ica = ICA(method=method, n_components=n_comp, random_state=random_state, fit_params=fit_params)
     ica.fit(raw_fit, tstep=tstep)
-
-    # Détection EOG/ECG
-    eog_inds, ecg_inds = [], []
     eog_ch = next((c for c in raw.ch_names if "EOG" in c.upper()), None)
-    if eog_ch:
-        eog_inds, _ = ica.find_bads_eog(raw_fit, ch_name=eog_ch)
     ecg_ch = next((c for c in raw.ch_names if "ECG" in c.upper()), None)
+    if eog_ch:
+        bad_eog, _ = ica.find_bads_eog(raw_fit, ch_name=eog_ch)
+        ica.exclude.extend(bad_eog)
     if ecg_ch:
-        ecg_inds, _ = ica.find_bads_ecg(raw_fit, ch_name=ecg_ch)
-    ica.exclude = eog_inds + ecg_inds
-
+        bad_ecg, _ = ica.find_bads_ecg(raw_fit, ch_name=ecg_ch)
+        ica.exclude.extend(bad_ecg)
     return ica.apply(raw.copy()), ica
 
-# =================================================
-# 3. SEGMENTATION FIXE
-# =================================================
-
-def segment_fixed_epochs(raw: mne.io.BaseRaw, dur: float = 4.0):
+# 3. SEGMENTATION
+def segment_fixed_epochs(raw, dur=4.0):
     events = mne.make_fixed_length_events(raw, 1, dur)
-    epochs = mne.Epochs(raw, events, 1, 0, dur, baseline=None, preload=True)
-    epochs._data = epochs.get_data().astype("float32")  # cast RAM ½
-    return epochs
+    ep = mne.Epochs(raw, events, 1, 0, dur, baseline=None, preload=True)
+    ep._data = ep.get_data().astype("float32")
+    return ep
 
-# =================================================
-# 4. RPF « MEMORY‑SAFE » PAR BATCHS
-# =================================================
-
-def _reg_cov(c, lam: float):
+# 4. RPF
+def _reg_cov(c, lam):
     return c + lam * np.eye(c.shape[-1], dtype=c.dtype)
 
-def _epoch_cov(epoch_data: np.ndarray, lam: float):
+def _epoch_cov(epoch_data, lam):
     return _reg_cov(np.cov(epoch_data), lam)
 
-def apply_rpf_batches(
-    epochs: mne.Epochs,
-    z: float = 2.0,
-    lam: float = 1e-6,
-    batch_size: int = 5000,
-):
-    """RPF en batchs, compatible anciennes versions MNE."""
+def apply_rpf_batches(epochs, z=2.0, lam=1e-6, batch_size=5000):
     n_epochs = len(epochs)
-    covs_list: list[np.ndarray] = []
-
+    covs_list = []
     for start in range(0, n_epochs, batch_size):
-        stop = min(start + batch_size, n_epochs)
-        batch_data = epochs[start:stop].get_data()  # slicing → version‑safe
-        for ep in batch_data:
-            covs_list.append(_epoch_cov(ep, lam))
-        del batch_data  # libère RAM
-
+        batch = epochs[start:start+batch_size].get_data()
+        covs_list.extend(_epoch_cov(ep, lam) for ep in batch)
+        del batch
     covs = np.stack(covs_list)
     mu = mean_riemann(covs)
-
-    dist = np.empty(n_epochs, dtype=np.float32)
-    idx = 0
-    for start in range(0, n_epochs, batch_size):
-        stop = min(start + batch_size, n_epochs)
-        for c in covs_list[start:stop]:
-            dist[idx] = distance_riemann(c, mu)
-            idx += 1
-
+    dist = np.fromiter((distance_riemann(c, mu) for c in covs_list), dtype=np.float32)
     thr = float(dist.mean() + z * dist.std())
     keep = dist < thr
     return epochs[keep], dist, thr
 
-# =================================================
-# 5. VISUALISATION RAPIDE
-# =================================================
+# 5. RECONSTRUCTION
+def epochs_to_raw(epochs):
+    data = np.concatenate(epochs.get_data(), axis=-1)
+    return mne.io.RawArray(data, epochs.info.copy())
 
-def quick_plot(
-    raw0: mne.io.BaseRaw,
-    raw_ica: mne.io.BaseRaw,
-    epochs_rpf: mne.Epochs | None = None,
-    n_ch: int = 5,
-    dur: int | None = None,
-):
-    """Affiche les *n_ch* premiers canaux (hors bads) sur toute la durée ou *dur* secondes.
+# 6. PIPELINE FICHIER UNIQUE
+def process_file(edf_path, out_ica_dir, out_rpf_dir, new_name, z_rpf=3.0):
+    try:
+        raw = mne.io.read_raw_edf(edf_path, preload=True, verbose="ERROR")
+        raw_p = preprocess_raw(raw)
 
-    - Retourne également la liste `(picks, ch_names)` pour savoir quels canaux sont tracés.
-    """
-    sf = raw0.info["sfreq"]
-    picks_all = mne.pick_types(raw0.info, eeg=True, exclude="bads")
-    picks = picks_all[1 : n_ch + 1] if len(picks_all) > n_ch else picks_all[:n_ch]
-    ch_names = [raw0.ch_names[p] for p in picks]
+        try:
+            raw_ica, _ = run_ica(raw_p)
+        except Exception as ica_err:
+            return f"{edf_path.name}: erreur ICA → {ica_err}"
 
-    # Portion temporelle
-    if dur is None:
-        t = slice(0, raw0.n_times)  # signal complet
-    else:
-        t = slice(0, int(dur * sf))
+        # ICA
+        out_ica = out_ica_dir / new_name
+        out_ica.parent.mkdir(parents=True, exist_ok=True)
+        raw_ica.save(out_ica, overwrite=True, verbose="ERROR")
 
-    rows = 3 if epochs_rpf is not None else 2
-    fig, ax = plt.subplots(rows, 1, figsize=(14, 3 * rows), sharex=True)
-    to_uV = lambda x: x * 1e6
+        # RPF
+        """"
+        ep = segment_fixed_epochs(raw_ica)
+        ep_clean, dist, thr = apply_rpf_batches(ep, z=z_rpf, batch_size=3000)
 
-    ax[0].set_title(f"Brut (µV) – canaux: {', '.join(ch_names)}")
-    ax[0].plot(to_uV(raw0.get_data(picks)[:, t]).T)
+        if len(ep_clean) == 0:
+            return f"{edf_path.name}: aucune époque propre (z={z_rpf}, thr={thr:.2f})"
 
-    ax[1].set_title("Après ICA (µV)")
-    ax[1].plot(to_uV(raw_ica.get_data(picks)[:, t]).T)
+        raw_rpf = epochs_to_raw(ep_clean)
+        out_rpf = out_rpf_dir / new_name
+        out_rpf.parent.mkdir(parents=True, exist_ok=True)
+        raw_rpf.save(out_rpf, overwrite=True, verbose="ERROR")
 
-    if epochs_rpf is not None:
-        ax[2].set_title("Moyenne après RPF (µV)")
-        # Reconstruit un Raw-like complet à partir des epochs nettoyées si besoin
-        data_rpf = epochs_rpf.get_data(picks).mean(0)
-        ax[2].plot(to_uV(data_rpf.T))
+        return f"{edf_path.name}: OK ({len(ep_clean)} époques propres)"
+        """
 
-    ax[-1].set_xlabel("Samples")
-    plt.tight_layout()
-    plt.show()
+    except Exception as e:
+        return f"{edf_path.name}: erreur générale → {e}"
 
-    return picks, ch_names
 
-# =================================================
-# 6. EXEMPLE UTILISATION
-# =================================================
-
+# 7. MAIN AUTOMATIQUE
 if __name__ == "__main__":
-    raw = mne.io.read_raw_edf("D:/EEG/raw/MN143/MN143_240115E-A.edf", preload=True)
+    root_raw = pathlib.Path(r"C:\Users\Dessalines\Desktop\EEG\raw")
+    out_ica_dir = pathlib.Path(r"D:/EEG/preprocessed_ica")
+    out_rpf_dir = pathlib.Path(r"D:/EEG/preprocessed_rpf")
 
-    raw_p = preprocess_raw(raw)
+    edf_paths = list(root_raw.rglob("*.edf"))
+    print(f"{len(edf_paths)} fichiers .edf trouvés.")
 
-    raw_ica, ica = run_ica(raw_p, method="picard", resample_hz=200, tstep=60.0)
+    for i, path in enumerate(edf_paths):
+        parent_name = path.parent.name
+        basename = path.stem.replace(" ", "").replace("-", "").upper()
+        new_name = f"{parent_name}_{basename}_{i:03d}.fif"
 
-    ep = segment_fixed_epochs(raw_ica, dur=4.0)
-    ep_clean, d, thr = apply_rpf_batches(ep, batch_size=3000)
+        print(f"\nTraitement de {path.name} → sauvegarde sous {new_name}")
 
-    quick_plot(raw, raw_ica, ep_clean, n_ch=5, dur=10)
+        # Chemin cible déjà traité ?
+        out_fif = out_ica_dir / new_name
+        if out_fif.exists():
+            print(f"{new_name} déjà traité, ignoré.")
+            continue
+
+        res = process_file(
+            edf_path=path,
+            out_ica_dir=out_ica_dir,
+            out_rpf_dir=out_rpf_dir,
+            new_name=new_name
+        )
+        print(res)
