@@ -78,7 +78,7 @@ def process_file(edf_path, out_ica_dir, out_rpf_dir, new_name, z_rpf=3.0):
         try:
             raw_ica, _ = run_ica(raw_p)
         except Exception as ica_err:
-            return f"{edf_path.name}: erreur ICA → {ica_err}"
+            return f"{edf_path.name}: erreur ICA -> {ica_err}"
 
         # ICA
         out_ica = out_ica_dir / new_name
@@ -102,7 +102,7 @@ def process_file(edf_path, out_ica_dir, out_rpf_dir, new_name, z_rpf=3.0):
         """
 
     except Exception as e:
-        return f"{edf_path.name}: erreur générale → {e}"
+        return f"{edf_path.name}: erreur générale -> {e}"
 
 
 # 7. MAIN AUTOMATIQUE
@@ -119,7 +119,7 @@ if __name__ == "__main__":
         basename = path.stem.replace(" ", "").replace("-", "").upper()
         new_name = f"{parent_name}_{basename}_{i:03d}.fif"
 
-        print(f"\nTraitement de {path.name} → sauvegarde sous {new_name}")
+        print(f"\nTraitement de {path.name} -> sauvegarde sous {new_name}")
 
         # Chemin cible déjà traité ?
         out_fif = out_ica_dir / new_name
