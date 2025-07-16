@@ -53,5 +53,5 @@ if __name__ == "__main__":
     epoch_and_label_rem_segments(
         rem_dir="../data/rem_segments",
         save_dir="../data/epochs_rem",
-        eog_ch_name="EOG"  # à adapter selon le nom exact
+        eog_ch_name="EOG"  
     )
