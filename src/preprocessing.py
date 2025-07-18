@@ -97,21 +97,26 @@ def process_file(edf_path, out_ica_dir, new_name, montage):
 # 4. MAIN AUTOMATIQUE
 if __name__ == "__main__":
     root_raw = pathlib.Path(r"C:\\Users\\Dessalines\\Desktop\\EEG\\raw")
-    out_ica_dir = pathlib.Path(r"D:/EEG/preprocessed_ica/full")
+    out_ica_dir = pathlib.Path(r"D:\\EEG\\preprocessed\\monopolaire\\full")
 
     edf_paths = list(root_raw.rglob("*.edf"))
     print(f"{len(edf_paths)} fichiers .edf trouvés.")
 
     for i, path in enumerate(edf_paths):
+        montage = "bipolaire"
         parent_name = path.parent.name
         basename = path.stem.replace(" ", "").replace("-", "").upper()
-        new_name = f"{parent_name}_{basename}_{i:03d}.fif"
-        montage = "bipolaire"
+        if montage=="bipolaire":
+            out_ica_dir = pathlib.Path(r"D:\\EEG\\preprocessed\\bipolaire\\full")
+            new_name = f"{parent_name}_preprocessed_bip.fif"
+        else:
+            new_name = f"{parent_name}_preprocessed_monop.fif"
 
         print(f"\nTraitement de {path.name} -> sauvegarde sous {new_name}")
 
         # Chemin cible déjà traité ?
         out_fif = out_ica_dir / new_name
+        print(out_fif)
         if out_fif.exists():
             print(f"{new_name} déjà traité, ignoré.")
             continue
