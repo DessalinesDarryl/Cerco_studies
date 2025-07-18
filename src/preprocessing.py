@@ -5,13 +5,42 @@ import numpy as np
 from mne.preprocessing import ICA
 
 # 1. FILTRAGE & RÉFÉRENCEMENT
-def preprocess_raw(raw, l_freq=10, h_freq=100, notch=50, ref="A1"):
+def preprocess_raw_A1(raw, l_freq=0.3, h_freq=100, notch=50, ref="A1"): 
     raw_f = raw.copy().filter(l_freq, h_freq, fir_design="firwin")
     raw_f.notch_filter(notch)
     if ref in raw_f.ch_names:
         raw_f.set_eeg_reference([ref])
     else:
         raw_f.set_eeg_reference("average", projection=False)
+    return raw_f
+
+def preprocess_raw_bip(raw, l_freq=0.3, h_freq=100, notch=50):
+    raw_f = raw.copy().filter(l_freq, h_freq, fir_design="firwin")
+    raw_f.notch_filter(notch)
+
+    # Dictionnaire des canaux bipolaires : nom_du_nouveau_canal : (canal1, canal2)
+    bipolar_pairs = {
+        "EOGD-A1": ("EOGD", "A1"),
+        "EOGG-A1": ("EOGG", "A1"),
+        "Fp2-C4": ("Fp2", "C4"),
+        "C4-O2": ("C4", "O2"),
+        "T4-O2": ("T4", "O2"),
+        "Cz-Pz": ("Cz", "Pz"),
+        "Fp1-C3": ("Fp1", "C3"),
+        "C3-O1": ("C3", "O1"),
+        "Fp1-T3": ("Fp1", "T3"),
+        "T3-O1": ("T3", "O1"),
+    }
+
+    # Appliquer les montages bipolaires
+    for new_name, (anode, cathode) in bipolar_pairs.items():
+        if anode in raw_f.ch_names and cathode in raw_f.ch_names:
+            raw_f = mne.set_bipolar_reference(
+                raw_f, anode=anode, cathode=cathode, ch_name=new_name, drop_refs=False, copy=False
+            )
+        else:
+            print(f"Canaux manquants pour {new_name}: {anode}, {cathode}")
+
     return raw_f
 
 # 2. ICA
@@ -42,10 +71,13 @@ def run_ica(raw, method="picard", n_comp=0.999, random_state=42, tstep=30.0, res
     return ica.apply(raw.copy()), ica
 
 # 3. PIPELINE FICHIER UNIQUE
-def process_file(edf_path, out_ica_dir, new_name):
+def process_file(edf_path, out_ica_dir, new_name, montage):
     try:
         raw = mne.io.read_raw_edf(edf_path, preload=True, verbose="ERROR")
-        raw_p = preprocess_raw(raw)
+        if montage == "bipolaire": 
+            raw_p = preprocess_raw_bip(raw)
+        else:
+            raw_p = preprocess_raw_A1(raw)
 
         try:
             raw_ica, _ = run_ica(raw_p)
@@ -65,7 +97,7 @@ def process_file(edf_path, out_ica_dir, new_name):
 # 4. MAIN AUTOMATIQUE
 if __name__ == "__main__":
     root_raw = pathlib.Path(r"C:\\Users\\Dessalines\\Desktop\\EEG\\raw")
-    out_ica_dir = pathlib.Path(r"D:/EEG/preprocessed_ica")
+    out_ica_dir = pathlib.Path(r"D:/EEG/preprocessed_ica/full")
 
     edf_paths = list(root_raw.rglob("*.edf"))
     print(f"{len(edf_paths)} fichiers .edf trouvés.")
@@ -74,6 +106,7 @@ if __name__ == "__main__":
         parent_name = path.parent.name
         basename = path.stem.replace(" ", "").replace("-", "").upper()
         new_name = f"{parent_name}_{basename}_{i:03d}.fif"
+        montage = "bipolaire"
 
         print(f"\nTraitement de {path.name} -> sauvegarde sous {new_name}")
 
@@ -86,6 +119,7 @@ if __name__ == "__main__":
         res = process_file(
             edf_path=path,
             out_ica_dir=out_ica_dir,
-            new_name=new_name
+            new_name=new_name, 
+            montage=montage
         )
         print(res)

@@ -10,7 +10,7 @@ st.set_page_config(page_title="Visualisation EEG", layout="wide")
 st.title("Visualisation des signaux EEG")
 
 # Dossier ICA / RPF
-base_dir = "D:/EEG/preprocessed_ica" 
+base_dir = r"D:\\EEG\\preprocessed\\monopolaire\\full" 
 fif_dir = st.sidebar.text_input("Dossier des fichiers .fif", base_dir)
 
 if not os.path.isdir(fif_dir):

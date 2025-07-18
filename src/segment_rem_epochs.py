@@ -12,7 +12,7 @@ def detect_rem_type(epoch, eog_ch_name):
     selon l'activité EOG.
     """
     eog_data = epoch.copy().pick_channels([eog_ch_name]).get_data()[0, 0]
-    peak_thresh_phasic = 25e-6  # 25 µV en V
+    peak_thresh_phasic = 25e-6  # 25 µV en V à revérifier ==> Ask Célia 
     peak_thresh_tonic = 100e-6 # 100 µV en V
 
     # détection de pics simples (abs > seuil)
@@ -35,11 +35,11 @@ def epoch_and_label_rem_segments(rem_dir, save_dir, eog_ch_name="EOG"):
             print(f"{base} : Canal EOG non trouvé.")
             continue
 
-        # découpage en époques de 4s
-        epochs = mne.make_fixed_length_epochs(raw, duration=4.0, preload=True)
+        # découpage en époques de 3s
+        epochs = mne.make_fixed_length_epochs(raw, duration=3.0, preload=True)
 
         # classification tonique/phasique/indéterminé
-        labels = [detect_rem_type(epoch, eog_ch_name) for epoch in epochs]
+        labels = [detect_rem_type(epoch, eog_ch_name) for epoch in epochs] # A vérifier ==> Ask Célia
 
         # assignation dans metadata
         epochs.metadata = pd.DataFrame({"rem_type": labels})

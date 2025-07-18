@@ -15,7 +15,7 @@ def load_annotation_file(txt_path):
 def get_rem_annotations(base_name, annot_dir):
     """
     Cherche automatiquement un fichier .txt d'annotations basé sur le dossier du code patient.
-    Ex: base_name = AN166_240425CA → cherche un .txt dans D:/EEG/raw/AN166/
+    Ex: base_name = AN166_240425CA -> cherche un .txt dans D:/EEG/raw/AN166/
     """
     patient_code = base_name.split("_")[0]
     txt_dir = Path(annot_dir) / patient_code
