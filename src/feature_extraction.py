@@ -4,9 +4,12 @@ import os
 import numpy as np
 import mne
 import pywt
+from pathlib import Path
+import platform
 from scipy.stats import skew
 from scipy.signal import welch
-from filters import filter_all_bands  
+from filters import filter_all_bands
+from mne.preprocessing import ICA
 
 def extract_band_features(raw_band, band_name):
     data, _ = raw_band.get_data(return_times=True)
@@ -24,13 +27,21 @@ def extract_band_features(raw_band, band_name):
     _, psd = welch(data, sfreq, axis=1)
     features[f'{band_name}_psd_mean'] = np.mean(psd, axis=1)
 
-    # Ondelettes
+    # Wavelet
     wavelet_stats = []
     for ch in data:
         coeffs = pywt.wavedec(ch, 'db4', level=4)
         ch_stats = [np.mean(c) for c in coeffs] + [np.std(c) for c in coeffs]
         wavelet_stats.append(ch_stats)
     features[f'{band_name}_wavelet'] = np.array(wavelet_stats)
+
+    # PCA
+    pca_var = extract_pca_features(data)
+    features[f'{band_name}_pca_var'] = pca_var
+
+    # ICA
+    ica_energy = extract_ica_features_infomax(raw_band)
+    features[f'{band_name}_ica_infomax_energy'] = ica_energy
 
     return features
 
@@ -42,25 +53,72 @@ def extract_all_band_features(raw):
         all_features.update(band_features)
     return all_features
 
+def extract_pca_features(data, n_components=5):
+    """
+    Applique PCA et retourne la variance expliquée des premières composantes.
+    """
+    pca = PCA(n_components=n_components)
+    pca.fit(data.T)  # shape = (time, channels)
+    return pca.explained_variance_ratio_
+
+def extract_ica_features_infomax(raw_band, n_components=5):
+    """
+    Applique ICA et retourne l'énergie moyenne des sources indépendantes.
+    """
+    try:
+        ica = ICA(n_components=n_components, method='infomax', random_state=42, max_iter='auto')
+        ica.fit(raw_band)
+
+        sources = ica.get_sources(raw_band).get_data()
+        energies = np.mean(sources**2, axis=1)
+        return energies
+    except Exception as e:
+        print(f" ICA Infomax failed: {e}")
+        return np.zeros(n_components)
+
 def load_and_extract(fif_file):
     raw = mne.io.read_raw_fif(fif_file, preload=True)
     return extract_all_band_features(raw)
 
 def batch_process(input_dir, output_dir):
     os.makedirs(output_dir, exist_ok=True)
-    for file in os.listdir(input_dir):
-        if file.endswith('.fif'):
-            print(f"Processing {file}...")
-            features = load_and_extract(os.path.join(input_dir, file))
-            save_path = os.path.join(output_dir, file.replace('.fif', '_features.npz'))
-            np.savez_compressed(save_path, **features)
-            print(f"Saved: {save_path}")
+    input_dir = Path(input_dir)
+
+    for fif_file in input_dir.rglob("*.fif"):
+        if not fif_file.name.endswith(".fif") or fif_file.name.startswith("._"):
+            continue
+
+        print(f"Processing {fif_file}...")
+        features = load_and_extract(fif_file)
+
+        # Création d’un sous-dossier dans results/ avec le nom du sujet
+        subject = fif_file.parent.name
+        save_subdir = Path(output_dir) / subject
+        save_subdir.mkdir(parents=True, exist_ok=True)
+
+        save_path = save_subdir / fif_file.name.replace(".fif", "_features.npz")
+        np.savez_compressed(save_path, **features)
+        print(f"Saved: {save_path}")
 
 if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input_dir", type=str, required=True)
-    parser.add_argument("--output_dir", type=str, required=True)
-    args = parser.parse_args()
+    # On demande à l'utilisateur si le montage est bipolaire
+    response = input("Le montage est-il bipolaire ? (y/n) : ").strip().lower()
+    if response not in {"y", "n"}:
+        print("Réponse invalide. Veuillez entrer 'y' pour oui ou 'n' pour non.")
+        sys.exit(1)
 
-    batch_process(args.input_dir, args.output_dir)
+    montage = "bipolaire" if response == "y" else "monopolaire"
+    print(f"montage défini={montage}")
+
+    # Adaptation système
+    system = platform.system()
+    if system == "Darwin":  # macOS
+        disque = "/Volumes/Crucial X6"
+    elif system == "Windows":
+        disque = "D:"
+    else:
+        raise RuntimeError("Système non supporté.")
+
+    input_dir = Path(f"{disque}/EEG/preprocessed/{montage}/rem_only")
+    output_dir = f"features/{montage}/rem_only"
+    batch_process(input_dir, output_dir)
