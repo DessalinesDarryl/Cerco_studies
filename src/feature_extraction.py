@@ -1,54 +1,66 @@
-"""
-EEG/EMG/ECG features
-"""
-import mne
+# src/feature_extraction.py
+
+import os
 import numpy as np
-import pandas as pd
-from utils import get_standard_bands, filter_band
+import mne
+import pywt
+from scipy.stats import skew
+from scipy.signal import welch
+from filters import filter_all_bands  
 
-def compute_band_power(raw):
-    """
-    Calcule la puissance moyenne dans chaque bande EEG standard pour chaque canal.
+def extract_band_features(raw_band, band_name):
+    data, _ = raw_band.get_data(return_times=True)
+    sfreq = raw_band.info['sfreq']
+    features = {}
 
-    Args:
-        raw (mne.io.Raw): Signal EEG brut (idéalement segmenté en phase REM).
+    # Caractéristiques statistiques
+    features[f'{band_name}_mean'] = np.mean(data, axis=1)
+    features[f'{band_name}_var'] = np.var(data, axis=1)
+    features[f'{band_name}_std'] = np.std(data, axis=1)
+    features[f'{band_name}_skew'] = skew(data, axis=1)
+    features[f'{band_name}_power'] = np.mean(data**2, axis=1)
 
-    Returns:
-        dict: {"bande": moyenne de puissance sur tous les canaux}
-    """
-    powers = {}
-    bands = get_standard_bands()
+    # PSD moyenne via Welch
+    _, psd = welch(data, sfreq, axis=1)
+    features[f'{band_name}_psd_mean'] = np.mean(psd, axis=1)
 
-    for name, (l_freq, h_freq) in bands.items():
-        raw_filt = filter_band(raw, l_freq, h_freq)
-        data, _ = raw_filt.get_data(return_times=True)
-        power = np.mean(data ** 2)  # Puissance moyenne
-        powers[name] = power # Attention puissance pour trigger EEG energy changes upon state changes, such as sleep stage changes, seizures, and emotional changes.
+    # Ondelettes
+    wavelet_stats = []
+    for ch in data:
+        coeffs = pywt.wavedec(ch, 'db4', level=4)
+        ch_stats = [np.mean(c) for c in coeffs] + [np.std(c) for c in coeffs]
+        wavelet_stats.append(ch_stats)
+    features[f'{band_name}_wavelet'] = np.array(wavelet_stats)
 
-    return powers
+    return features
 
-def extract_features_from_directory(rem_dir):
-    """
-    Extrait les puissances par bande pour chaque fichier .fif dans un dossier.
+def extract_all_band_features(raw):
+    band_raws = filter_all_bands(raw)
+    all_features = {}
+    for band_name, raw_band in band_raws.items():
+        band_features = extract_band_features(raw_band, band_name.replace(" ", "_"))
+        all_features.update(band_features)
+    return all_features
 
-    Args:
-        rem_dir (str): Dossier contenant les fichiers *_REM_raw.fif
+def load_and_extract(fif_file):
+    raw = mne.io.read_raw_fif(fif_file, preload=True)
+    return extract_all_band_features(raw)
 
-    Returns:
-        pd.DataFrame: Une ligne par fichier, une colonne par bande
-    """
-    import os
-    import glob
+def batch_process(input_dir, output_dir):
+    os.makedirs(output_dir, exist_ok=True)
+    for file in os.listdir(input_dir):
+        if file.endswith('.fif'):
+            print(f"Processing {file}...")
+            features = load_and_extract(os.path.join(input_dir, file))
+            save_path = os.path.join(output_dir, file.replace('.fif', '_features.npz'))
+            np.savez_compressed(save_path, **features)
+            print(f"Saved: {save_path}")
 
-    results = []
-    files = glob.glob(os.path.join(rem_dir, "*_REM_raw.fif"))
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_dir", type=str, required=True)
+    parser.add_argument("--output_dir", type=str, required=True)
+    args = parser.parse_args()
 
-    for fpath in files:
-        raw = mne.io.read_raw_fif(fpath, preload=True)
-        raw.pick_types(eeg=True)
-
-        features = compute_band_power(raw)
-        features["patient"] = os.path.basename(fpath).replace("_REM_raw.fif", "")
-        results.append(features)
-
-    return pd.DataFrame(results)
+    batch_process(args.input_dir, args.output_dir)
