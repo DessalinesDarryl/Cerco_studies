@@ -1,5 +1,7 @@
 import os
-import pathlib
+import sys
+from pathlib import Path
+import platform
 import mne
 import numpy as np
 from mne.preprocessing import ICA
@@ -36,7 +38,12 @@ def preprocess_raw_bip(raw, l_freq=0.3, h_freq=100, notch=50):
     for new_name, (anode, cathode) in bipolar_pairs.items():
         if anode in raw_f.ch_names and cathode in raw_f.ch_names:
             raw_f = mne.set_bipolar_reference(
-                raw_f, anode=anode, cathode=cathode, ch_name=new_name, drop_refs=False, copy=False
+                raw_f,
+                anode=anode,
+                cathode=cathode,
+                ch_name=new_name,
+                drop_refs=True,
+                copy=False
             )
         else:
             print(f"Canaux manquants pour {new_name}: {anode}, {cathode}")
@@ -74,6 +81,16 @@ def run_ica(raw, method="picard", n_comp=0.999, random_state=42, tstep=30.0, res
 def process_file(edf_path, out_ica_dir, new_name, montage):
     try:
         raw = mne.io.read_raw_edf(edf_path, preload=True, verbose="ERROR")
+
+        # Renommer les canaux commençant par "EGG" en supprimant le préfixe
+        print(f"Liste des canaux actuels:{raw.ch_names}")
+        rename_dict = {
+            ch: ch.replace("EEG ", "", 1) for ch in raw.ch_names if ch.startswith("EEG ")
+        }
+        if rename_dict:
+            raw.rename_channels(rename_dict)
+            print(f"Liste des canaux à jour : {raw.ch_names}")
+
         if montage == "bipolaire": 
             raw_p = preprocess_raw_bip(raw)
         else:
@@ -96,27 +113,38 @@ def process_file(edf_path, out_ica_dir, new_name, montage):
 
 # 4. MAIN AUTOMATIQUE
 if __name__ == "__main__":
-    root_raw = pathlib.Path(r"C:\\Users\\Dessalines\\Desktop\\EEG\\raw")
-    out_ica_dir = pathlib.Path(r"D:\\EEG\\preprocessed\\monopolaire\\full")
+    # On demande à l'utilisateur si le montage est bipolaire
+    response = input("Le montage est-il bipolaire ? (y/n) : ").strip().lower()
+    if response not in {"y", "n"}:
+        print("Réponse invalide. Veuillez entrer 'y' pour oui ou 'n' pour non.")
+        sys.exit(1)
+
+    montage = "bipolaire" if response == "y" else "monopolaire"
+    print(f"montage défini={montage}")
+
+    # Adaptation système
+    system = platform.system()
+    if system == "Darwin":  # macOS
+        disque = "/Volumes/Crucial X6"
+    elif system == "Windows":
+        disque = "D:"
+    else:
+        raise RuntimeError("Système non supporté.")
+
+    root_raw = Path(f"{disque}/EEG/raw")
+    out_base = Path(f"{disque}/EEG/preprocessed")
+    out_ica_dir = out_base / montage / "full"
 
     edf_paths = list(root_raw.rglob("*.edf"))
     print(f"{len(edf_paths)} fichiers .edf trouvés.")
 
     for i, path in enumerate(edf_paths):
-        montage = "bipolaire"
         parent_name = path.parent.name
-        basename = path.stem.replace(" ", "").replace("-", "").upper()
-        if montage=="bipolaire":
-            out_ica_dir = pathlib.Path(r"D:\\EEG\\preprocessed\\bipolaire\\full")
-            new_name = f"{parent_name}_preprocessed_bip.fif"
-        else:
-            new_name = f"{parent_name}_preprocessed_monop.fif"
+        suffix = "bip" if montage == "bipolaire" else "monop"
+        new_name = f"{parent_name}_preprocessed_{suffix}.fif"
 
         print(f"\nTraitement de {path.name} -> sauvegarde sous {new_name}")
-
-        # Chemin cible déjà traité ?
         out_fif = out_ica_dir / new_name
-        print(out_fif)
         if out_fif.exists():
             print(f"{new_name} déjà traité, ignoré.")
             continue
@@ -124,7 +152,7 @@ if __name__ == "__main__":
         res = process_file(
             edf_path=path,
             out_ica_dir=out_ica_dir,
-            new_name=new_name, 
+            new_name=new_name,
             montage=montage
         )
         print(res)
