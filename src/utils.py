@@ -1,3 +1,5 @@
+# src/utils.py
+
 import os
 
 def list_fif_files(directory):
@@ -15,7 +17,7 @@ def list_fif_files(directory):
         for f in filenames:
             if f.endswith('.fif'):
                 full_path = os.path.join(dirpath, f)
-                fif_files.append(os.path.relpath(full_path, directory))  # chemin relatif
+                fif_files.append(os.path.relpath(full_path, directory))  
     return fif_files
 
 

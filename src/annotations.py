@@ -5,6 +5,27 @@ import mne
 from pathlib import Path
 
 def load_annotation_file(txt_path):
+    """
+    Charge un fichier d’annotations de sommeil au format .txt et extrait les périodes de sommeil REM.
+
+    Le fichier doit être tabulé avec au moins les colonnes suivantes :
+    - "start" : temps de début (en secondes),
+    - "stage" : stade de sommeil (ex. : REM, N2, etc.).
+
+    La durée de chaque période est calculée comme la différence entre deux onsets successifs.
+
+    Paramètres
+    ----------
+    txt_path : str ou Path
+        Chemin vers le fichier d’annotations .txt.
+
+    Retour
+    ------
+    numpy.ndarray
+        Tableau 2D de forme (n, 2) contenant les segments REM,
+        où chaque ligne est (start, duration) en secondes.
+    """
+
     df = pd.read_csv(txt_path, sep="\t", names=["start", "temps", "stage", "index"])
     df = df.dropna(subset=["start", "stage"])
     df["duration"] = df["start"].shift(-1) - df["start"]

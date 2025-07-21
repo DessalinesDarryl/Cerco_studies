@@ -1,3 +1,5 @@
+# src/segment_rem.py
+
 import os
 import mne
 import platform
@@ -6,6 +8,33 @@ from annotations import get_rem_annotations
 
 
 def extract_rem_segments(fif_path, annot_dir, output_root):
+    """
+    Extrait et sauvegarde les segments de sommeil REM à partir d’un enregistrement EEG au format FIF,
+    en utilisant un fichier d’annotations `.txt` correspondant (=hypnogramme).
+
+    Paramètres
+    ----------
+    fif_path : str ou Path
+        Chemin vers le fichier EEG prétraité au format `.fif`.
+
+    annot_dir : str ou Path
+        Répertoire contenant les fichiers d’annotations REM au format `.txt`. Le fichier doit
+        correspondre au début du nom du fichier `.fif` (ex. `AN123` dans `AN123_preprocessed.fif`).
+
+    output_root : str ou Path
+        Répertoire racine dans lequel seront sauvegardés les segments REM extraits. 
+        Un sous-dossier sera créé automatiquement pour chaque sujet.
+
+    Comportement
+    ------------
+    - Charge le fichier `.fif` contenant les données EEG prétraitées.
+    - Localise le fichier d’annotations REM correspondant dans `annot_dir`.
+    - Pour chaque segment REM détecté, extrait la portion du signal correspondante et la sauvegarde
+      dans un nouveau fichier `.fif` nommé `{base_name}_REM_{i}.fif`.
+    - Ignore les segments déjà extraits (présents dans le dossier de sortie).
+    - Affiche des messages de progression et gère les erreurs éventuelles.
+
+    """
     base_name = Path(fif_path).stem.split('_')[0]
     output_dir = Path(output_root) / base_name
     output_dir.mkdir(parents=True, exist_ok=True)
