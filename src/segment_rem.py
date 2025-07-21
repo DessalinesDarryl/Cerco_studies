@@ -68,6 +68,16 @@ def extract_rem_segments(fif_path, annot_dir, output_root):
             print(f"Erreur pour le segment {i}: {e}")
 
 if __name__ == "__main__":
+    # On demande à l'utilisateur si le montage est bipolaire
+    response = input("Le montage est-il bipolaire ? (y/n) : ").strip().lower()
+    if response not in {"y", "n"}:
+        print("Réponse invalide. Veuillez entrer 'y' pour oui ou 'n' pour non.")
+        sys.exit(1)
+
+    montage = "bipolaire" if response == "y" else "monopolaire"
+    suffix = "bip" if response == "y" else "monop"
+    print(f"montage défini={montage}")
+
     # Détection automatique du système
     system = platform.system()
     if system == "Darwin":  # MacOS
@@ -78,10 +88,12 @@ if __name__ == "__main__":
         raise RuntimeError("Système non supporté.")
 
     # Chemins correctement interpolés
-    fif_dir = Path(f"{disque}/EEG/preprocessed/monopolaire/full")
+    fif_dir = Path(f"{disque}/EEG/preprocessed/{montage}/full")
     annot_dir = Path(f"{disque}/EEG/raw")
-    output_root = Path(f"{disque}/EEG/preprocessed/monopolaire/rem_only")
+    output_root = Path(f"{disque}/EEG/preprocessed/{montage}/rem_only")
 
     # Boucle sur tous les fichiers .fif
-    for fif_file in fif_dir.glob("*_preprocessed_monop.fif"):
+    for fif_file in fif_dir.glob(f"*_preprocessed_{suffix}.fif"):
+        if not fif_file.name.endswith(".fif") or fif_file.name.startswith("._"): #ignore les fichiers fantômes et autres que .fif
+            continue
         extract_rem_segments(fif_file, annot_dir, output_root)
