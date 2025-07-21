@@ -10,9 +10,14 @@ def list_fif_files(directory):
     Returns:
         list: Liste triée des fichiers .fif
     """
-    if not os.path.isdir(directory):
-        return []
-    return sorted([f for f in os.listdir(directory) if f.endswith(".fif")])
+    fif_files = []
+    for dirpath, _, filenames in os.walk(directory):
+        for f in filenames:
+            if f.endswith('.fif'):
+                full_path = os.path.join(dirpath, f)
+                fif_files.append(os.path.relpath(full_path, directory))  # chemin relatif
+    return fif_files
+
 
 def get_base_name(file_path, suffix="_eeg_cleaned_raw.fif"):
     """

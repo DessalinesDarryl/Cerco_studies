@@ -1,5 +1,6 @@
 import os
 import mne
+import platform
 from pathlib import Path
 from annotations import get_rem_annotations
 
@@ -38,10 +39,19 @@ def extract_rem_segments(fif_path, annot_dir, output_root):
             print(f"Erreur pour le segment {i}: {e}")
 
 if __name__ == "__main__":
-    # Dossiers fixés selon ton organisation
-    fif_dir = Path("D:/EEG/preprocessed/monopolaire/full")
-    annot_dir = Path("D:/EEG/raw")
-    output_root = Path("D:/EEG/preprocessed/monopolaire/rem_only")
+    # Détection automatique du système
+    system = platform.system()
+    if system == "Darwin":  # MacOS
+        disque = "/Volumes/Crucial X6"
+    elif system == "Windows":
+        disque = "D:"
+    else:
+        raise RuntimeError("Système non supporté.")
+
+    # Chemins correctement interpolés
+    fif_dir = Path(f"{disque}/EEG/preprocessed/monopolaire/full")
+    annot_dir = Path(f"{disque}/EEG/raw")
+    output_root = Path(f"{disque}/EEG/preprocessed/monopolaire/rem_only")
 
     # Boucle sur tous les fichiers .fif
     for fif_file in fif_dir.glob("*_preprocessed_monop.fif"):

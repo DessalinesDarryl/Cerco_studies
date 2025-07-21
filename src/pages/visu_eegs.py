@@ -2,6 +2,8 @@ import streamlit as st
 import mne
 import os
 import matplotlib.pyplot as plt
+import platform
+from pathlib import Path
 from filters import get_standard_bands, filter_band
 from annotations import get_rem_annotations
 from utils import list_fif_files, get_base_name
@@ -10,7 +12,16 @@ st.set_page_config(page_title="Visualisation EEG", layout="wide")
 st.title("Visualisation des signaux EEG")
 
 # Dossier ICA / RPF
-base_dir = r"D:\\EEG\\preprocessed\\monopolaire\\full" 
+    # Détection automatique du système
+system = platform.system()
+if system == "Darwin":  # MacOS
+    disque = "/Volumes/Crucial X6"
+elif system == "Windows":
+    disque = "D:"
+else:
+    raise RuntimeError("Système non supporté.")
+
+base_dir = Path(f"{disque}/EEG/preprocessed/monopolaire/full") 
 fif_dir = st.sidebar.text_input("Dossier des fichiers .fif", base_dir)
 
 if not os.path.isdir(fif_dir):
@@ -53,7 +64,7 @@ if band_name != "Aucune":
 
 # Annotations REM
 if st.checkbox("Afficher les périodes REM sur le signal"):
-    annot_root = st.sidebar.text_input("Dossier des annotations (.txt)", "D:/EEG/raw")
+    annot_root = st.sidebar.text_input("Dossier des annotations (.txt)", f"{disque}/EEG/raw")
     rem_annotations = get_rem_annotations(base_name, annot_root)
 
     if rem_annotations:
@@ -63,7 +74,7 @@ if st.checkbox("Afficher les périodes REM sur le signal"):
         st.warning("Aucune période REM trouvée pour ce patient.")
 
 # Échelle amplitude µV
-amplitude = st.number_input("Amplitude (µV)", min_value=1.0, max_value=500000.0, value=25.0, step=1.0)
+amplitude = st.number_input("Amplitude (µV)", min_value=1.0, max_value=50000000.0, value=25.0, step=1.0)
 
 
 # Plage d’affichage
@@ -75,10 +86,12 @@ plt.close('all')
 fig = raw_display.plot(
     start=start_time,
     duration=duration,
-    scalings = dict(eeg=amplitude * 1e-6),
+    scalings=dict(eeg=amplitude * 1e-6),
     remove_dc=True,
     show=False
-)
+    )
+
 st.pyplot(fig=fig, clear_figure=True)
 
 st.success("Affichage terminé.")
+
