@@ -113,3 +113,4 @@ if __name__ == "__main__":
     joblib.dump(model, f"models/{args.model}_model.joblib")
     joblib.dump(le, f"models/{args.model}_label_encoder.joblib")
     print(f"[OK] Modèle et encoder sauvegardés dans 'models/'")
+
