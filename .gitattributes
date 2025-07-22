@@ -6,3 +6,4 @@ data/MG16.edf filter=lfs diff=lfs merge=lfs -text
 data/MA27.edf filter=lfs diff=lfs merge=lfs -text
 data/CS147_240301e-a.edf filter=lfs diff=lfs merge=lfs -text
 data/MN143_240115E-A.edf filter=lfs diff=lfs merge=lfs -text
+data/dataset_features_labels.csv filter=lfs diff=lfs merge=lfs -text
