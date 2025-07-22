@@ -3,4 +3,5 @@
 *.edf
 *.txt
 *.fif
-data/dataset_features_labels.csv
+data/features_monopolaire.csv
+data/features_bipolaire.csv
