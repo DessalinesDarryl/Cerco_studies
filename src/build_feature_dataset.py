@@ -23,18 +23,16 @@ def flatten_npz_dict(d):
     return flat
 
 def main():
-    # On demande à l'utilisateur si le montage est bipolaire
+    # Demande du montage
     response = input("Le montage est-il bipolaire ? (y/n) : ").strip().lower()
     if response not in {"y", "n"}:
-        print("Réponse invalide. Veuillez entrer 'y' pour oui ou 'n' pour non.")
+        print("Réponse invalide. Veuillez entrer 'y' ou 'n'.")
         sys.exit(1)
-
     montage = "bipolaire" if response == "y" else "monopolaire"
-    print(f"montage défini={montage}")
 
-    # Adaptation système
+    # Détection du système
     system = platform.system()
-    if system == "Darwin":  # macOS
+    if system == "Darwin":
         disque = "/Volumes/Crucial X6"
     elif system == "Windows":
         disque = "D:"
@@ -42,45 +40,67 @@ def main():
         raise RuntimeError("Système non supporté.")
 
     excel_path = "data/Tableau_synthese_patients.xlsx"
-    if not Path(excel_path).exists():
-        raise FileNotFoundError(f" Le fichier Excel est introuvable : {excel_path}")
+    features_root = Path(f"features/{montage}/rem_only")
+    output_features = f"data/features_{montage}.csv"
+    output_info = "data/patient_info.csv"
 
-    features_root = Path(f"features/{montage}/rem_only")  
-    output_csv = "data/dataset_features_labels.csv"
-
-    # 1. Chargement des groupes + métadonnées 
-    print("Chargement des données...")
+    # 1. Charger les métadonnées
+    print("[INFO] Chargement des métadonnées...")
     df_excel, group_map, demographics_map = load_patient_groups(excel_path, sheet_index=0)
 
-    # 2. Fusion labels + infos démographiques
-    print("Fusion des labels et des données demographiques avec les features...")
     full_info_map = {}
     for patient_id in group_map:
-        full_info_map[patient_id] = {'label': group_map[patient_id]}
-        if patient_id in demographics_map:
-            full_info_map[patient_id].update(demographics_map[patient_id])
+        label = group_map.get(patient_id)
+        demo = demographics_map.get(patient_id)
+        if label is not None and demo is not None:
+            full_info_map[patient_id] = {
+                "label": label,
+                "age": demo.get("age", np.nan),
+                "genre": demo.get("genre", np.nan)
+            }
 
+    # 2. Construction des features
     rows = []
+    info_rows = {}
     for npz_file in features_root.rglob("*.npz"):
-        subject = npz_file.parent.name  # Nom du dossier patient
-        data = dict(np.load(npz_file))
-        flat = flatten_npz_dict(data)
-        flat["subject"] = subject
-        flat["segment"] = npz_file.name.replace("_features.npz", "")
-
-        if subject in full_info_map:
-            flat.update(full_info_map[subject])
-        else:
-            print(f"Sujet {subject} introuvable dans le fichier Excel. Segment ignoré.")
+        subject = npz_file.parent.name
+        if subject not in full_info_map:
+            print(f"[WARNING] Sujet {subject} absent du fichier Excel. Ignoré.")
             continue
 
+        data = dict(np.load(npz_file))
+        flat = flatten_npz_dict(data)
+        flat["id_patient"] = subject
+        flat["segment"] = npz_file.name.replace("_features.npz", "")
         rows.append(flat)
 
-    # 3. DataFrame final 
-    print("Sauvegarde...")
-    df = pd.DataFrame(rows)
-    df.to_csv(output_csv, index=False)
-    print(f"Fichier CSV généré : {output_csv} ({df.shape[0]} lignes, {df.shape[1]} colonnes)")
+        if subject not in info_rows:
+            info = {"id_patient": subject}
+            info.update(full_info_map[subject])
+            info_rows[subject] = info
+
+    df_features = pd.DataFrame(rows)
+    df_info = pd.DataFrame(info_rows.values())
+
+    # 3. Jointure finale
+    print("[INFO] Fusion features + info pour reconstituer le dataset final...")
+    df_final = pd.merge(df_features, df_info, on="id_patient", how="left")
+
+    # Vérification des colonnes
+    if df_final[["label", "age", "genre"]].isnull().any().any():
+        print("[WARNING] Des colonnes label/age/genre contiennent des NaNs après fusion.")
+
+    # Réorganisation des colonnes
+    feature_cols = [col for col in df_final.columns if col not in {"id_patient", "label", "age", "genre"}]
+    ordered_cols = ["id_patient", "label", "age", "genre"] + feature_cols
+    df_final = df_final[ordered_cols]
+
+    # 4. Sauvegarde
+    df_final.to_csv(output_features, index=False)
+    df_info.to_csv(output_info, index=False)
+
+    print(f"[OK] Fichier final : {output_features} ({df_final.shape[0]} lignes)")
+    print(f"[OK] Infos patient (unique) : {output_info} ({df_info.shape[0]} patients)")
 
 if __name__ == "__main__":
     main()
