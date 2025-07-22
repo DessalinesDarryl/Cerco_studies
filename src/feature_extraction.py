@@ -10,6 +10,8 @@ from scipy.stats import skew
 from scipy.signal import welch
 from filters import filter_all_bands
 from mne.preprocessing import ICA
+from sklearn.decomposition import PCA
+
 
 def extract_band_features(raw_band, band_name):
     data, _ = raw_band.get_data(return_times=True)
