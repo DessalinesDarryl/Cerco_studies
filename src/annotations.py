@@ -2,6 +2,7 @@
 import os
 import pandas as pd
 import mne
+import numpy as np
 from pathlib import Path
 
 def load_annotation_file(txt_path):
@@ -54,3 +55,38 @@ def get_rem_annotations(base_name, annot_dir):
         except Exception:
             continue
     return None
+
+
+def load_all_annotations_from_file(txt_path, stage_map=None):
+    """
+    Charge les étiquettes de stades de sommeil à partir d'un fichier texte tabulé.
+
+    Paramètres
+    ----------
+    txt_path : str
+        Chemin vers le fichier contenant les étiquettes (une ligne par époque de 30s).
+    stage_map : dict ou None
+        Dictionnaire de mappage (ex: {"W": 0, "N1": 1, "N2": 2, "N3": 3, "REM": 4}).
+
+    Retour
+    ------
+    y_true : np.ndarray
+        Tableau d'entiers représentant les stades de sommeil, un par époque.
+    """
+    labels = []
+
+    with open(txt_path, "r") as f:
+        for line in f:
+            parts = line.strip().split("\t")
+            if len(parts) >= 3:
+                label_raw = parts[2].strip().upper()
+                if stage_map:
+                    if label_raw not in stage_map:
+                        raise ValueError(f"Étiquette inconnue dans le fichier : '{label_raw}'")
+                    label = stage_map[label_raw]
+                else:
+                    label = label_raw
+                labels.append(label)
+
+    return np.array(labels, dtype=int if stage_map else str)
+

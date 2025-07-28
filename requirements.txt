@@ -10,3 +10,4 @@ numpy==2.2
 python-picard
 PyWavelets
 xgboost
+torch
