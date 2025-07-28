@@ -38,7 +38,7 @@ MA27,MA27_REM_48,tcspi,3,3,3,True,tcspi,tcspi
 TO145,TO145_REM_80,tcspi,3,3,3,True,tcspi,tcspi
 SB178,SB178_REM_37,autoimmune encephalitides,0,0,0,True,autoimmune encephalitides,autoimmune encephalitides
 JB173,JB173_REM_220,autoimmune encephalitides,0,0,0,True,autoimmune encephalitides,autoimmune encephalitides
-RJP148,RJP148_REM_107,synucleopathy,2,3,2,False,tcspi,synucleopathy
+RJP148,RJP148_REM_107,synucleopathy,2,2,2,True,synucleopathy,synucleopathy
 CB165,CB165_REM_91,tcspi,3,3,3,True,tcspi,tcspi
 TJ127,TJ127_REM_5,autoimmune encephalitides,0,0,0,True,autoimmune encephalitides,autoimmune encephalitides
 DA110,DA110_REM_90,tcspi,3,3,3,True,tcspi,tcspi
@@ -514,12 +514,12 @@ SB176,SB176_REM_102,tcspi,3,3,3,True,tcspi,tcspi
 CA169,CA169_REM_108,tcspi,3,3,3,True,tcspi,tcspi
 TLM168,TLM168_REM_123,narcolepsy,1,1,1,True,narcolepsy,narcolepsy
 SB176,SB176_REM_208,tcspi,3,3,3,True,tcspi,tcspi
-MFJ160,MFJ160_REM_51,autoimmune encephalitides,0,3,0,False,tcspi,autoimmune encephalitides
+MFJ160,MFJ160_REM_51,autoimmune encephalitides,0,0,0,True,autoimmune encephalitides,autoimmune encephalitides
 MM109,MM109_REM_103,tcspi,3,3,3,True,tcspi,tcspi
 DSJ112,DSJ112_REM_129,tcspi,3,3,3,True,tcspi,tcspi
 MHTK39,MHTK39_REM_91,narcolepsy,1,1,1,True,narcolepsy,narcolepsy
 ML135,ML135_REM_134,synucleopathy,2,2,2,True,synucleopathy,synucleopathy
-TO145,TO145_REM_98,tcspi,3,2,3,False,synucleopathy,tcspi
+TO145,TO145_REM_98,tcspi,3,3,3,True,tcspi,tcspi
 AE129,AE129_REM_256,narcolepsy,1,1,1,True,narcolepsy,narcolepsy
 KH113,KH113_REM_94,autoimmune encephalitides,0,0,0,True,autoimmune encephalitides,autoimmune encephalitides
 MFJ160,MFJ160_REM_28,autoimmune encephalitides,0,0,0,True,autoimmune encephalitides,autoimmune encephalitides
@@ -538,7 +538,7 @@ PA139,PA139_REM_23,synucleopathy,2,2,2,True,synucleopathy,synucleopathy
 LS162,LS162_REM_77,tcspi,3,3,3,True,tcspi,tcspi
 TO145,TO145_REM_82,tcspi,3,3,3,True,tcspi,tcspi
 RB103,RB103_REM_25,narcolepsy,1,1,1,True,narcolepsy,narcolepsy
-BF181,BF181_REM_159,synucleopathy,2,3,2,False,tcspi,synucleopathy
+BF181,BF181_REM_159,synucleopathy,2,2,2,True,synucleopathy,synucleopathy
 SJP172,SJP172_REM_39,synucleopathy,2,2,2,True,synucleopathy,synucleopathy
 CB165,CB165_REM_141,tcspi,3,3,3,True,tcspi,tcspi
 JLJ177,JLJ177_REM_113,tcspi,3,3,3,True,tcspi,tcspi
@@ -1178,7 +1178,7 @@ CA169,CA169_REM_132,tcspi,3,3,3,True,tcspi,tcspi
 LS162,LS162_REM_197,tcspi,3,3,3,True,tcspi,tcspi
 CS131,CS131_REM_23,tcspi,3,3,3,True,tcspi,tcspi
 BJ138,BJ138_REM_17,tcspi,3,3,3,True,tcspi,tcspi
-ML135,ML135_REM_95,synucleopathy,2,3,2,False,tcspi,synucleopathy
+ML135,ML135_REM_95,synucleopathy,2,2,2,True,synucleopathy,synucleopathy
 IS179,IS179_REM_178,tcspi,3,3,3,True,tcspi,tcspi
 LS162,LS162_REM_275,tcspi,3,3,3,True,tcspi,tcspi
 TM142,TM142_REM_115,synucleopathy,2,2,2,True,synucleopathy,synucleopathy
@@ -1236,7 +1236,7 @@ MM109,MM109_REM_18,tcspi,3,3,3,True,tcspi,tcspi
 SJP172,SJP172_REM_116,synucleopathy,2,2,2,True,synucleopathy,synucleopathy
 NGA157,NGA157_REM_174,synucleopathy,2,2,2,True,synucleopathy,synucleopathy
 MA27,MA27_REM_37,tcspi,3,3,3,True,tcspi,tcspi
-VJ149,VJ149_REM_23,tcspi,3,2,3,False,synucleopathy,tcspi
+VJ149,VJ149_REM_23,tcspi,3,3,3,True,tcspi,tcspi
 RB103,RB103_REM_83,narcolepsy,1,1,1,True,narcolepsy,narcolepsy
 BO60,BO60_REM_2,synucleopathy,2,3,2,False,tcspi,synucleopathy
 NGA157,NGA157_REM_177,synucleopathy,2,2,2,True,synucleopathy,synucleopathy
@@ -1355,7 +1355,7 @@ PJC140,PJC140_REM_27,tcspi,3,3,3,True,tcspi,tcspi
 CC175,CC175_REM_34,tcspi,3,3,3,True,tcspi,tcspi
 GD170,GD170_REM_32,synucleopathy,2,2,2,True,synucleopathy,synucleopathy
 DSJ112,DSJ112_REM_26,tcspi,3,3,3,True,tcspi,tcspi
-CJP53,CJP53_REM_41,tcspi,3,2,3,False,synucleopathy,tcspi
+CJP53,CJP53_REM_41,tcspi,3,3,3,True,tcspi,tcspi
 MFJ160,MFJ160_REM_4,autoimmune encephalitides,0,0,0,True,autoimmune encephalitides,autoimmune encephalitides
 DJ137,DJ137_REM_35,tcspi,3,3,3,True,tcspi,tcspi
 AE129,AE129_REM_296,narcolepsy,1,1,1,True,narcolepsy,narcolepsy
@@ -1725,7 +1725,7 @@ PJC140,PJC140_REM_54,tcspi,3,3,3,True,tcspi,tcspi
 RB103,RB103_REM_106,narcolepsy,1,1,1,True,narcolepsy,narcolepsy
 CB165,CB165_REM_53,tcspi,3,3,3,True,tcspi,tcspi
 GR108,GR108_REM_19,tcspi,3,3,3,True,tcspi,tcspi
-ML135,ML135_REM_203,synucleopathy,2,3,2,False,tcspi,synucleopathy
+ML135,ML135_REM_203,synucleopathy,2,2,2,True,synucleopathy,synucleopathy
 JB173,JB173_REM_121,autoimmune encephalitides,0,0,0,True,autoimmune encephalitides,autoimmune encephalitides
 CS147,CS147_REM_51,narcolepsy,1,1,1,True,narcolepsy,narcolepsy
 CD164,CD164_REM_156,tcspi,3,3,3,True,tcspi,tcspi

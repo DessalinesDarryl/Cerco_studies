@@ -30,15 +30,7 @@ def main():
         sys.exit(1)
     montage = "bipolaire" if response == "y" else "monopolaire"
 
-    # Détection du système
-    system = platform.system()
-    if system == "Darwin":
-        disque = "/Volumes/Crucial X6"
-    elif system == "Windows":
-        disque = "D:"
-    else:
-        raise RuntimeError("Système non supporté.")
-
+    # Chemins
     excel_path = "data/Tableau_synthese_patients.xlsx"
     features_root = Path(f"features/{montage}/rem_only")
     output_features = f"data/features_{montage}.csv"

@@ -26,15 +26,6 @@ if __name__ == "__main__":
     montage = "bipolaire" if response == "y" else "monopolaire"
     print(f"montage défini={montage}")
 
-    # Détection système
-    system = platform.system()
-    if system == "Darwin":
-        disque = "/Volumes/Crucial X6"
-    elif system == "Windows":
-        disque = "D:"
-    else:
-        raise RuntimeError("Système non supporté.")
-
     # Chargement du fichier CSV
     print("[INFO] Chargement des données...")
     path_csv = f"data/features_{montage}.csv"
