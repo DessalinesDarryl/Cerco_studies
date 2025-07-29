@@ -22,7 +22,7 @@ def segment_rem_in_windows(raw, rem_segments, window_sec=4, step_sec=2):
         print(f"[INFO] Segment REM #{seg_idx}: de {start:.2f}s à {end:.2f}s")
         t = start
         while t + window_sec <= end:
-            print(f"  ↳ Fenêtre : tmin={t:.2f}s, tmax={t + window_sec:.2f}s")
+            print(f"  >>> Fenêtre : tmin={t:.2f}s, tmax={t + window_sec:.2f}s")
             try:
                 epoch = raw.copy().crop(tmin=t, tmax=t + window_sec).load_data()
                 windows.append(epoch)
