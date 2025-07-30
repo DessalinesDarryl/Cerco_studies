@@ -3,25 +3,26 @@ from signal_processing.windowing import segment_rem_in_windows
 from signal_processing.eog_analysis import detect_eog_bursts
 from signal_processing.eeg_features import extract_spectral_features
 from signal_processing.emg_analysis import evaluate_emg_twitching
-from utils.microstate_annotation import annotate_microstates_to_raw
+from signal_processing.annotation import annotate_microstates
+
 from pathlib import Path
 import platform
 import sys
-import mne  
+import matplotlib
+
+matplotlib.use("TkAgg")
 
 def main():
-    # On demande à l'utilisateur si le montage est bipolaire
     response = input("Le montage est-il bipolaire ? (y/n) : ").strip().lower()
     if response not in {"y", "n"}:
-        print("Réponse invalide. Veuillez entrer 'y' pour oui ou 'n' pour non.")
+        print("Réponse invalide. Veuillez entrer 'y' ou 'n'.")
         sys.exit(1)
-
     montage = "bipolaire" if response == "y" else "monopolaire"
-    print(f"montage défini = {montage}")
+    print(f"montage défini={montage}")
 
-    # Détection automatique du système
+    # Détection du système
     system = platform.system()
-    if system == "Darwin":  # MacOS
+    if system == "Darwin":
         disque = "/Volumes/Crucial X6"
     elif system == "Windows":
         disque = "D:"
@@ -32,11 +33,16 @@ def main():
 
     edf_path = Path(f"{disque}/EEG/raw/MN143/MN143_raw.edf")
     annot_path = Path(f"{disque}/EEG/raw/MN143/MN143_hypnoEXP.txt")
-    
+
     print("Chargement des fichiers...")
     raw, rem_segments = load_signals_and_annotations(edf_path, annot_path)
+
+    print(f"Fichiers détectés : {edf_path} + {annot_path}")
+    print(f"Durée fichier EDF : {raw.times[-1]:.2f} secondes")
+    print(f"Premier segment REM à t={rem_segments[0][0]:.2f} secondes")
+
     print("Identification des segments REM...")
-    windows = segment_rem_in_windows(raw, rem_segments)
+    windows = segment_rem_in_windows(raw, rem_segments, window_sec=4, step_sec=2)
 
     print("Détection des REM toniques/phasiques...")
     labels = []
@@ -46,14 +52,22 @@ def main():
         emg_score = evaluate_emg_twitching(win)
 
         score = 0.5 * eog_score + 0.3 * eeg_score + 0.2 * emg_score
-        labels.append("phasic" if score > 0.5 else "tonic")
+        label = "phasic" if score > 0.5 else "tonic"
+        labels.append(label)
 
-    print("Annotation dans le fichier MNE en cours...")
-    raw_annotated = annotate_microstates_to_raw(raw, windows, labels, win_len_sec=4.0)
+    print("Ajout des annotations visuelles sur le signal EEG...")
+    annotate_microstates(raw, windows, labels, window_sec=4)
 
-    output_path = edf_path.with_name(edf_path.stem + "_annotated.fif")
-    raw_annotated.save(output_path, overwrite=True)
-    print(f"Fichier annoté sauvegardé : {output_path}")
+    print("Sauvegarde du fichier .fif")
+    output_dir = Path(f"{disque}/EEG/raw")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    annotated_path = output_dir / f"{edf_path.stem}_annotated.fif"
+
+    # Sauvegarde du fichier avec les annotations tonic/phasic
+    raw.save(annotated_path, overwrite=True)
+    print(f"[INFO] Fichier annoté sauvegardé : {annotated_path}")
+
 
 if __name__ == "__main__":
     main()
