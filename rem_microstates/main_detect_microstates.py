@@ -6,7 +6,7 @@ from signal_processing.windowing import segment_rem_in_windows
 from signal_processing.eog_analysis import detect_eog_microstate
 from signal_processing.annotation import annotate_microstates
 from signal_processing.filters import apply_custom_filters
-
+from utils.preprocessing_bip import apply_custom_bipolar_montage
 
 from pathlib import Path
 import platform
@@ -33,11 +33,17 @@ def main():
     else:
         raise RuntimeError("Système non supporté.")
 
+    #Fichiers sources
     edf_path = Path(f"{disque}/EEG/raw/MN143/MN143_raw.edf")
     annot_path = Path(f"{disque}/EEG/raw/MN143/MN143_hypnoEXP.txt")
 
     print("Chargement des fichiers...")
     raw, rem_segments = load_signals_and_annotations(edf_path, annot_path)
+
+    # Nettoyage des noms si montage bipolaire
+    if montage == "bipolaire":
+        print("Application du montage bipolaire personnalisé...")
+        raw = apply_custom_bipolar_montage(raw)
 
     print("Application des filtres sur les canaux EOG, EMG et EEG...")
     raw = apply_custom_filters(raw)
@@ -45,7 +51,7 @@ def main():
     print(f"{len(rem_segments)} segments REM détectés.")
     windows = segment_rem_in_windows(raw, rem_segments, window_sec=4, step_sec=4)
 
-    # Labélisation de la fenêtre
+    # Labélisation de la fenêtre (tonic/phasic)
     labels = []
     valid_windows = []
 
