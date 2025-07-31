@@ -45,13 +45,24 @@ def main():
     print(f"{len(rem_segments)} segments REM détectés.")
     windows = segment_rem_in_windows(raw, rem_segments, window_sec=4, step_sec=4)
 
+    # Labélisation de la fenêtre
     labels = []
     valid_windows = []
-    for win in windows:
+
+    i = 0
+    while i < len(windows):
+        win = windows[i]
         label = detect_eog_microstate(win)
+
         if label != "ignore":
             labels.append(label)
             valid_windows.append(win)
+
+        # Saut de 8 s (= 2 fenêtres) si "phasic", sinon on passe à la suivante
+        if label == "phasic":
+            i += 2
+        else:
+            i += 1
 
     print(f"{len(valid_windows)} fenêtres retenues ({labels.count('phasic')} phasic / {labels.count('tonic')} tonic)")
 
