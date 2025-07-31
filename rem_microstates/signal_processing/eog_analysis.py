@@ -15,7 +15,7 @@ def detect_eog_microstate(win, sfreq=250.0):
     try:
         # On copie la fenêtre (Raw de 4 s) et on sélectionne uniquement les canaux de type EOG
         eog_picks = win.copy().pick_types(eog=True)
-        print(f">>> Canaux EOG : {eog_picks}")
+        print(f">>> Canaux EOG : {eog_picks}") 
 
         # Récupère les données brutes sous forme de tableau numpy [n_channels, n_samples]
         data = eog_picks.get_data()*1e6
@@ -27,7 +27,7 @@ def detect_eog_microstate(win, sfreq=250.0):
             return "ignore"
 
         # On utilise le premier canal EOG pour l'analyse (supposé suffisant)
-        signal = data[0]*1e6
+        signal = data[0]
 
         # Nombre d’échantillons (doit correspondre à 4 s * fréquence d’échantillonnage)
         n_samples = signal.shape[0]
@@ -43,8 +43,8 @@ def detect_eog_microstate(win, sfreq=250.0):
             peaks, _ = find_peaks(np.abs(segment), height=150)
             print(f">>> Nombre de pic >150µV : {peaks}")
 
-            # Moins de 2 pics -> ne remplit pas le critère
-            if len(peaks) < 2:
+            # Moins de 1 pic -> ne remplit pas le critère
+            if len(peaks) < 1:
                 print("Moins de 2 pics -> ne remplit pas les critères")
                 return 0
 
@@ -73,7 +73,6 @@ def detect_eog_microstate(win, sfreq=250.0):
         # Si aucune ou une seule déflexion > 25 µV -> tonic
         if len(all_peaks) <= 1:
             return "tonic"
-
 
         # Si on n'est ni phasic ni tonic selon les critères -> ignorer cette fenêtre
         return "ignore"

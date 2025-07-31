@@ -57,7 +57,7 @@ def apply_custom_filters(raw):
 
     # EEG : 0.3–70 Hz
     eeg_channels = [ch for ch in raw.ch_names if ch.startswith('EEG ')]
-    if eeg_channels.size > 0:
+    if len(eeg_channels) > 0:
         raw_filt.filter(0.3, 70., picks=eeg_channels, fir_design='firwin')
 
     return raw_filt
