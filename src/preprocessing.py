@@ -45,7 +45,7 @@ def preprocess_raw_A1(raw, l_freq=0.3, h_freq=100, notch=50, ref="A1"):
         raw_f.set_eeg_reference("average", projection=False)
     return raw_f
 
-def preprocess_raw_bip(raw, l_freq=0.3, h_freq=100, notch=50):
+def preprocess_raw_bip(raw, l_freq=0.3, h_freq=200, notch=50):
     """
     Applique un filtrage passe-bande, un filtre notch, puis construit un montage EEG bipolaire 
     à partir d’un ensemble de paires de canaux définies.
