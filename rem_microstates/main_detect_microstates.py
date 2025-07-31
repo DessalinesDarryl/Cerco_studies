@@ -1,16 +1,19 @@
+import matplotlib
+matplotlib.use("Agg")
+
 from signal_processing.loader import load_signals_and_annotations
 from signal_processing.windowing import segment_rem_in_windows
-from signal_processing.eog_analysis import detect_eog_bursts
-from signal_processing.eeg_features import extract_spectral_features
-from signal_processing.emg_analysis import evaluate_emg_twitching
+from signal_processing.eog_analysis import detect_eog_microstate
 from signal_processing.annotation import annotate_microstates
+from signal_processing.filters import apply_custom_filters
+
 
 from pathlib import Path
 import platform
 import sys
-import matplotlib
+import pandas as pd
 
-matplotlib.use("TkAgg")
+
 
 def main():
     response = input("Le montage est-il bipolaire ? (y/n) : ").strip().lower()
@@ -20,7 +23,6 @@ def main():
     montage = "bipolaire" if response == "y" else "monopolaire"
     print(f"montage défini={montage}")
 
-    # Détection du système
     system = platform.system()
     if system == "Darwin":
         disque = "/Volumes/Crucial X6"
@@ -37,37 +39,37 @@ def main():
     print("Chargement des fichiers...")
     raw, rem_segments = load_signals_and_annotations(edf_path, annot_path)
 
-    print(f"Fichiers détectés : {edf_path} + {annot_path}")
-    print(f"Durée fichier EDF : {raw.times[-1]:.2f} secondes")
-    print(f"Premier segment REM à t={rem_segments[0][0]:.2f} secondes")
+    print("Application des filtres sur les canaux EOG, EMG et EEG...")
+    raw = apply_custom_filters(raw)
 
-    print("Identification des segments REM...")
-    windows = segment_rem_in_windows(raw, rem_segments, window_sec=4, step_sec=2)
+    print(f"{len(rem_segments)} segments REM détectés.")
+    windows = segment_rem_in_windows(raw, rem_segments, window_sec=4, step_sec=4)
 
-    print("Détection des REM toniques/phasiques...")
     labels = []
+    valid_windows = []
     for win in windows:
-        eog_score = detect_eog_bursts(win)
-        eeg_score = extract_spectral_features(win)
-        emg_score = evaluate_emg_twitching(win)
+        label = detect_eog_microstate(win)
+        if label != "ignore":
+            labels.append(label)
+            valid_windows.append(win)
 
-        score = 0.5 * eog_score + 0.3 * eeg_score + 0.2 * emg_score
-        label = "phasic" if score > 0.5 else "tonic"
-        labels.append(label)
+    print(f"{len(valid_windows)} fenêtres retenues ({labels.count('phasic')} phasic / {labels.count('tonic')} tonic)")
 
-    print("Ajout des annotations visuelles sur le signal EEG...")
-    annotate_microstates(raw, windows, labels, window_sec=4)
+    annotate_microstates(raw, valid_windows, labels, window_sec=4)
 
-    print("Sauvegarde du fichier .fif")
-    output_dir = Path(f"{disque}/EEG/raw")
+    output_dir = Path(f"{disque}/EEG/raw/MN143")
     output_dir.mkdir(parents=True, exist_ok=True)
-
     annotated_path = output_dir / f"{edf_path.stem}_annotated.fif"
-
-    # Sauvegarde du fichier avec les annotations tonic/phasic
     raw.save(annotated_path, overwrite=True)
-    print(f"[INFO] Fichier annoté sauvegardé : {annotated_path}")
+    print(f"[OK] Fichier annoté sauvegardé : {annotated_path}")
 
+    df = pd.DataFrame({
+        "tmin": [win.first_time for win in valid_windows],
+        "tmax": [win.first_time + 4 for win in valid_windows],
+        "label": labels
+    })
+    df.to_excel(output_dir / f"{edf_path.stem}_microstates.xlsx", index=False)
+    print("[OK] Export Excel terminé.")
 
 if __name__ == "__main__":
     main()
