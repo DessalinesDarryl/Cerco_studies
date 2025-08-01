@@ -2,12 +2,9 @@ import mne
 
 def apply_custom_bipolar_montage(raw):
     """
-    Applique un montage bipolaire personnalisé à l'objet raw,
-    selon la configuration MYMONTAGE_BIP fournie.
+    Applique un montage bipolaire personnalisé à l'objet raw.
+    Ignore les paires si les canaux n'existent pas.
     """
-    # Nettoyage des noms de canaux : supprime le préfixe "EEG "
-    raw.rename_channels(lambda name: name.replace("EEG ", ""))
-
     bipolar_mappings = {
         "EOGD-A1": ("EOGD", "A1"),
         "EOGG-A1": ("EOGG", "A1"),
@@ -21,19 +18,27 @@ def apply_custom_bipolar_montage(raw):
         "T3-O1": ("T3", "O1")
     }
 
-    # Crée les canaux bipolaires
-    bipolars = []
+    raw_bip = raw.copy()
+    all_new_channels = []
+
     for new_name, (anode, cathode) in bipolar_mappings.items():
-        raw_bip = mne.set_bipolar_reference(raw, anode, cathode,
-                                            ch_name=new_name,
-                                            drop_refs=False,
-                                            copy=True)
-        bipolars.append(raw_bip.pick_channels([new_name]))
+        if anode in raw_bip.ch_names and cathode in raw_bip.ch_names:
+            raw_bip = mne.set_bipolar_reference(
+                raw_bip, anode, cathode,
+                ch_name=new_name,
+                drop_refs=False,
+                copy=False
+            )
+            all_new_channels.append(new_name)
+            print(f"[OK] Canal bipolaire ajouté : {new_name}")
+        else:
+            print(f"[SKIP] Canal ignoré : {new_name} (manque {anode} ou {cathode})")
 
-    # Récupère les canaux monopolaire à conserver
-    monopolar_keep = ["Menton", "JAMBG", "JAMBD", "RONF", "EMG1", "EMG2", "ECG"]
-    raw_mono = raw.copy().pick_channels(monopolar_keep)
+    # Canaux monopolaire à conserver
+    keep_channels = all_new_channels + [
+        "Menton", "JAMBG", "JAMBD", "RONF", "EMG1", "EMG2", "ECG"
+    ]
+    keep_channels = [ch for ch in keep_channels if ch in raw_bip.ch_names]
 
-    # Concatène les canaux bipolaires + monopolaire
-    raw_final = mne.concatenate_raws(bipolars + [raw_mono])
-    return raw_final
+    raw_bip.pick_channels(keep_channels)
+    return raw_bip

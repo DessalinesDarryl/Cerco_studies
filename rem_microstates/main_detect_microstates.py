@@ -12,8 +12,23 @@ from pathlib import Path
 import platform
 import sys
 import pandas as pd
+import numpy as np
 
 
+def save_raw_amplitudes_to_csv(raw, output_path):
+    """
+    Sauvegarde les amplitudes du signal brut (µV) pour chaque canal dans un fichier CSV.
+    
+    Args:
+        raw (mne.io.Raw): objet Raw MNE contenant le signal
+        output_path (Path): chemin du fichier de sortie .csv
+    """
+    data = raw.get_data() * 1e6  # (µV)
+    times = raw.times  # (s)
+    df = pd.DataFrame(data.T, columns=raw.ch_names)
+    df.insert(0, "time_sec", times)
+    df.to_csv(output_path, index=False)
+    print(f"[OK] Amplitudes brutes sauvegardées dans : {output_path}")
 
 def main():
     response = input("Le montage est-il bipolaire ? (y/n) : ").strip().lower()
@@ -34,8 +49,8 @@ def main():
         raise RuntimeError("Système non supporté.")
 
     #Fichiers sources
-    edf_path = Path(f"{disque}/EEG/raw/MN143/MN143_raw.edf")
-    annot_path = Path(f"{disque}/EEG/raw/MN143/MN143_hypnoEXP.txt")
+    edf_path = Path(f"{disque}/EEG/raw/BB114/BB114_raw.edf")
+    annot_path = Path(f"{disque}/EEG/raw/BB114/BB114_hypnoEXP.txt")
 
     print("Chargement des fichiers...")
     raw, rem_segments = load_signals_and_annotations(edf_path, annot_path)
@@ -43,6 +58,9 @@ def main():
     # Nettoyage des noms si montage bipolaire
     if montage == "bipolaire":
         print("Application du montage bipolaire personnalisé...")
+        print(f"Liste des canaux AVANT : {raw.ch_names}")
+        raw.rename_channels(lambda name: name.replace("EEG ", ""))
+        print(f"Liste des canaux APRÈS : {raw.ch_names}")
         raw = apply_custom_bipolar_montage(raw)
 
     print("Application des filtres sur les canaux EOG, EMG et EEG...")
@@ -74,19 +92,26 @@ def main():
 
     annotate_microstates(raw, valid_windows, labels, window_sec=4)
 
-    output_dir = Path(f"{disque}/EEG/raw/MN143")
+    output_dir = Path(f"{disque}/EEG/raw/BB114")
     output_dir.mkdir(parents=True, exist_ok=True)
     annotated_path = output_dir / f"{edf_path.stem}_annotated.fif"
     raw.save(annotated_path, overwrite=True)
     print(f"[OK] Fichier annoté sauvegardé : {annotated_path}")
 
+    # Sauvegarde du résumé des fenêtres REM labélisées tonic/phasic
     df = pd.DataFrame({
         "tmin": [win.first_time for win in valid_windows],
         "tmax": [win.first_time + 4 for win in valid_windows],
         "label": labels
     })
     df.to_excel(output_dir / f"{edf_path.stem}_microstates.xlsx", index=False)
-    print("[OK] Export Excel terminé.")
+    print("[OK] Export resumé des fenêtres Excel terminé.")
+
+    # Sauvegarde des amplitudes brutes
+    csv_path = output_dir / f"{edf_path.stem}_amplitudes.csv"
+    save_raw_amplitudes_to_csv(raw, csv_path)
+    print("[OK] Export amplitudes Excel terminé.")
+
 
 if __name__ == "__main__":
     main()
