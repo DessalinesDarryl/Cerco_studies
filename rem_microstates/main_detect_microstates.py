@@ -15,21 +15,6 @@ import pandas as pd
 import numpy as np
 
 
-def save_raw_amplitudes_to_csv(raw, output_path):
-    """
-    Sauvegarde les amplitudes du signal brut (µV) pour chaque canal dans un fichier CSV.
-    
-    Args:
-        raw (mne.io.Raw): objet Raw MNE contenant le signal
-        output_path (Path): chemin du fichier de sortie .csv
-    """
-    data = raw.get_data() * 1e6  # (µV)
-    times = raw.times  # (s)
-    df = pd.DataFrame(data.T, columns=raw.ch_names)
-    df.insert(0, "time_sec", times)
-    df.to_csv(output_path, index=False)
-    print(f"[OK] Amplitudes brutes sauvegardées dans : {output_path}")
-
 def main():
     response = input("Le montage est-il bipolaire ? (y/n) : ").strip().lower()
     if response not in {"y", "n"}:
@@ -106,11 +91,6 @@ def main():
     })
     df.to_excel(output_dir / f"{edf_path.stem}_microstates.xlsx", index=False)
     print("[OK] Export resumé des fenêtres Excel terminé.")
-
-    # Sauvegarde des amplitudes brutes
-    csv_path = output_dir / f"{edf_path.stem}_amplitudes.csv"
-    save_raw_amplitudes_to_csv(raw, csv_path)
-    print("[OK] Export amplitudes Excel terminé.")
 
 
 if __name__ == "__main__":
