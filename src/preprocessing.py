@@ -7,6 +7,8 @@ import platform
 import mne
 import numpy as np
 from mne.preprocessing import ICA
+from utils import apply_custom_bipolar_montage
+from filters import apply_custom_filters
 
 # 1. FILTRAGE & RÉFÉRENCEMENT
 def preprocess_raw_A1(raw, l_freq=0.3, h_freq=100, notch=50, ref="A1"): 
@@ -72,33 +74,14 @@ def preprocess_raw_bip(raw, l_freq=0.3, h_freq=200, notch=50):
     raw_f = raw.copy().filter(l_freq, h_freq, fir_design="firwin")
     raw_f.notch_filter(notch)
 
-    # Dictionnaire des canaux bipolaires : nom_du_nouveau_canal : (canal1, canal2)
-    bipolar_pairs = {
-        "EOGD-A1": ("EOGD", "A1"),
-        "EOGG-A1": ("EOGG", "A1"),
-        "Fp2-C4": ("Fp2", "C4"),
-        "C4-O2": ("C4", "O2"),
-        "T4-O2": ("T4", "O2"),
-        "Cz-Pz": ("Cz", "Pz"),
-        "Fp1-C3": ("Fp1", "C3"),
-        "C3-O1": ("C3", "O1"),
-        "Fp1-T3": ("Fp1", "T3"),
-        "T3-O1": ("T3", "O1"),
-    }
+    print("Application du montage bipolaire personnalisé...")
+    print(f"Liste des canaux AVANT : {raw_f.ch_names}")
+    raw_f.rename_channels(lambda name: name.replace("EEG ", ""))
+    print(f"Liste des canaux APRÈS : {raw_f.ch_names}")
+    raw_f = apply_custom_bipolar_montage(raw)
 
-    # Appliquer les montages bipolaires
-    for new_name, (anode, cathode) in bipolar_pairs.items():
-        if anode in raw_f.ch_names and cathode in raw_f.ch_names:
-            raw_f = mne.set_bipolar_reference(
-                raw_f,
-                anode=anode,
-                cathode=cathode,
-                ch_name=new_name,
-                drop_refs=True,
-                copy=False
-            )
-        else:
-            print(f"Canaux manquants pour {new_name}: {anode}, {cathode}")
+    print("Application des filtres sur les canaux EOG, EMG et EEG...")
+    raw_f = apply_custom_filters(raw)
 
     return raw_f
 
