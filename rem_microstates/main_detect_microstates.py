@@ -34,8 +34,8 @@ def main():
         raise RuntimeError("Système non supporté.")
 
     #Fichiers sources
-    edf_path = Path(f"{disque}/EEG/raw/BB114/BB114_raw.edf")
-    annot_path = Path(f"{disque}/EEG/raw/BB114/BB114_hypnoEXP.txt")
+    edf_path = Path(f"{disque}/EEG/raw/RB103/RB103_raw.edf")
+    annot_path = Path(f"{disque}/EEG/raw/RB103/RB103_hypnoEXP.txt")
 
     print("Chargement des fichiers...")
     raw, rem_segments = load_signals_and_annotations(edf_path, annot_path)
@@ -75,13 +75,24 @@ def main():
 
     print(f"{len(valid_windows)} fenêtres retenues ({labels.count('phasic')} phasic / {labels.count('tonic')} tonic)")
 
+    # Sauvegarde du raw.fif
+    output_dir = Path(f"{disque}/EEG/raw/RB103")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    raw_path = output_dir / f"{edf_path.stem}.fif"
+
+    if not raw_path.exists():
+        raw.save(raw_path, overwrite=True)
+        print(f"[OK] Fichier raw.fif sauvegardé : {raw_path}")
+    else:
+        print(f"[SKIP] Le fichier existe déjà : {raw_path}")
+
+    # Sauvegarde du raw.fif annoté
     annotate_microstates(raw, valid_windows, labels, window_sec=4)
 
-    output_dir = Path(f"{disque}/EEG/raw/BB114")
-    output_dir.mkdir(parents=True, exist_ok=True)
     annotated_path = output_dir / f"{edf_path.stem}_annotated.fif"
     raw.save(annotated_path, overwrite=True)
-    print(f"[OK] Fichier annoté sauvegardé : {annotated_path}")
+    print(f"[OK] Fichier annoté.fif sauvegardé : {annotated_path}")
 
     # Sauvegarde du résumé des fenêtres REM labélisées tonic/phasic
     df = pd.DataFrame({
