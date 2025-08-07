@@ -85,67 +85,104 @@ def preprocess_raw_bip(raw, l_freq=0.3, h_freq=200, notch=50):
 
     return raw_f
 
-# 2. ICA
-def run_ica(raw, method="picard", n_comp=0.999, random_state=42, tstep=30.0, resample_hz=150):
+# 2. Nettoyage par YASA (art_detect + interpolation)
+def detect_and_interpolate_artifacts(raw, edf_path, win_sec=4, method='covar', threshold=3):
     """
-    Applique l’Analyse en Composantes Indépendantes (ICA) sur un signal EEG pour détecter
-    et exclure les artefacts (EOG, ECG).
+    Détecte et interpole les artéfacts dans les données EEG à l'aide de YASA (méthode 'covar').
+    Ajoute également des annotations MNE sur les segments corrompus et exporte les fenêtres en CSV + log TXT.
 
     Paramètres
     ----------
     raw : mne.io.Raw
-        Données EEG brutes à nettoyer.
+        Données EEG brutes filtrées.
+
+    edf_path : Path
+        Chemin du fichier de sortie (même dossier que le .fif de sortie).
+
+    win_sec : int
+        Longueur des fenêtres temporelles (en secondes).
 
     method : str
-        Méthode ICA à utiliser : "fastica", "picard", ou "infomax".
+        Méthode de détection YASA (par défaut 'covar').
 
-    n_comp : float ou int
-        Nombre de composantes ICA à extraire. Peut être un float (variance expliquée) ou un entier.
-
-    random_state : int
-        Graine de génération aléatoire pour la reproductibilité.
-
-    tstep : float
-        Taille des fenêtres en secondes pour l’entraînement ICA.
-
-    resample_hz : float ou None
-        Fréquence d’échantillonnage temporaire utilisée pour accélérer l’entraînement ICA.
+    threshold : float
+        Seuil de détection pour les artéfacts.
 
     Retour
     ------
-    raw_clean : mne.io.Raw
-        Données EEG avec les artefacts ICA supprimés.
+    raw_interp : mne.io.Raw
+        Données EEG nettoyées avec interpolation des artéfacts et annotations ajoutées.
 
-    ica : mne.preprocessing.ICA
-        Objet ICA ajusté, contenant les composantes exclues.
+    valid_mask : np.ndarray
+        Masque booléen des échantillons valides (True = propre).
     """
-    if method not in {"fastica", "picard", "infomax"}:
-        raise ValueError("method doit être 'fastica', 'picard' ou 'infomax'")
+    import yasa
+    import pandas as pd
+    import numpy as np
+    import mne
 
-    # Copie pour entraînement ICA sur EEG uniquement
-    raw_fit = raw.copy().pick_types(eeg=True)
-    if resample_hz is not None and resample_hz < raw_fit.info["sfreq"]:
-        raw_fit = raw_fit.resample(resample_hz, npad="auto")
+    sfreq = raw.info['sfreq']
+    data = raw.get_data()
+    n_samples = data.shape[1]
+    win_samples = int(win_sec * sfreq)
 
-    fit_params = dict(ortho=False) if method == "picard" else {}
-    ica = ICA(method=method, n_components=n_comp, random_state=random_state, fit_params=fit_params)
-    ica.fit(raw_fit, tstep=tstep)
+    # === 1. Détection des artéfacts avec YASA
+    art, zscores = yasa.art_detect(data, sf=sfreq, window=win_sec, method=method, threshold=threshold)
 
-    # Détection des composantes EOG/ECG dans le raw complet
-    eog_ch = next((c for c in raw.ch_names if "EOG" in c.upper()), None)
-    ecg_ch = next((c for c in raw.ch_names if "ECG" in c.upper()), None)
-    if eog_ch:
-        bad_eog, _ = ica.find_bads_eog(raw, ch_name=eog_ch)
-        ica.exclude.extend(bad_eog)
-    if ecg_ch:
-        bad_ecg, _ = ica.find_bads_ecg(raw, ch_name=ecg_ch)
-        ica.exclude.extend(bad_ecg)
+    # === 2. Création du masque temporel
+    valid_mask = np.full(n_samples, False)
+    for i, is_art in enumerate(art):
+        if not is_art:
+            start = i * win_samples
+            end = min(start + win_samples, n_samples)
+            valid_mask[start:end] = True
 
-    # Application à tout le signal 
-    return ica.apply(raw.copy()), ica
+    # === 3. Interpolation linéaire des artéfacts
+    interp_data = data.copy()
+    x = np.arange(n_samples)
+    for ch in range(data.shape[0]):
+        good = valid_mask
+        bad = ~valid_mask
+        interp_data[ch, bad] = np.interp(x[bad], x[good], data[ch, good])
+
+    # === 4. Export CSV des fenêtres d'artéfacts
+    art_windows = []
+    for i, is_art in enumerate(art):
+        if is_art:
+            start_sec = i * win_sec
+            end_sec = start_sec + win_sec
+            art_windows.append((start_sec, end_sec))
+
+    df_art = pd.DataFrame(art_windows, columns=["start_time_s", "end_time_s"])
+
+    out_dir = edf_path.parent
+    export_path = out_dir / f"{edf_path.stem}_artifact_windows.csv"
+    df_art.to_csv(export_path, index=False)
+    print(f"Artéfacts exportés : {len(df_art)} fenêtres -> {export_path.name}")
+
+    # === 5. Ajout d’annotations BAD dans le Raw
+    onset = [start for start, end in art_windows]
+    duration = [win_sec] * len(onset)
+    description = ["BAD_Artifact"] * len(onset)
+    annotations = mne.Annotations(onset=onset, duration=duration, description=description)
+    
+    # === 6. Création d’un nouvel objet Raw avec les données interpolées et annotations
+    raw_interp = raw.copy()
+    raw_interp._data = interp_data
+    raw_interp.set_annotations(annotations)
+
+    # === 7. Log du pourcentage de signal conservé
+    pourcentage_conserve = valid_mask.sum() / len(valid_mask) * 100
+    log_path = out_dir / "artifact_report.txt"
+    with open(log_path, "a") as f:
+        f.write(f"{edf_path.stem}.fif : {pourcentage_conserve:.2f}% du signal conservé après suppression des artéfacts.\n")
+
+    return raw_interp, valid_mask
+
+
 
 # 3. PIPELINE FICHIER UNIQUE
-def process_file(edf_path, out_ica_dir, new_name, montage):
+def process_file(edf_path, out_yasa_dir, new_name, montage):
     """
     Traite un fichier EEG .edf : renommage des canaux, prétraitement (filtrage + référence), 
     ICA, puis sauvegarde au format .fif.
@@ -155,7 +192,7 @@ def process_file(edf_path, out_ica_dir, new_name, montage):
     edf_path : Path
         Chemin vers le fichier .edf à traiter.
 
-    out_ica_dir : Path
+    out_yasa_dir : Path
         Répertoire de sortie où le fichier .fif prétraité sera sauvegardé.
 
     new_name : str
@@ -187,14 +224,15 @@ def process_file(edf_path, out_ica_dir, new_name, montage):
             raw_p = preprocess_raw_A1(raw)
 
         try:
-            raw_ica, _ = run_ica(raw_p)
-        except Exception as ica_err:
-            return f"{edf_path.name}: erreur ICA -> {ica_err}"
+            raw_clean, valid_mask = detect_and_interpolate_artifacts(raw_p, out_yasa_dir)
+        except Exception as clean_err:
+            return f"{edf_path.name}: erreur YASA -> {clean_err}"
 
-        # Application ICA
-        out_ica = out_ica_dir / new_name
-        out_ica.parent.mkdir(parents=True, exist_ok=True)
-        raw_ica.save(out_ica, overwrite=True, verbose="ERROR")
+
+        # Sauvegarde
+        out_yasa = out_yasa_dir / new_name
+        out_yasa.parent.mkdir(parents=True, exist_ok=True)
+        raw_clean.save(out_yasa, overwrite=True, verbose="ERROR")
 
         return f"{edf_path.name}: OK"
 
