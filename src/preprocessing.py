@@ -139,8 +139,8 @@ if __name__ == "__main__":
     out_base = Path(f"{disque}/EEG/preprocessed")
     out_yasa_dir = out_base / montage / "full"
 
-    edf_paths = list(root_raw.rglob("*.edf"))
-    print(f"{len(edf_paths)} fichiers .edf trouvés.")
+    edf_paths = list(root_raw.rglob("*.[eE][dD][fF]"))
+    print(f"{len(edf_paths)} fichiers .edf/.EDF trouvés.")
 
     for path in edf_paths:
         parent_name = path.parent.name
