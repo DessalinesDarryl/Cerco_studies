@@ -7,7 +7,7 @@ def load_annotation_file(txt_path):
     segments = []
     current_start = None
 
-    with open(txt_path, 'r') as f:
+    with open(txt_path, "r", encoding="utf-8-sig") as f:
         lines = f.readlines()
 
     for i, line in enumerate(lines):
