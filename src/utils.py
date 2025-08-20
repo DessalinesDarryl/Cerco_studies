@@ -4,23 +4,18 @@ import os
 import mne
 
 
-def list_fif_files(directory):
-    """
-    Liste les fichiers .fif présents dans un dossier donné.
+from pathlib import Path
 
-    Args:
-        directory (str): Chemin vers le dossier.
+def list_fif_files(directory: str):
+    root = Path(directory)
+    out = []
+    for p in root.rglob("*.fif"):
+        name = p.name
+        if name.startswith(("._", ".")):
+            continue
+        out.append(str(p.relative_to(root)))
+    return sorted(out)
 
-    Returns:
-        list: Liste triée des fichiers .fif
-    """
-    fif_files = []
-    for dirpath, _, filenames in os.walk(directory):
-        for f in filenames:
-            if f.endswith('.fif'):
-                full_path = os.path.join(dirpath, f)
-                fif_files.append(os.path.relpath(full_path, directory))  
-    return fif_files
 
 
 def get_base_name(file_path, suffix="_eeg_cleaned_raw.fif"):

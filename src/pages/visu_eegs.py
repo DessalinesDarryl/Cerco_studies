@@ -14,14 +14,16 @@ st.title("Visualisation des signaux EEG")
 # Dossier ICA / RPF
     # Détection automatique du système
 system = platform.system()
-if system == "Darwin":  # MacOS
+if system == "Darwin":
     disque = "/Volumes/Crucial X6"
 elif system == "Windows":
     disque = "D:"
+elif system == "Linux":
+    disque = "/media/darryld/Crucial X6"
 else:
     raise RuntimeError("Système non supporté.")
 
-base_dir = Path(f"{disque}/EEG/preprocessed/monopolaire/full") 
+base_dir = Path(f"{disque}/EEG/preprocessed/bipolaire/rem_only") 
 fif_dir = st.sidebar.text_input("Dossier des fichiers .fif", base_dir)
 
 if not os.path.isdir(fif_dir):
