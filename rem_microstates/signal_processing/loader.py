@@ -7,8 +7,12 @@ def load_signals_and_annotations(fif_path, annot_path):
 
     print(f"Fichiers détectés : {fif_path} + {annot_path}")
     print(f"Durée fichier FIF : {raw.times[-1]:.2f} secondes")
-    print(f"Premier segment REM à t={rem_segments[0][0]:.2f} secondes")
-
+    if rem_segments:
+        t0, t1 = rem_segments[0]
+        print(f"Premier segment REM : {t0:.2f} s → {t1:.2f} s ({(t1 - t0):.1f} s)")
+    else:
+        print("[INFO] Aucun segment REM détecté dans l'annotation.")
+        
     raw.set_channel_types({
         "EOGG": "eog",
         "EOGD": "eog"
