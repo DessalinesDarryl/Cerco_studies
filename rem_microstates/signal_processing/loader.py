@@ -2,7 +2,7 @@ import mne
 from segment_rem import extract_rem_segments
 
 def load_signals_and_annotations(fif_path, annot_path):
-    raw = mne.io.read_raw_fif(fif_path, preload=True)
+    raw = mne.io.read_raw_fif(fif_path, preload=False, verbose="ERROR")
     rem_segments = extract_rem_segments(annot_path)
 
     print(f"Fichiers détectés : {fif_path} + {annot_path}")

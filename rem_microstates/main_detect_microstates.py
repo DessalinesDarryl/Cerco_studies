@@ -1,14 +1,35 @@
+# ==========================
+#   Parallélisation & CPU
+# ==========================
+# À définir AVANT d'importer numpy/scipy/mne
+import os
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("NUMEXPR_NUM_THREADS", "1")
+os.environ.setdefault("VECLIB_MAXIMUM_THREADS", "1")  # macOS/Accelerate
+
+from concurrent.futures import ProcessPoolExecutor, as_completed
+import multiprocessing as mp
+import faulthandler; faulthandler.enable()  # log des crashes natifs
+
+# ==========================
+#   Imports standard
+# ==========================
 import platform
 from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib
-matplotlib.use("Agg")  # backend non interactif
+matplotlib.use("Agg")  # backend non interactif, sûr en multiprocess
 import matplotlib.pyplot as plt
 import argparse
 import math
 import re
 
+# ==========================
+#   Imports projet
+# ==========================
 from signal_processing.loader import load_signals_and_annotations
 from signal_processing.windowing import segment_rem_in_windows
 from signal_processing.eog_analysis import detect_eog_microstate
@@ -16,7 +37,19 @@ from signal_processing.annotation import annotate_microstates
 from signal_processing.filters import apply_custom_filters  # si utilisé ailleurs
 from utils.preprocessing_bip import apply_custom_bipolar_montage  # si utilisé ailleurs
 
+# --- Import comparaison .mat robuste
+from utils.compare_mat import compare_with_mat, _load_rem_phasic_intervals as load_rem_intervals
+
 import mne
+
+
+# Petit helper commun (tolérance d’inclusion)
+def _is_inside(start: float, end: float, intervals, tol: float = 0.5) -> bool:
+    s = float(start); e = float(end)
+    for a, b in intervals:
+        if (a - tol) <= s and e <= (b + tol):
+            return True
+    return False
 
 
 # =========================================================
@@ -48,7 +81,6 @@ def process_patient(fif_path, raw_dir, out_dir, montage, seuil):
                 break
         if annot_path is None:
             print(f"[SKIP] {patient_id} : pas d'hypnogramme (txt/csv) pour générer les sorties automatiques.")
-            # On tentera quand même la comparaison si un xlsx existe par ailleurs
             if not xlsx_out.exists():
                 return
 
@@ -70,19 +102,25 @@ def process_patient(fif_path, raw_dir, out_dir, montage, seuil):
         while i < len(windows):
             win = windows[i]
             label = detect_eog_microstate(win)
-
             if label != "ignore":
                 labels.append(label)
                 valid_windows.append(win)
-
             i += 2 if label == "phasic" else 1
 
         print(f"[{patient_id}] {len(valid_windows)} fenêtres retenues "
               f"({labels.count('phasic')} phasic / {labels.count('tonic')} tonic)")
 
-        annotate_microstates(raw, valid_windows, labels, window_sec=4)
+        # Ajoute les annotations sans écraser l'existant
+        annotate_microstates(
+            raw, valid_windows, labels, window_sec=4,
+            mode="add",
+            prefix="microstate_"
+        )
+
+        # Sauvegarde du Raw annoté
         raw.save(raw_annotated_path, overwrite=True)
 
+        # Export tabulaire des fenêtres retenues
         df = pd.DataFrame({
             "tmin": [win.first_time for win in valid_windows],
             "tmax": [win.first_time + 4 for win in valid_windows],
@@ -98,89 +136,36 @@ def process_patient(fif_path, raw_dir, out_dir, montage, seuil):
             return
 
     # =========================
-    # Comparaison avec .mat
+    # Comparaison avec .mat (robuste via compare_mat)
     # =========================
     mat_candidates = sorted((raw_dir / patient_id).glob(f"events_{patient_id}*.mat"))
-    print(f"[{patient_id}] {len(mat_candidates)} fichiers .mat trouvés pour comparaison. "
-          f"chemin = {mat_candidates}")
+    print(f"[{patient_id}] {len(mat_candidates)} fichiers .mat trouvés pour comparaison. chemin = {mat_candidates}")
     if mat_candidates:
         mat_path = max(mat_candidates, key=lambda p: p.stat().st_mtime)
 
-        from scipy.io import loadmat
+        # 1) Sauvegarde des erreurs via compare_with_mat (suffixe avec seuil, comme avant)
+        errors_suffix = f"_microstates_errors_{seuil}.xlsx"
+        _ = compare_with_mat(
+            df_windows=df,
+            raw_dir=raw_dir,
+            patient_id=patient_id,
+            out_patient_dir=out_patient_dir,
+            glob_pattern="events_{pid}*.mat",
+            inside_tol_sec=0.5,
+            pad_sec_if_single_time=2.0,
+            errors_xlsx_suffix=errors_suffix,
+            verbose=True,
+        )
 
-        def _as_1d_float_array(x):
-            try:
-                a = np.asarray(x, dtype=float).ravel()
-                return a if a.size else np.array([], dtype=float)
-            except Exception:
-                return np.array([], dtype=float)
-
-        def _norm_label(x):
-            if isinstance(x, np.ndarray):
-                try:
-                    x = x.item()
-                except Exception:
-                    x = str(x)
-            return str(x).strip().lower().replace("_", " ")
-
-        def _merge_intervals(intervals, tol=0.0):
-            if not intervals:
-                return []
-            ints = sorted((float(s), float(e)) if float(s) <= float(e) else (float(e), float(s))
-                          for s, e in intervals)
-            out = []
-            cs, ce = ints[0]
-            for s, e in ints[1:]:
-                if s <= ce + tol:
-                    ce = max(ce, e)
-                else:
-                    out.append((cs, ce))
-                    cs, ce = s, e
-            out.append((cs, ce))
-            return out
-
-        def is_inside(start, end, intervals, tol=0.5):
-            s = float(start)
-            e = float(end)
-            for a, b in intervals:
-                if (a - tol) <= s and e <= (b + tol):
-                    return True
-            return False
-
-        mat = loadmat(mat_path, squeeze_me=True, struct_as_record=False)
-        events = np.atleast_1d(mat.get("events", []))
-
-        rem_phasic = []
-        PAD_SEC = 2.0
-
-        for ev in events:
-            label = _norm_label(getattr(ev, "label", ""))
-            if label in {"rem phasique", "rem phasic", "rem_phasic"}:
-                t = _as_1d_float_array(getattr(ev, "times", []))
-                if t.size == 0:
-                    continue
-                if t.size >= 2:
-                    start, end = float(t[0]), float(t[-1])
-                else:
-                    center = float(t[0])
-                    start, end = center - PAD_SEC, center + PAD_SEC
-                if end < start:
-                    start, end = end, start
-                rem_phasic.append((start, end))
-
-        rem_phasic = _merge_intervals(rem_phasic, tol=0.0)
+        # 2) Stats + figure locales (en réutilisant le loader robuste)
+        rem_phasic = load_rem_intervals(mat_path, pad_sec=2.0)
 
         erreurs = []
         bons = []
         for _, row in df.iterrows():
-            start, end, pred = row["tmin"], row["tmax"], str(row["label"]).strip().lower()
-            true = "phasic" if is_inside(start, end, rem_phasic, tol=0.5) else "tonic"
-            result = {
-                "tmin": float(start),
-                "tmax": float(end),
-                "auto_label": pred,
-                "true_label": true,
-            }
+            start, end, pred = float(row["tmin"]), float(row["tmax"]), str(row["label"]).strip().lower()
+            true = "phasic" if _is_inside(start, end, rem_phasic, tol=0.5) else "tonic"
+            result = {"tmin": start, "tmax": end, "auto_label": pred, "true_label": true}
             (bons if pred == true else erreurs).append(result)
 
         # --- Stats globales & par classe ---
@@ -220,38 +205,51 @@ def process_patient(fif_path, raw_dir, out_dir, montage, seuil):
             )
 
         # --- Visualisation du summary (PNG) ---
-        fig, ax = plt.subplots(figsize=(6, 4))
-        categories = ["Bonnes", "Mauvaises"]
-        values = [pct_good, pct_bad]
-        bars = ax.bar(categories, values)
-        ax.set_ylim(0, 100)
-        ax.set_ylabel("Pourcentage (%)")
-        ax.set_title(f"{patient_id} — microstates ({seuil})\nÉvaluées: {n_eval}/{n_total}")
-        for rect, count in zip(bars, [n_good, n_bad]):
-            height = rect.get_height()
-            ax.text(rect.get_x() + rect.get_width() / 2.0, height,
-                    f"{height:.1f}%\n(n={count})",
-                    ha="center", va="bottom", fontsize=9)
-        out_png = out_patient_dir / f"{patient_id}_microstates_eval_summary_{seuil}.png"
-        fig.savefig(out_png, dpi=150, bbox_inches="tight")
-        plt.close(fig)
-        print(f"[{patient_id}] Visualisation summary sauvegardée → {out_png.name}")
-
-        # Export des erreurs (même si 0 -> fichier vide)
-        df_err = pd.DataFrame(erreurs, columns=["tmin", "tmax", "auto_label", "true_label"])
-        df_err.to_excel(out_patient_dir / f"{patient_id}_microstates_errors_{seuil}.xlsx", index=False)
-        print(f"[{patient_id}] errors_{seuil}.xlsx sauvegardé ({len(erreurs)} erreurs).")
+        try:
+            fig, ax = plt.subplots(figsize=(6, 4))
+            categories = ["Bonnes", "Mauvaises"]
+            values = [pct_good, pct_bad]
+            bars = ax.bar(categories, values)
+            ax.set_ylim(0, 100)
+            ax.set_ylabel("Pourcentage (%)")
+            ax.set_title(f"{patient_id} — microstates ({seuil})\nÉvaluées: {n_eval}/{n_total}")
+            for rect, count in zip(bars, [n_good, n_bad]):
+                height = rect.get_height()
+                ax.text(rect.get_x() + rect.get_width() / 2.0, height,
+                        f"{height:.1f}%\n(n={count})",
+                        ha="center", va="bottom", fontsize=9)
+            out_png = out_patient_dir / f"{patient_id}_microstates_eval_summary_{seuil}.png"
+            fig.savefig(out_png, dpi=150, bbox_inches="tight")
+            plt.close(fig)
+            print(f"[{patient_id}] Visualisation summary sauvegardée → {out_png.name}")
+        except Exception as e:
+            print(f"[{patient_id}] Plot skipped: {e}")
 
     else:
-        # Crée aussi un fichier d'erreurs vide pour harmoniser les sorties
-        out_patient_dir.mkdir(parents=True, exist_ok=True)
-        pd.DataFrame(columns=["tmin", "tmax", "auto_label", "true_label"]).to_excel(
-            out_patient_dir / f"{patient_id}_microstates_errors_{seuil}.xlsx", index=False
-        )
-        print(f"[{patient_id}] Pas d’événements .mat pour comparaison manuelle. "
-              f"errors_{seuil}.xlsx créé (vide).")
+        print(f"[{patient_id}] Pas d’événements .mat pour comparaison manuelle. (comparaison sautée)")
+
 
     print(f"[{patient_id}] Traitement terminé.\n")
+
+
+# =========================================================
+#  FONCTION WORKER TOP-LEVEL (picklable pour spawn)
+# =========================================================
+def run_one(path_str: str, raw_dir_str: str, out_dir_str: str, montage: str, seuil: int):
+    """Wrapper isolant le cache Matplotlib, pour exécution en multiprocess."""
+    try:
+        mpl_cache = f"/tmp/mplcache_{os.getpid()}"
+        os.environ["MPLCONFIGDIR"] = mpl_cache
+        os.makedirs(mpl_cache, exist_ok=True)
+    except Exception:
+        pass
+    return process_patient(
+        Path(path_str),
+        Path(raw_dir_str),
+        Path(out_dir_str),
+        montage,
+        seuil,
+    )
 
 
 # =========================================================
@@ -265,47 +263,10 @@ def aggregate_and_plot_overview_all_seuils(raw_dir: Path, out_dir: Path):
     exporte un Excel global unique (tous seuils),
     et trace un radar multi-polygones (un par seuil).
     """
-    from scipy.io import loadmat
     from collections import defaultdict, Counter
 
-    # Helpers
-    def _as_1d_float_array(x):
-        try:
-            a = np.asarray(x, dtype=float).ravel()
-            return a if a.size else np.array([], dtype=float)
-        except Exception:
-            return np.array([], dtype=float)
-
-    def _norm_label(x):
-        if isinstance(x, np.ndarray):
-            try:
-                x = x.item()
-            except Exception:
-                x = str(x)
-        return str(x).strip().lower().replace("_", " ")
-
-    def _merge_intervals(intervals, tol=0.0):
-        if not intervals:
-            return []
-        ints = sorted((float(s), float(e)) if float(s) <= float(e) else (float(e), float(s))
-                      for s, e in intervals)
-        out = []
-        cs, ce = ints[0]
-        for s, e in ints[1:]:
-            if s <= ce + tol:
-                ce = max(ce, e)
-            else:
-                out.append((cs, ce))
-                cs, ce = s, e
-        out.append((cs, ce))
-        return out
-
-    def is_inside(start, end, intervals, tol=0.5):
-        s = float(start); e = float(end)
-        for a, b in intervals:
-            if (a - tol) <= s and e <= (b + tol):
-                return True
-        return False
+    def _pct(x, denom):
+        return (100.0 * x / denom) if denom else 0.0
 
     pattern = re.compile(r"_microstates_(\d+)\.xlsx$", re.IGNORECASE)
 
@@ -342,31 +303,14 @@ def aggregate_and_plot_overview_all_seuils(raw_dir: Path, out_dir: Path):
                 continue
 
             mat_path = max(mat_candidates, key=lambda q: q.stat().st_mtime)
-            mat = loadmat(mat_path, squeeze_me=True, struct_as_record=False)
-            events = np.atleast_1d(mat.get("events", []))
 
-            rem_phasic = []
-            PAD_SEC = 2.0
-            for ev in events:
-                label = _norm_label(getattr(ev, "label", ""))
-                if label in {"rem phasique", "rem phasic", "rem_phasic"}:
-                    t = _as_1d_float_array(getattr(ev, "times", []))
-                    if t.size == 0:
-                        continue
-                    if t.size >= 2:
-                        start, end = float(t[0]), float(t[-1])
-                    else:
-                        center = float(t[0])
-                        start, end = center - PAD_SEC, center + PAD_SEC
-                    if end < start:
-                        start, end = end, start
-                    rem_phasic.append((start, end))
-            rem_phasic = _merge_intervals(rem_phasic, tol=0.0)
+            # Intervalles robustes
+            rem_phasic = load_rem_intervals(mat_path, pad_sec=2.0)
 
             erreurs, bons = [], []
             for _, row in df.iterrows():
-                start, end, pred = row["tmin"], row["tmax"], str(row["label"]).strip().lower()
-                true = "phasic" if is_inside(start, end, rem_phasic, tol=0.5) else "tonic"
+                start, end, pred = float(row["tmin"]), float(row["tmax"]), str(row["label"]).strip().lower()
+                true = "phasic" if _is_inside(start, end, rem_phasic, tol=0.5) else "tonic"
                 result = {"tmin": float(start), "tmax": float(end), "auto_label": pred, "true_label": true}
                 (bons if pred == true else erreurs).append(result)
 
@@ -462,6 +406,8 @@ if __name__ == "__main__":
                         help="Valeur de seuil pour le nommage des fichiers (ex: 100 ou 150)")
     parser.add_argument("--aggregate", action="store_true",
                         help="Mode agrégat : radar multi-seuils + Excel récap, sans retraiter les FIF.")
+    parser.add_argument("--workers", type=int, default=10,
+                        help="Nb de processus en parallèle (0 => CPU-1)")
     args = parser.parse_args()
     seuil = args.seuil
 
@@ -469,10 +415,11 @@ if __name__ == "__main__":
     response = input("Montage bipolaire ? (y/n) : ").strip().lower()
     if response not in {"y", "n"}:
         print("Réponse invalide. Tape 'y' ou 'n'.")
-        exit()
+        raise SystemExit(1)
     montage = "bipolaire" if response == "y" else "monopolaire"
 
-    # --- Détection du disque selon OS ---
+    # --- Détection du disque selon OS (ici forcé) ---
+    """
     system = platform.system()
     if system == "Darwin":
         disque = "/Volumes/Crucial X6"
@@ -482,10 +429,28 @@ if __name__ == "__main__":
         disque = "/media/darryld/Crucial X6"
     else:
         raise RuntimeError("Système non supporté.")
+    """
+    disque = "/home/darryld/documents"
 
     root_preproc = Path(f"{disque}/EEG/preprocessed/{montage}/full/")
-    root_raw = Path(f"{disque}/EEG/raw")
-    root_out = Path(f"{disque}/EEG/preprocessed/{montage}/rem_only")
+    root_raw     = Path(f"{disque}/EEG/raw")
+    root_out     = Path(f"{disque}/EEG/preprocessed/{montage}/rem_only")
+
+    # --- Warm-up Matplotlib pour éviter la création concurrente du cache
+    def _warmup_matplotlib():
+        import os
+        import matplotlib
+        import matplotlib.pyplot as plt
+        from matplotlib import font_manager as fm
+        matplotlib.get_cachedir()
+        fm.findfont('DejaVu Sans', rebuild_if_missing=True)
+        fig = plt.figure()
+        plt.plot([0, 1], [0, 1])
+        with open(os.devnull, "wb") as f:
+            fig.savefig(f, format="png")  # pas d’extension => pas de '/dev/null.png'
+        plt.close(fig)
+
+    _warmup_matplotlib()
 
     if args.aggregate:
         # Agrégat multi-seuils (scanne tous les *_microstates_*.xlsx)
@@ -498,5 +463,26 @@ if __name__ == "__main__":
         ]
         print(f"{len(fif_paths)} fichiers trouvés dans {root_preproc}")
 
-        for path in fif_paths:
-            process_patient(path, root_raw, root_out, montage, seuil=seuil)
+        if not fif_paths:
+            raise SystemExit(0)
+
+        # Calcul du nombre de workers
+        cpu = os.cpu_count() or 1
+        max_workers = (cpu - 1) if args.workers in (0, None) else max(1, args.workers)
+        max_workers = min(max_workers, len(fif_paths))
+        print(f"[INFO] Lancement en multiprocess avec {max_workers} worker(s) (CPU={cpu})")
+
+        ctx = mp.get_context("spawn")  # plus sûr avec NumPy/MKL
+
+        # Prépare les arguments (strings picklables)
+        args_list = [(str(p), str(root_raw), str(root_out), montage, seuil) for p in fif_paths]
+
+        # Pool de processus
+        with ProcessPoolExecutor(max_workers=max_workers, mp_context=ctx) as ex:
+            futures = {ex.submit(run_one, *a): a[0] for a in args_list}
+            for fut in as_completed(futures):
+                pstr = futures[fut]
+                try:
+                    fut.result()
+                except Exception as e:
+                    print(f"[ERROR] {Path(pstr).name}: {e}")
