@@ -9,7 +9,6 @@ os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
 os.environ.setdefault("NUMEXPR_NUM_THREADS", "1")
 os.environ.setdefault("VECLIB_MAXIMUM_THREADS", "1")  # macOS/Accelerate
 
-from concurrent.futures import ProcessPoolExecutor, as_completed
 import multiprocessing as mp
 import faulthandler; faulthandler.enable()  # log des crashes natifs
 
@@ -26,12 +25,16 @@ import matplotlib.pyplot as plt
 import argparse
 import math
 import re
+import shutil
+import tempfile
+import traceback
+import gc
 
 # ==========================
 #   Imports projet
 # ==========================
 from signal_processing.loader import load_signals_and_annotations
-from signal_processing.windowing import segment_rem_in_windows
+from signal_processing.windowing import segment_rem_in_windows  # générateur WindowProxy
 from signal_processing.eog_analysis import detect_eog_microstate
 from signal_processing.annotation import annotate_microstates
 from signal_processing.filters import apply_custom_filters  # si utilisé ailleurs
@@ -41,9 +44,13 @@ from utils.preprocessing_bip import apply_custom_bipolar_montage  # si utilisé 
 from utils.compare_mat import compare_with_mat, _load_rem_phasic_intervals as load_rem_intervals
 
 import mne
+mne.set_config('MNE_MEMMAP_MIN_SIZE', '1M', set_env=True)  # favorise memmap
 
 
-# Petit helper commun (tolérance d’inclusion)
+# -------------------------------------------------------------------
+# Utilitaires
+# -------------------------------------------------------------------
+
 def _is_inside(start: float, end: float, intervals, tol: float = 0.5) -> bool:
     s = float(start); e = float(end)
     for a, b in intervals:
@@ -51,11 +58,72 @@ def _is_inside(start: float, end: float, intervals, tol: float = 0.5) -> bool:
             return True
     return False
 
+def _free_gb(path: Path) -> float:
+    return shutil.disk_usage(path).free / (1024 ** 3)
+
+def _free_big(*objs):
+    """Ferme/supprime des objets lourds et force un GC."""
+    for o in objs:
+        try:
+            if hasattr(o, "close"):
+                o.close()
+        except Exception:
+            pass
+        try:
+            del o
+        except Exception:
+            pass
+    gc.collect()
+
+def _load_microstates_excel(xlsx_path: Path) -> pd.DataFrame:
+    """
+    Lit un *_microstates_*.xlsx potentiellement hétérogène et renvoie un DataFrame
+    standardisé: colonnes ['tmin','tmax','label'] en numériques.
+    Lignes non convertibles supprimées avec log.
+    """
+    # Lecture (engine explicite si dispo)
+    try:
+        df = pd.read_excel(xlsx_path, engine="openpyxl")
+    except Exception:
+        df = pd.read_excel(xlsx_path)
+
+    def norm(s): return str(s).strip().lower()
+    cols = {norm(c): c for c in df.columns}
+
+    candidates_tmin = ["tmin", "start", "t_start", "debut", "onset", "begin"]
+    candidates_tmax = ["tmax", "end", "t_end", "fin", "offset", "stop"]
+    c_label = cols.get("label") or cols.get("classe") or cols.get("class") or cols.get("etat") or cols.get("state")
+
+    def pick(cands):
+        for k in cands:
+            if k in cols: return cols[k]
+        return None
+
+    c_tmin = pick(candidates_tmin) or ("tmin" if "tmin" in df.columns else None)
+    c_tmax = pick(candidates_tmax) or ("tmax" if "tmax" in df.columns else None)
+
+    if c_tmin is None or c_tmax is None:
+        raise ValueError(f"{xlsx_path.name}: colonnes tmin/tmax introuvables parmi {list(df.columns)}")
+
+    out = pd.DataFrame({
+        "tmin": pd.to_numeric(df[c_tmin], errors="coerce"),
+        "tmax": pd.to_numeric(df[c_tmax], errors="coerce"),
+        "label": (df[c_label] if c_label else "unknown"),
+    })
+    out["label"] = out["label"].astype(str).str.strip().str.lower()
+
+    before = len(out)
+    out = out.dropna(subset=["tmin", "tmax"]).reset_index(drop=True)
+    dropped = before - len(out)
+    if dropped:
+        print(f"[SANITIZE] {xlsx_path.name}: {dropped} ligne(s) ignorée(s) (tmin/tmax non numériques).")
+    return out
+
 
 # =========================================================
 #                 TRAITEMENT PAR PATIENT
 # =========================================================
-def process_patient(fif_path, raw_dir, out_dir, montage, seuil):
+def process_patient(fif_path: Path, raw_dir: Path, out_dir: Path, montage: str, seuil: int):
     patient_id = fif_path.stem.split("_")[0]
 
     if patient_id == "." or not patient_id.isalnum():
@@ -86,51 +154,70 @@ def process_patient(fif_path, raw_dir, out_dir, montage, seuil):
 
     # --- (Re)traitement seulement si nécessaire ---
     if not outputs_exist:
-        # Charge les signaux + segments REM et exécute le pipeline
+        # Espace disque minimal (sécurité)
+        if _free_gb(out_patient_dir) < 5.0:
+            print(f"[SKIP] {patient_id}: espace insuffisant (<5 Go) sur {out_patient_dir}")
+            return
+
+        # Charge les signaux + segments REM (memmap, preload=False dans loader)
         raw, rem_segments = load_signals_and_annotations(fif_path, annot_path)
 
         if not rem_segments:
             print(f"[SKIP] {patient_id} : aucun segment REM détecté.")
+            _free_big(raw)
             return
 
         print(f"[{patient_id}] {len(rem_segments)} segments REM détectés.")
-        windows = segment_rem_in_windows(raw, rem_segments, window_sec=4, step_sec=4)
 
+        # --- Streaming des fenêtres: pas de liste 'windows' en RAM
         labels = []
-        valid_windows = []
-        i = 0
-        while i < len(windows):
-            win = windows[i]
-            label = detect_eog_microstate(win)
+        valid_times = []  # liste de tuples (tmin, tmax)
+        skip_to = 0
+        for idx, win in enumerate(segment_rem_in_windows(raw, rem_segments, window_sec=4, step_sec=4)):
+            if idx < skip_to:
+                continue
+            label = detect_eog_microstate(win=win, min_pair_amp_uv=seuil)
             if label != "ignore":
+                t0 = float(win.first_time)
+                valid_times.append((t0, t0 + 4.0))
                 labels.append(label)
-                valid_windows.append(win)
-            i += 2 if label == "phasic" else 1
+            # saut de 2 si phasic, sinon 1
+            skip_to = idx + (2 if label == "phasic" else 1)
 
-        print(f"[{patient_id}] {len(valid_windows)} fenêtres retenues "
+        print(f"[{patient_id}] {len(valid_times)} fenêtres retenues "
               f"({labels.count('phasic')} phasic / {labels.count('tonic')} tonic)")
 
-        # Ajoute les annotations sans écraser l'existant
-        annotate_microstates(
-            raw, valid_windows, labels, window_sec=4,
-            mode="add",
-            prefix="microstate_"
-        )
+        # Écriture via répertoire temporaire + moves atomiques
+        with tempfile.TemporaryDirectory(prefix=f"{patient_id}_", dir=out_patient_dir) as td:
+            tdir = Path(td)
 
-        # Sauvegarde du Raw annoté
-        raw.save(raw_annotated_path, overwrite=True)
+            # Ajoute les annotations sans écraser l'existant
+            annotate_microstates(
+                raw, valid_times, labels, window_sec=4,
+                mode="add",
+                prefix="microstate_"
+            )
 
-        # Export tabulaire des fenêtres retenues
-        df = pd.DataFrame({
-            "tmin": [win.first_time for win in valid_windows],
-            "tmax": [win.first_time + 4 for win in valid_windows],
-            "label": labels
-        })
-        df.to_excel(xlsx_out, index=False)
+            # 1) Sauvegarde du Raw annoté -> temp -> destination
+            tmp_fif = tdir / raw_annotated_path.name
+            raw.save(tmp_fif, overwrite=True)
+            os.replace(tmp_fif, raw_annotated_path)
+
+            # 2) Export tabulaire des fenêtres retenues -> temp -> destination
+            df = pd.DataFrame({"tmin": [a for a, _ in valid_times],
+                               "tmax": [b for _, b in valid_times],
+                               "label": labels})
+            tmp_xlsx = tdir / xlsx_out.name
+            df.to_excel(tmp_xlsx, index=False, engine="xlsxwriter")
+            os.replace(tmp_xlsx, xlsx_out)
+
+        # Libère RAM
+        _free_big(raw, df, valid_times, labels)
+
     else:
         print(f"[{patient_id}] Sorties auto déjà présentes, on saute le pipeline et on charge l'Excel.")
         try:
-            df = pd.read_excel(xlsx_out)
+            df = _load_microstates_excel(xlsx_out)
         except Exception as e:
             print(f"[{patient_id}] Impossible de lire {xlsx_out.name} pour la comparaison : {e}")
             return
@@ -157,7 +244,7 @@ def process_patient(fif_path, raw_dir, out_dir, montage, seuil):
             verbose=True,
         )
 
-        # 2) Stats + figure locales (en réutilisant le loader robuste)
+        # 2) Stats + figure locales (loader robuste)
         rem_phasic = load_rem_intervals(mat_path, pad_sec=2.0)
 
         erreurs = []
@@ -173,20 +260,15 @@ def process_patient(fif_path, raw_dir, out_dir, montage, seuil):
         n_bad = len(erreurs)
         n_eval = n_good + n_bad
         n_total = len(df)
-
-        if n_eval > 0:
-            pct_good = 100.0 * n_good / n_eval
-            pct_bad  = 100.0 * n_bad  / n_eval
-        else:
-            pct_good = pct_bad = 0.0
+        pct_good = (100.0 * n_good / n_eval) if n_eval else 0.0
+        pct_bad  = (100.0 * n_bad  / n_eval) if n_eval else 0.0
 
         from collections import Counter
         true_counts = Counter([r["true_label"] for r in bons + erreurs])
         good_counts = Counter([r["true_label"] for r in bons])
         bad_counts  = Counter([r["true_label"] for r in erreurs])
 
-        def _pct(x, denom):
-            return (100.0 * x / denom) if denom else 0.0
+        def _pct(x, denom): return (100.0 * x / denom) if denom else 0.0
 
         print(
             f"[{patient_id}] Comparaison .mat — "
@@ -219,15 +301,19 @@ def process_patient(fif_path, raw_dir, out_dir, montage, seuil):
                         f"{height:.1f}%\n(n={count})",
                         ha="center", va="bottom", fontsize=9)
             out_png = out_patient_dir / f"{patient_id}_microstates_eval_summary_{seuil}.png"
-            fig.savefig(out_png, dpi=150, bbox_inches="tight")
+            with tempfile.TemporaryDirectory(prefix=f"{patient_id}_", dir=out_patient_dir) as td:
+                tmp_png = Path(td) / out_png.name
+                fig.savefig(tmp_png, dpi=150, bbox_inches="tight")
+                os.replace(tmp_png, out_png)
             plt.close(fig)
             print(f"[{patient_id}] Visualisation summary sauvegardée → {out_png.name}")
         except Exception as e:
             print(f"[{patient_id}] Plot skipped: {e}")
 
+        _free_big(erreurs, bons, rem_phasic)
+
     else:
         print(f"[{patient_id}] Pas d’événements .mat pour comparaison manuelle. (comparaison sautée)")
-
 
     print(f"[{patient_id}] Traitement terminé.\n")
 
@@ -236,20 +322,20 @@ def process_patient(fif_path, raw_dir, out_dir, montage, seuil):
 #  FONCTION WORKER TOP-LEVEL (picklable pour spawn)
 # =========================================================
 def run_one(path_str: str, raw_dir_str: str, out_dir_str: str, montage: str, seuil: int):
-    """Wrapper isolant le cache Matplotlib, pour exécution en multiprocess."""
+    """Wrapper: exécution par patient (mémoire isolée)."""
     try:
-        mpl_cache = f"/tmp/mplcache_{os.getpid()}"
+        mpl_cache = os.path.join(tempfile.gettempdir(), f"mplcache_{os.getpid()}")
         os.environ["MPLCONFIGDIR"] = mpl_cache
         os.makedirs(mpl_cache, exist_ok=True)
     except Exception:
         pass
-    return process_patient(
-        Path(path_str),
-        Path(raw_dir_str),
-        Path(out_dir_str),
-        montage,
-        seuil,
-    )
+    try:
+        return process_patient(
+            Path(path_str), Path(raw_dir_str), Path(out_dir_str), montage, seuil
+        )
+    except Exception as e:
+        # Trace complète depuis le worker (remonte côté parent)
+        raise RuntimeError(f"Worker error on {Path(path_str).name}: {e}\n{traceback.format_exc()}") from e
 
 
 # =========================================================
@@ -258,21 +344,16 @@ def run_one(path_str: str, raw_dir_str: str, out_dir_str: str, montage: str, seu
 def aggregate_and_plot_overview_all_seuils(raw_dir: Path, out_dir: Path):
     """
     Scanne out_dir/*/ pour tous les *_microstates_*.xlsx.
-    Pour chaque fichier, retrouve events_{ID}*.mat, recalcule les stats,
-    écrit errors_{seuil}.xlsx par (patient, seuil),
-    exporte un Excel global unique (tous seuils),
+    Recalcule les stats à partir des .mat, exporte un Excel global,
     et trace un radar multi-polygones (un par seuil).
     """
     from collections import defaultdict, Counter
 
-    def _pct(x, denom):
-        return (100.0 * x / denom) if denom else 0.0
-
+    def _pct(x, denom): return (100.0 * x / denom) if denom else 0.0
     pattern = re.compile(r"_microstates_(\d+)\.xlsx$", re.IGNORECASE)
 
     overview_rows = []
     radar_data = defaultdict(dict)   # seuil -> {patient_id: pct_good}
-
     processed_any = False
 
     for pdir in sorted([p for p in out_dir.iterdir() if p.is_dir()]):
@@ -283,14 +364,11 @@ def aggregate_and_plot_overview_all_seuils(raw_dir: Path, out_dir: Path):
                 continue
             seuil = int(m.group(1))
 
-            # Charger l'xlsx auto
+            # Charger l'xlsx (sanitizer)
             try:
-                df = pd.read_excel(xlsx_path)
+                df = _load_microstates_excel(xlsx_path)
             except Exception as e:
-                print(f"[{pid}] lecture {xlsx_path.name} impossible: {e} — errors_{seuil}.xlsx vide créé.")
-                pd.DataFrame(columns=["tmin", "tmax", "auto_label", "true_label"]).to_excel(
-                    pdir / f"{pid}_microstates_errors_{seuil}.xlsx", index=False
-                )
+                print(f"[{pid}] lecture {xlsx_path.name} impossible: {e}")
                 continue
 
             # .mat candidats
@@ -298,7 +376,7 @@ def aggregate_and_plot_overview_all_seuils(raw_dir: Path, out_dir: Path):
             if not mat_candidates:
                 print(f"[{pid}] pas de .mat — ignoré pour stats, errors_{seuil}.xlsx vide créé.")
                 pd.DataFrame(columns=["tmin", "tmax", "auto_label", "true_label"]).to_excel(
-                    pdir / f"{pid}_microstates_errors_{seuil}.xlsx", index=False
+                    pdir / f"{pid}_microstates_errors_{seuil}.xlsx", index=False, engine="xlsxwriter"
                 )
                 continue
 
@@ -345,7 +423,7 @@ def aggregate_and_plot_overview_all_seuils(raw_dir: Path, out_dir: Path):
 
             # Fichier d'erreurs (même si vide)
             pd.DataFrame(erreurs, columns=["tmin", "tmax", "auto_label", "true_label"]).to_excel(
-                pdir / f"{pid}_microstates_errors_{seuil}.xlsx", index=False
+                pdir / f"{pid}_microstates_errors_{seuil}.xlsx", index=False, engine="xlsxwriter"
             )
             print(f"[{pid}] errors_{seuil}.xlsx sauvegardé ({len(erreurs)} erreurs).")
 
@@ -359,7 +437,7 @@ def aggregate_and_plot_overview_all_seuils(raw_dir: Path, out_dir: Path):
     # --- Export Excel global (tous seuils)
     df_overview = pd.DataFrame(overview_rows)
     out_excel = out_dir / "microstates_eval_overview_all.xlsx"
-    df_overview.to_excel(out_excel, index=False)
+    df_overview.to_excel(out_excel, index=False, engine="xlsxwriter")
     print(f"[AGRÉGAT] Export récap → {out_excel}")
 
     # --- Radar multi-polygones (un par seuil) ---
@@ -376,22 +454,24 @@ def aggregate_and_plot_overview_all_seuils(raw_dir: Path, out_dir: Path):
     ax.set_yticklabels([str(v) for v in [20, 40, 60, 80, 100]])
     ax.set_title("Pourcentage de bonnes prédictions — tous seuils", va="bottom")
 
-    # Couleurs: si exactement {100,150} -> bleu/orange ; sinon couleurs auto
     seuils_sorted = sorted(radar_data.keys())
     two_standard = (len(seuils_sorted) == 2 and set(seuils_sorted) == {100, 150})
     color_map = {100: "tab:blue", 150: "tab:orange"} if two_standard else {}
 
-    for seuil in seuils_sorted:
-        data = radar_data[seuil]
+    for s in seuils_sorted:
+        data = radar_data[s]
         vals = [data.get(pid, np.nan) for pid in all_patients]
         vals_closed = vals + [vals[0]]
-        color = color_map.get(seuil, None)  # None => couleur auto
-        ax.plot(angles_closed, vals_closed, linewidth=2, label=f"seuil {seuil}", color=color)
+        color = color_map.get(s, None)  # None => couleur auto
+        ax.plot(angles_closed, vals_closed, linewidth=2, label=f"seuil {s}", color=color)
         ax.fill(angles_closed, vals_closed, alpha=0.15, color=color)
 
     ax.legend(loc="upper right", bbox_to_anchor=(1.25, 1.1))
     out_png = out_dir / "microstates_eval_radar_all.png"
-    fig.savefig(out_png, dpi=150, bbox_inches="tight")
+    with tempfile.TemporaryDirectory(prefix="_overview_", dir=out_dir) as td:
+        tmp_png = Path(td) / out_png.name
+        fig.savefig(tmp_png, dpi=150, bbox_inches="tight")
+        os.replace(tmp_png, out_png)
     plt.close(fig)
     print(f"[AGRÉGAT] Radar multi-seuils sauvegardé → {out_png}")
 
@@ -406,17 +486,25 @@ if __name__ == "__main__":
                         help="Valeur de seuil pour le nommage des fichiers (ex: 100 ou 150)")
     parser.add_argument("--aggregate", action="store_true",
                         help="Mode agrégat : radar multi-seuils + Excel récap, sans retraiter les FIF.")
-    parser.add_argument("--workers", type=int, default=10,
+    parser.add_argument("--workers", type=int, default=4,
                         help="Nb de processus en parallèle (0 => CPU-1)")
+    parser.add_argument("--montage", choices=["bipolaire", "monopolaire"], default=None,
+                        help="Montage à utiliser sans invite interactive.")
     args = parser.parse_args()
     seuil = args.seuil
 
     # --- Choix du montage ---
-    response = input("Montage bipolaire ? (y/n) : ").strip().lower()
-    if response not in {"y", "n"}:
-        print("Réponse invalide. Tape 'y' ou 'n'.")
-        raise SystemExit(1)
-    montage = "bipolaire" if response == "y" else "monopolaire"
+    def choose_montage(args):
+        if args.aggregate:
+            return args.montage or "bipolaire"
+        if args.montage in {"bipolaire", "monopolaire"}:
+            return args.montage
+        resp = input("Montage bipolaire ? (y/n) : ").strip().lower()
+        if resp not in {"y", "n"}:
+            print("Réponse invalide. Tape 'y' ou 'n'."); raise SystemExit(1)
+        return "bipolaire" if resp == "y" else "monopolaire"
+
+    montage = choose_montage(args)
 
     # --- Détection du disque selon OS (ici forcé) ---
     """
@@ -436,9 +524,14 @@ if __name__ == "__main__":
     root_raw     = Path(f"{disque}/EEG/raw")
     root_out     = Path(f"{disque}/EEG/preprocessed/{montage}/rem_only")
 
+    # Vérif d'existence + création
+    for p in [root_preproc, root_raw]:
+        if not p.exists():
+            raise SystemExit(f"[CONFIG] Dossier introuvable: {p}")
+    root_out.mkdir(parents=True, exist_ok=True)
+
     # --- Warm-up Matplotlib pour éviter la création concurrente du cache
     def _warmup_matplotlib():
-        import os
         import matplotlib
         import matplotlib.pyplot as plt
         from matplotlib import font_manager as fm
@@ -447,16 +540,14 @@ if __name__ == "__main__":
         fig = plt.figure()
         plt.plot([0, 1], [0, 1])
         with open(os.devnull, "wb") as f:
-            fig.savefig(f, format="png")  # pas d’extension => pas de '/dev/null.png'
+            fig.savefig(f, format="png")
         plt.close(fig)
 
     _warmup_matplotlib()
 
     if args.aggregate:
-        # Agrégat multi-seuils (scanne tous les *_microstates_*.xlsx)
         aggregate_and_plot_overview_all_seuils(raw_dir=root_raw, out_dir=root_out)
     else:
-        # Mode traitement patient par patient
         fif_paths = [
             p for p in root_preproc.rglob("*_preprocessed_*.fif")
             if not p.name.startswith("._") and not p.name.startswith(".")
@@ -470,19 +561,17 @@ if __name__ == "__main__":
         cpu = os.cpu_count() or 1
         max_workers = (cpu - 1) if args.workers in (0, None) else max(1, args.workers)
         max_workers = min(max_workers, len(fif_paths))
-        print(f"[INFO] Lancement en multiprocess avec {max_workers} worker(s) (CPU={cpu})")
-
-        ctx = mp.get_context("spawn")  # plus sûr avec NumPy/MKL
+        print(f"[INFO] Lancement en multiprocess avec {max_workers} worker(s) (CPU={cpu}) (maxtasksperchild=1)")
 
         # Prépare les arguments (strings picklables)
         args_list = [(str(p), str(root_raw), str(root_out), montage, seuil) for p in fif_paths]
 
-        # Pool de processus
-        with ProcessPoolExecutor(max_workers=max_workers, mp_context=ctx) as ex:
-            futures = {ex.submit(run_one, *a): a[0] for a in args_list}
-            for fut in as_completed(futures):
-                pstr = futures[fut]
-                try:
-                    fut.result()
-                except Exception as e:
-                    print(f"[ERROR] {Path(pstr).name}: {e}")
+        # Pool recyclable + Option A: STARMAP (pas de wrapper local)
+        ctx = mp.get_context("spawn")
+        with ctx.Pool(processes=max_workers, maxtasksperchild=1) as pool:
+            try:
+                # starmap renvoie les résultats dans l'ordre; on itère pour exécuter/propager les erreurs
+                for _ in pool.starmap(run_one, args_list, chunksize=1):
+                    pass
+            except Exception as e:
+                print(f"[POOL ERROR] {e}\n{traceback.format_exc()}")
