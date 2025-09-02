@@ -802,13 +802,13 @@ def detect_disque(explicit: str | None = None) -> str:
         return explicit
     system = platform.system()
     if system == "Darwin":
-        return "/Volumes/Crucial X6"
+        return "/Volumes/" # disque dur -> "/Volumes/Crucial X6"
     elif system == "Windows":
         return "D:"
     elif system == "Linux":
         # Adapter si besoin; fallback générique
         user = os.getenv("USER") or os.getenv("USERNAME") or ""
-        return f"/media/{user}/Crucial X6" if user else "/media/Crucial X6"
+        return f"/media/{user}/" # disque dur -> f"/media/{user}/Crucial X6" if user else "/media/Crucial X6"
     else:
         raise RuntimeError("Système non supporté pour la détection de disque.")
 
