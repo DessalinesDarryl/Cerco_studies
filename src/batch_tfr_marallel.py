@@ -859,9 +859,9 @@ if __name__ == "__main__":
     disque = detect_disque(args.disk)
 
     # Fixe les roots selon le disque détecté
-    fif_root    = Path(f"{disque}/documents/EEG/preprocessed/bipolaire/full")
-    annot_root  = Path(f"{disque}/documents/EEG/raw")
-    out_root    = Path(f"{disque}/documents/EEG/preprocessed/bipolaire/PWD")
+    fif_root    = Path(f"{disque}/EEG/preprocessed/bipolaire/full")
+    annot_root  = Path(f"{disque}/EEG/raw")
+    out_root    = Path(f"{disque}/EEG/preprocessed/bipolaire/PWD")
 
     # Vérif d'existence + création
     for p in [fif_root, annot_root]:
