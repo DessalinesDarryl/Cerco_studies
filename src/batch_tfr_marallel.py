@@ -46,6 +46,8 @@ from collections import Counter
 import argparse
 import numpy as np
 import pandas as pd
+import tempfile
+
 
 # Matplotlib non-interactif sûr en multiprocess
 import matplotlib
@@ -440,11 +442,21 @@ def _plot_and_save_power(power, ch, base, stage, out_png, vmin_eff, vmax_eff, n_
     figs = fig if isinstance(fig, (list, tuple)) else [fig]
     _format_time_axes(figs)
 
-    # Titre avec n_epochs
-    try:
-        figs[0].suptitle(f"{base} — {ch} — {stage}  (n_epochs={n_epochs})", y=0.98)
-    except Exception:
-        pass
+    # ---- Titre AU-DESSUS de l'image ----
+    title = f"{base} — {ch} — {stage}  (n_epochs={n_epochs})"
+    for f in figs:
+        # Évite les conflits entre constrained_layout et tight_layout
+        try:
+            f.set_constrained_layout(False)
+        except Exception:
+            pass
+        # titre au-dessus des axes
+        f.suptitle(title, y=1.02)             # >1.00 le met au-dessus de l'axe/colorbar
+        # espace pour le titre
+        try:
+            f.tight_layout(rect=[0, 0, 1, 0.96])  # garde 4% en haut pour le titre
+        except Exception:
+            f.subplots_adjust(top=0.90)           # fallback
 
     # Garde-fou "figure blanche"
     ax0 = figs[0].axes[0] if figs and figs[0].axes else None
@@ -471,9 +483,9 @@ def _plot_and_save_power(power, ch, base, stage, out_png, vmin_eff, vmax_eff, n_
     return True
 
 
+
 def process_one_patient(item):
     global out_root, annot_root
-    # item peut être "base" (str) ou (base, fif_path)
     if isinstance(item, tuple):
         base, fif_path = item
         fif_path = Path(fif_path)
@@ -509,7 +521,7 @@ def process_one_patient(item):
         print(f"[{base}] Save FULL_clean échoué: {e}")
 
     # =================== PIPELINE REM (inchangé) ===================
-    # Annotations REM depuis .txt (comme avant)
+    # Annotations REM depuis .txt 
     rem_annots = get_rem_annotations(base, annot_dir=str(annot_root))
     if rem_annots is None or len(rem_annots) == 0:
         print(f"[{base}] Aucune annotation REM -> skip REM")
@@ -802,13 +814,13 @@ def detect_disque(explicit: str | None = None) -> str:
         return explicit
     system = platform.system()
     if system == "Darwin":
-        return "/Volumes/" # disque dur -> "/Volumes/Crucial X6"
+        return "/Volumes/Crucial X6"
     elif system == "Windows":
         return "D:"
     elif system == "Linux":
         # Adapter si besoin; fallback générique
         user = os.getenv("USER") or os.getenv("USERNAME") or ""
-        return f"/media/{user}/" # disque dur -> f"/media/{user}/Crucial X6" if user else "/media/Crucial X6"
+        return f"/media/{user}/Crucial X6" if user else "/media/Crucial X6"
     else:
         raise RuntimeError("Système non supporté pour la détection de disque.")
 
@@ -844,6 +856,21 @@ def _worker_wrapper(item):
         import traceback
         raise RuntimeError(f"Worker error on {item}: {e}\n{traceback.format_exc()}") from e
 
+def _init_worker(gl_out_root: str, gl_annot_root: str, gl_fif_root: str):
+    """Initialise les globaux dans chaque worker (spawn)."""
+    global out_root, annot_root, fif_root
+    out_root = Path(gl_out_root)
+    annot_root = Path(gl_annot_root)
+    fif_root = Path(gl_fif_root)
+
+    # isole le cache Matplotlib par PID (évite les races)
+    try:
+        mpl_cache = os.path.join(tempfile.gettempdir(), f"mplcache_{os.getpid()}")
+        os.environ["MPLCONFIGDIR"] = mpl_cache
+        os.makedirs(mpl_cache, exist_ok=True)
+    except Exception:
+        pass
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -856,7 +883,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Détection de disque selon OS (override CLI possible)
-    disque = detect_disque(args.disk)
+    #disque = detect_disque(args.disk)
+    disque = "/home/darryld/documents" # connexion ssh
 
     # Fixe les roots selon le disque détecté
     fif_root    = Path(f"{disque}/EEG/preprocessed/bipolaire/full")
@@ -892,9 +920,15 @@ if __name__ == "__main__":
     # Pool spawn, une tâche par patient, recycle les workers
     ctx = mp.get_context("spawn")
     try:
-        with ctx.Pool(processes=max_workers, maxtasksperchild=1) as pool:
+        with ctx.Pool(
+            processes=max_workers,
+            maxtasksperchild=1,
+            initializer=_init_worker,
+            initargs=(str(out_root), str(annot_root), str(fif_root)),
+        ) as pool:
             for _ in pool.imap_unordered(_worker_wrapper, PATIENTS, chunksize=1):
                 pass
     except Exception as e:
         import traceback
         print(f"[POOL ERROR] {e}\n{traceback.format_exc()}")
+
