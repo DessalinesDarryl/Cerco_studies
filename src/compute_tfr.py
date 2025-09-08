@@ -288,7 +288,7 @@ def _plot_and_save_power(power, ch, base, stage, out_png, vmin_eff, vmax_eff, n_
     if isinstance(fig, (list, tuple)):
         fig = fig[0]
     try:
-        fig.savefig(out_png, dpi=200, bbox_inches="tight")
+        fig.savefig(out_png, dpi=300, bbox_inches="tight")  # dpi (rélodution) : 300 -> articles / 600 -> posters
         print(f"[{base}:{stage}:{ch}] [ok] {out_png.name}")
     except Exception as e:
         print(f"[{base}:{stage}:{ch}] Save figure erreur: {e}")
