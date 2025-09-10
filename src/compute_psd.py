@@ -271,7 +271,7 @@ def per_band_barplots(df_patients: pd.DataFrame, out_root: Path,
         plt.bar(x, mean.values, yerr=sem.values, capsize=3, color=colors)
         plt.xticks(x, xticks, rotation=30, ha="right")
         plt.ylabel(ylabel)
-        plt.title(f"{band} — moyenne par catégorie")
+        plt.title(f"{band} - moyenne par catégorie")
         plt.tight_layout()
         out = out_root / f"perband_{kind}_{band}.png"
         fig.savefig(out, dpi=230)
@@ -369,8 +369,8 @@ def main():
         n = int(group_counts.get(grp, 0))
         fig = plt.figure(figsize=(7, 4))
         plt.bar(names, vals)
-        plt.ylabel("PSD intégrée (µV²)")
-        plt.title(f"Band power (absolute, µV²) — {grp} (n={n})")
+        plt.ylabel("PSD absolue (µV²)")
+        plt.title(f"Band power (absolute, µV²) - {grp} (n={n})")
         plt.tight_layout()
         out_png = out_root / f"{sanitize_name(grp)}_band_power_abs.png"
         fig.savefig(out_png, dpi=230)
@@ -379,7 +379,7 @@ def main():
     # On conserve le barplot global pour les RELATIVES
     g_rel_plot = g_rel.copy(); g_rel_plot.columns = band_names
     grouped_barplot(g_rel_plot, out_root / "group_band_power_rel.png",
-                    "Band power (relative) — mean per category",
+                    "Band power (relative) - mean per category",
                     ylabel="PSD relative")
     
     # --- barplots *par bande* (comparaison inter-catégorie) ---
@@ -390,7 +390,7 @@ def main():
     if missing:
         with open(out_root / "patients_unknown_category.txt", "w") as f:
             for b in sorted(set(missing)): f.write(f"{b}\n")
-        print(f"[INFO] {len(set(missing))} patient(s) sans catégorie connue → patients_unknown_category.txt")
+        print(f"[INFO] {len(set(missing))} patient(s) sans catégorie connue -> patients_unknown_category.txt")
 
 if __name__ == "__main__":
     main()
