@@ -23,7 +23,8 @@ elif system == "Linux":
 else:
     raise RuntimeError("Système non supporté.")
 
-base_dir = Path(f"{disque}/EEG/preprocessed/bipolaire/rem_only") 
+disque = "../../../home/darryld/documents/"
+base_dir = Path(f"{disque}/EEG/raw/") 
 fif_dir = st.sidebar.text_input("Dossier des fichiers .fif", base_dir)
 
 if not os.path.isdir(fif_dir):
