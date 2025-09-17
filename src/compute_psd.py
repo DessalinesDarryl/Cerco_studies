@@ -41,17 +41,22 @@ import mne
 mne.set_config('MNE_MEMMAP_MIN_SIZE', '1M', set_env=True)
 
 # ---------- Defaults ----------
-REM_DIR_DEFAULT  = "/home/darryld/documents/EEG/preprocessed/bipolaire/2_rem_only"
-OUT_ROOT_DEFAULT = "/home/darryld/documents/EEG/preprocessed/bipolaire/3_results_analysis"
+REM_DIR_DEFAULT  = "/home/darryld/documents/EEG/preprocessed/bipolaire/2_rem_only/gp1"
+OUT_ROOT_DEFAULT = "/home/darryld/documents/EEG/preprocessed/bipolaire/3_results_analysis/gp1"
 
 BANDS = {
     "Delta": (0.5, 4.0),
     "Theta": (4.0, 8.0),
     "Alpha": (8.0, 13.0),
     "Beta":  (13.0, 30.0),
-    "Gamma": (30.0, 45.0),
+    "Gamma Bas": (30.0, 45.0),
+    "Gamma Haut": (45.0, 80.0),
 }
-FMIN, FMAX = 0.5, 45.0   # bande globale (total)
+FMIN, FMAX = 0.5, 80.0   # bande globale (total)
+# pour comparer entre patients (évite les sfreq différents)
+COMMON_NFREQ = 400
+COMMON_FREQS = np.linspace(FMIN, FMAX, COMMON_NFREQ)
+
 
 # ---------- Utils ----------
 def normalize_id(x: str) -> str:
@@ -165,6 +170,23 @@ def make_patient_fig(base: str, freqs, psd_lin, out_png: Path, bands=BANDS):
     fig.savefig(out_png, dpi=220)
     plt.close(fig)
 
+def interp_to_common_grid(freqs: np.ndarray, psd_lin_mean: np.ndarray,
+                          grid: np.ndarray = COMMON_FREQS) -> np.ndarray:
+    """Interpole la PSD (moyenne sur canaux) sur une grille commune."""
+    # on enlève éventuels NaN/inf et assure ordre croissant
+    m = np.isfinite(freqs) & np.isfinite(psd_lin_mean)
+    f = freqs[m]
+    y = psd_lin_mean[m]
+    if f.size < 2:
+        return np.full_like(grid, np.nan, dtype=float)
+    # Clamp aux bords pour éviter extrapolations bizarres
+    y0 = np.interp(grid, f, y, left=y[0], right=y[-1])
+    return y0
+
+def band_indices(grid: np.ndarray, lo: float, hi: float) -> np.ndarray:
+    return np.where((grid >= lo) & (grid < hi))[0]
+
+
 # ---------- Worker ----------
 def process_one(base: str, rem_dir: Path, out_root: Path):
     base_n = normalize_id(base)
@@ -183,6 +205,9 @@ def process_one(base: str, rem_dir: Path, out_root: Path):
     try:
         freqs, psd_lin, ch_names = compute_psd(raw, fmin=FMIN, fmax=FMAX)
         total_abs, band_abs, band_rel = integrate_band_powers(freqs, psd_lin, BANDS)
+        # PSD moyenne sur canaux -> interpolation grille commune
+        psd_lin_mean = np.nanmean(psd_lin, axis=0)  # (n_freq,)
+        spec_lin_common = interp_to_common_grid(freqs, psd_lin_mean, COMMON_FREQS)  # (COMMON_NFREQ,)
     except Exception as e:
         return {"base": base_n, "ok": False, "reason": f"psd_error: {e}"}
 
@@ -201,7 +226,9 @@ def process_one(base: str, rem_dir: Path, out_root: Path):
         **{f"abs_{b}": abs_mean[b] for b in BANDS},
         **{f"rel_{b}": rel_mean[b] for b in BANDS},
     }
-    return {"base": base_n, "ok": True, "row": row}
+    # PSD interpollée
+    return {"base": base_n, "ok": True, "row": row, "spec_lin_common": spec_lin_common.tolist()}
+
 
 # ---------- Plots groupes ----------
     # --- Couleurs fixes par catégorie (hex) ---
@@ -349,7 +376,85 @@ def main():
     df = pd.DataFrame(rows).set_index("base").sort_index()
     csv_all = out_root / "all_band_powers.csv"
     df.to_csv(csv_all, float_format="%.8e")
-    print(f"→ {csv_all}")
+    print(f">>> {csv_all}")
+
+    # on récupére les PSD interpollées (linéaire), synchronisées par base
+    spec_map = {r["base"]: np.array(r["spec_lin_common"], dtype=float)
+                for r in results if r.get("ok") and "spec_lin_common" in r}
+    # Alignement avec df
+    bases_ok = [b for b in df.index if b in spec_map]
+    row_index = {b: i for i, b in enumerate(bases_ok)}  # base -> row index dans SPEC
+    if not bases_ok:
+        print("[WARN] Aucune PSD interpolée récupérée, skip figure inter-groupes.")
+    else:
+        SPEC = np.vstack([spec_map[b] for b in bases_ok])   # (n_patients_ok, COMMON_NFREQ)
+        DF_ALIGNED = df.loc[bases_ok].copy()
+
+        # Conversion en dB (re µV²/Hz)
+        eps = np.finfo(float).tiny
+        SPEC_DB = 10.0 * np.log10(np.maximum(SPEC, eps))
+
+        # Figure inter-groupes: une courbe par groupe, mêmes axes, par bande
+        fig, axes = plt.subplots(3, 2, figsize=(11, 9))
+        axes = axes.ravel()
+        fig.suptitle("PSD REM - courbes par bande, superposées par groupe (moy ± p10–p90)", fontsize=14, y=0.98)
+
+        band_list = list(BANDS.items())
+        for i, (name, (lo, hi)) in enumerate(band_list):
+            ax = axes[i]
+            idx = band_indices(COMMON_FREQS, lo, hi)
+            if idx.size == 0:
+                ax.set_visible(False); continue
+
+            for grp, idx_labels in DF_ALIGNED.groupby("group").groups.items():
+                if len(idx_labels) == 0:
+                    continue
+                # convertir labels -> indices entiers
+                idx_int = np.array([row_index[b] for b in idx_labels if b in row_index], dtype=int)
+                if idx_int.size == 0:
+                    continue
+
+                # PSD du groupe (en dB) restreinte à la sous-bande
+                sub = SPEC_DB[idx_int][:, idx]  # (n_grp, n_freq_band)
+                if sub.size == 0:
+                    continue
+
+                m   = np.nanmean(sub, axis=0)
+                p10 = np.nanpercentile(sub, 10, axis=0)
+                p90 = np.nanpercentile(sub, 90, axis=0)
+
+                color = color_for_group(grp)
+                ax.plot(COMMON_FREQS[idx], m, lw=2, label=f"{short_label(grp)}", color=color)
+                ax.fill_between(COMMON_FREQS[idx], p10, p90, alpha=0.12, color=color)
+
+
+            ax.set_xscale("log")
+            lo_i = max(1, int(np.ceil(lo)))
+            hi_i = int(np.floor(hi))
+            ticks = list(range(lo_i, hi_i + 1))
+            if ticks:
+                ax.xaxis.set_major_locator(FixedLocator(ticks))
+                ax.minorticks_off()
+            ax.xaxis.set_major_formatter(ScalarFormatter())
+            ax.set_xlabel("Fréquence (Hz)")
+            ax.set_ylabel("PSD (dB re µV²/Hz)")
+            ax.set_title(f"{name}  [{lo:.1f}-{hi:.1f}] Hz")
+            ax.grid(True, alpha=0.2)
+
+        if len(band_list) < len(axes):
+            axes[-1].axis("off")
+
+        # Légende globale
+        handles, labels = axes[0].get_legend_handles_labels()
+        if handles:
+            fig.legend(handles, labels, loc="lower center", ncol=5, frameon=False)
+
+        plt.tight_layout(rect=[0, 0.04, 1, 0.96])
+        out_png = out_root / "group_psd_bands.png"
+        fig.savefig(out_png, dpi=230)
+        plt.close(fig)
+        print(f">>> {out_png}")
+
 
     # Agrégats par label
     band_names = list(BANDS.keys())
@@ -383,8 +488,8 @@ def main():
                     ylabel="PSD relative")
     
     # --- barplots *par bande* (comparaison inter-catégorie) ---
-    per_band_barplots(df, out_root, bands=BANDS, kind="abs")  # fichiers perband_abs_<Band>.png
-    per_band_barplots(df, out_root, bands=BANDS, kind="rel")  # fichiers perband_rel_<Band>.png
+    per_band_barplots(df, out_root, bands=BANDS, kind="abs")  
+    per_band_barplots(df, out_root, bands=BANDS, kind="rel") 
 
 
     if missing:

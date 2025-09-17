@@ -6,7 +6,7 @@ import platform
 from pathlib import Path
 from filters import get_standard_bands, filter_band
 from annotations import get_rem_annotations
-from utils import list_fif_files, get_base_name
+from utils.common import list_fif_files, get_base_name
 
 st.set_page_config(page_title="Visualisation EEG", layout="wide")
 st.title("Visualisation des signaux EEG")
@@ -18,10 +18,12 @@ if system == "Darwin":  # MacOS
     disque = "/Volumes/Crucial X6"
 elif system == "Windows":
     disque = "D:"
+elif system == "Linux":
+    disque = "/home/darryld/documents"
 else:
     raise RuntimeError("Système non supporté.")
 
-base_dir = Path(f"{disque}/EEG/preprocessed/monopolaire/full") 
+base_dir = Path(f"{disque}/EEG/preprocessed/bipolaire/1_noArtefacts/gp1/")
 fif_dir = st.sidebar.text_input("Dossier des fichiers .fif", base_dir)
 
 if not os.path.isdir(fif_dir):
@@ -62,19 +64,10 @@ if band_name != "Aucune":
     raw_display = filter_band(raw_display, l_freq, h_freq)
     st.markdown(f"Filtrage appliqué : **{band_name}**")
 
-# Annotations REM
-if st.checkbox("Afficher les périodes REM sur le signal"):
-    annot_root = st.sidebar.text_input("Dossier des annotations (.txt)", f"{disque}/EEG/raw")
-    rem_annotations = get_rem_annotations(base_name, annot_root)
-
-    if rem_annotations:
-        raw_display.set_annotations(rem_annotations)
-        st.success(f"{len(rem_annotations)} segments REM ajoutés.")
-    else:
-        st.warning("Aucune période REM trouvée pour ce patient.")
-
 # Échelle amplitude µV
-amplitude = st.number_input("Amplitude (µV)", min_value=1.0, max_value=50000000.0, value=25.0, step=1.0)
+amplitude_eeg = st.number_input("Amplitude EEG (µV)", min_value=1.0, max_value=50000000.0, value=25.0, step=1.0)
+amplitude_emg = st.number_input("Amplitude EMG (µV)", min_value=1.0, max_value=50000000.0, value=100.0, step=1.0)
+amplitude_eog = st.number_input("Amplitude EOG (µV)", min_value=1.0, max_value=50000000.0, value=100.0, step=1.0)
 
 
 # Plage d’affichage
@@ -86,7 +79,11 @@ plt.close('all')
 fig = raw_display.plot(
     start=start_time,
     duration=duration,
-    scalings=dict(eeg=amplitude * 1e-6),
+    scalings=dict(
+        eeg=amplitude_eeg * 1e-6,
+        emg=amplitude_emg * 1e-6,
+        eog=amplitude_eog * 1e-6,
+    ),
     remove_dc=True,
     show=False
     )

@@ -38,15 +38,18 @@ def _read_hypnogram_any(path: Path) -> pd.DataFrame:
     suf = path.suffix.lower()
 
     if suf == ".txt":
-        # Format tabulé: start (s), time 'hh:mm:ss', stage, index
+        # Format à séparateurs variables (espaces, tabs). Noms de colonnes imposés.
         df = pd.read_csv(
-            path, sep="\t",
+            path,
+            sep=r"\s+",                 # accepte 1..n espaces ou tabulations
             names=["start", "time", "stage", "index"],
-            engine="python"
+            engine="python",
+            on_bad_lines="skip"         # utile si lignes corrompues
         )
         df = df.dropna(subset=["start", "stage"]).copy()
-        df["start"] = df["start"].astype(float)
+        df["start"] = pd.to_numeric(df["start"], errors="coerce")
         stage = df["stage"].map(_norm_stage)
+
 
     elif suf == ".csv":
         # Délimiteur auto + colonnes flexibles
@@ -112,7 +115,9 @@ def _find_annot_for_base(base_name: str, annot_dir: str | Path) -> list[Path]:
     """
     patient_code = str(base_name).split("_")[0]
     pdir = Path(annot_dir) / patient_code
-    return list(pdir.glob("*.txt")) + list(pdir.glob("*.csv"))
+    allc = list(pdir.glob("*.txt")) + list(pdir.glob("*.csv"))
+    files = [p for p in allc if not p.name.startswith("._")]   # ignore macOS hidden files
+    return files
 
 def get_rem_annotations(base_name: str, annot_dir: str | Path) -> mne.Annotations | None:
     """
