@@ -518,8 +518,8 @@ if __name__ == "__main__":
     ap.add_argument("--workers", type=int, default=8, help="Nb de workers (0=CPU-1)")
     args = ap.parse_args()
 
-    in_path = Path("/home/darryld/documents/EEG/preprocessed/bipolaire/0_raw_bip_gp1") if args.in_path is None else Path(args.in_path)
-    out_root = Path("/home/darryld/documents/EEG/preprocessed/bipolaire/1_noArtefacts/gp1") if args.out_dir is None else Path(args.out_dir)
+    in_path = Path("/home/darryld/documents/EEG/preprocessed/bipolaire/0_raw_bip_gp2") if args.in_path is None else Path(args.in_path)
+    out_root = Path("/home/darryld/documents/EEG/preprocessed/bipolaire/1_noArtefacts/gp2") if args.out_dir is None else Path(args.out_dir)
     out_root.mkdir(parents=True, exist_ok=True)
 
     hypno_root = Path("/home/darryld/documents/EEG/raw/")

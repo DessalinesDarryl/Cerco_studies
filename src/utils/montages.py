@@ -48,16 +48,22 @@ MONTAGE_GP1 = Montage(
     keep_raw=["Menton", "JAMBG", "JAMBD", "RONF", "EMG1", "EMG2", "ECG", "EOGD", "EOGG"],
 )
 
-# === Montage bipolaire pour le groupe 2 ===
+# === Montage bipolaire pour le groupe 1 & 2 ===
 MONTAGE_GP2 = Montage(
     name="gp2",
     pairs=[
-        ("Fp1", "T3",  "Fp1-T3"), 
+        ("Fp1", "T3",  "Fp1-T3"),
         ("Fp1", "C3",  "Fp1-C3"),
         ("T3",  "O1",  "T3-O1"),
         ("Fp2", "T4",  "Fp2-T4"),
         ("Fp2", "C4",  "Fp2-C4"),
         ("T4",  "O2",  "T4-O2"),
+        ("Fp1", "A1", "Fp1-A1"),
+        ("Fp2", "A1", "Fp2-A1"),
+        ("T3", "A1", "T3-A1"),
+        ("C3", "A1", "C3-A1"),
+        ("T4", "A1", "T4-A1"),
+        ("C4", "A1", "C4-A1"),
     ],
     keep_raw=["Menton", "JAMBG", "JAMBD", "RONF", "EMG1", "EMG2", "ECG", "EOGD", "EOGG"],
 )
@@ -66,6 +72,7 @@ MONTAGE_GP2 = Montage(
 MONTAGES: Dict[str, Montage] = {
     MONTAGE_DEFAULT.name: MONTAGE_DEFAULT,
     MONTAGE_GP1.name: MONTAGE_GP1,
+    MONTAGE_GP2.name: MONTAGE_GP2,
 }
 
 

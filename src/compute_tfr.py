@@ -43,10 +43,10 @@ import mne
 mne.set_config('MNE_MEMMAP_MIN_SIZE', '1M', set_env=True)
 
 # --------- Dossiers par défaut ----------
-DEFAULT_REM_DIR   = "/home/darryld/documents/EEG/preprocessed/bipolaire/2_rem_only"
-DEFAULT_CLEAN_DIR = "/home/darryld/documents/EEG/preprocessed/bipolaire/1_noArtefacts"
+DEFAULT_REM_DIR   = "/home/darryld/documents/EEG/preprocessed/bipolaire/2_rem_only/gp2"
+DEFAULT_CLEAN_DIR = "/home/darryld/documents/EEG/preprocessed/bipolaire/1_noArtefacts/gp2"
 DEFAULT_ANNOT_DIR = "/home/darryld/documents/EEG/raw"
-DEFAULT_OUT_ROOT  = "/home/darryld/documents/EEG/preprocessed/bipolaire/3_results_analysis"
+DEFAULT_OUT_ROOT  = "/home/darryld/documents/EEG/preprocessed/bipolaire/3_results_analysis/gp2"
 
 # --------- TFR / Epochs ----------
 FREQ_MIN    = 1.0
@@ -268,7 +268,7 @@ def _plot_and_save_power(power, ch, base, stage, out_png, vmin_eff, vmax_eff, n_
     figs = fig if isinstance(fig, (list, tuple)) else [fig]
     _format_time_axes(figs)
 
-    title = f"{base} — {ch} — {stage}  (n_epochs={n_epochs})"
+    title = f"{base} - {ch} - {stage}  (n_epochs={n_epochs})"
     for f in figs:
         try: f.set_constrained_layout(False)
         except Exception: pass
@@ -288,7 +288,7 @@ def _plot_and_save_power(power, ch, base, stage, out_png, vmin_eff, vmax_eff, n_
     if isinstance(fig, (list, tuple)):
         fig = fig[0]
     try:
-        fig.savefig(out_png, dpi=300, bbox_inches="tight")  # dpi (rélodution) : 300 -> articles / 600 -> posters
+        fig.savefig(out_png, dpi=1200, bbox_inches="tight")  # dpi (rélodution) : 300 -> articles / 600 -> posters
         print(f"[{base}:{stage}:{ch}] [ok] {out_png.name}")
     except Exception as e:
         print(f"[{base}:{stage}:{ch}] Save figure erreur: {e}")
@@ -390,7 +390,7 @@ def pipeline_n2n3(base: str, clean_dir: Path, annot_dir: Path, out_root: Path):
         mapping = _orig2clean_mapping_from_artifacts(bad_orig, t_end_orig=float(bad_orig[-1][1]) + 1e9)  # t_end approx
     else:
         mapping = None
-        print(f"[{base}] WARNING: pas de CSV *_artifact_windows.csv* trouvé — "
+        print(f"[{base}] WARNING: pas de CSV *_artifact_windows.csv* trouvé - "
               f"crop direct sur timeline CLEAN (supposée non-concat), sinon résultats faux.")
 
     sf = float(raw_full.info["sfreq"])

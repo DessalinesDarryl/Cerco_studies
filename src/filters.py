@@ -15,7 +15,8 @@ def get_standard_bands():
         "Theta": (4, 8),
         "Alpha": (8, 13),
         "Beta": (13, 30),
-        "Gamma": (30, 45)
+        "Gamma Bas": (30, 50),
+        "Gamma Haut": (50, 80),
     }
 
 def filter_band(raw, l_freq, h_freq):

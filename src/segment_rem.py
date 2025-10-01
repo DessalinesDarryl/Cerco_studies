@@ -212,9 +212,9 @@ if __name__ == "__main__":
     args = ap.parse_args()
 
     # Defaults (adaptés à tes chemins "gp1")
-    clean_root = Path("/home/darryld/documents/EEG/preprocessed/bipolaire/1_noArtefacts/gp1") if args.clean_root is None else Path(args.clean_root)
+    clean_root = Path("/home/darryld/documents/EEG/preprocessed/bipolaire/1_noArtefacts/gp2") if args.clean_root is None else Path(args.clean_root)
     annot_root = Path("/home/darryld/documents/EEG/raw") if args.annot_root is None else Path(args.annot_root)
-    out_root   = Path("/home/darryld/documents/EEG/preprocessed/bipolaire/2_rem_only/gp1") if args.out_root is None else Path(args.out_root)
+    out_root   = Path("/home/darryld/documents/EEG/preprocessed/bipolaire/2_rem_only/gp2") if args.out_root is None else Path(args.out_root)
     tmp_root   = Path(args.tmp_root) if args.tmp_root else None
 
     out_root.mkdir(parents=True, exist_ok=True)

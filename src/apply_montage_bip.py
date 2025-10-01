@@ -100,7 +100,7 @@ def apply_bipolar_montage(inst: mne.io.BaseRaw, montage_name: str, base: str="")
     # Détermine les types des nouveaux canaux par convention de nommage
     type_map = {}
     for ch in inst.ch_names:
-        if ch.endswith("-A1") or ch.startswith("EOG"):  # e.g., "EOGD-A1"
+        if ch.startswith("EOG"):  # "EOGD" & "EOGG"
             type_map[ch] = "eog"
         elif "-" in ch:
             # Suppose que les noms "X-Y" (non EOG) sont EEG bipolaires
@@ -140,7 +140,7 @@ MONTAGE_NAME = "default"
 DO_FILTER = False
 L_FREQ = 0.3
 H_FREQ = 100.0
-NOTCH_FREQS = None  # e.g. [50] ou [50,100]
+NOTCH_FREQS = [50]  # e.g. [50] ou [50,100]
 
 def process_one(item):
     base, edf_path = item
@@ -225,7 +225,7 @@ def main():
     args = parser.parse_args()
 
     edf_root = Path("/home/darryld/documents/EEG/raw") if args.in_root is None else Path(args.in_root)
-    out_root = Path("/home/darryld/documents/EEG/preprocessed/bipolaire/0_raw_bip_gp1") if args.out_root is None else Path(args.out_root)
+    out_root = Path(f"/home/darryld/documents/EEG/preprocessed/bipolaire/0_raw_bip_{args.montage}") if args.out_root is None else Path(args.out_root)
     out_root.mkdir(parents=True, exist_ok=True)
 
     # Liste patients à garder
