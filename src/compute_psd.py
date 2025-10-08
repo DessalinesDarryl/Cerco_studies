@@ -222,16 +222,19 @@ def process_one(base: str, rem_dir: Path, out_root: Path):
     except Exception as e:
         print(f"[{base_n}] figure globale erreur: {e}")
 
-    # --- figures PAR CANAL + table longue
+    # --- figures PAR CANAL + table longue + PSD interp par canal
     per_channel_rows = []
+    spec_chan = []  # NEW: PSD interpolée (lin) par canal pour les agrégats inter-patients
+
     for i, ch in enumerate(ch_names):
-        # figure par canal utilisant le **nom complet**
+        # figure par canal (patient) :
         try:
             out_png = out_dir / f"{base_n}_psd_bands_{sanitize_name(ch)}.png"
             make_patient_fig_channel(base_n, ch, freqs, psd_lin[i, :], out_png, bands=BANDS)
         except Exception as e:
             print(f"[{base_n}] figure canal '{ch}' erreur: {e}")
-        # lignes CSV longues (une par bande) — **sans 'canonical'**
+
+        # lignes CSV "long" (par bande, par canal) :
         for b in BANDS.keys():
             per_channel_rows.append({
                 "base": base_n,
@@ -242,6 +245,14 @@ def process_one(base: str, rem_dir: Path, out_root: Path):
                 "total_abs_channel": float(total_abs_ch[i]),
             })
 
+        # PSD interpolée par canal sur la grille commune
+        try:
+            spec_lin_common_chan = interp_to_common_grid(freqs, psd_lin[i, :], COMMON_FREQS)
+        except Exception:
+            spec_lin_common_chan = np.full_like(COMMON_FREQS, np.nan, dtype=float)
+        spec_chan.append({"channel": ch, "spec_lin_common": spec_lin_common_chan.tolist()})
+
+
     # --- ligne CSV patient (agrégats globaux)
     row = {"base": base_n, "total_abs": total_mean_global}
     row.update({f"abs_{b}": abs_mean_global[b] for b in BANDS})
@@ -250,8 +261,9 @@ def process_one(base: str, rem_dir: Path, out_root: Path):
     return {
         "base": base_n, "ok": True,
         "row": row,
-        "spec_lin_common": spec_lin_common.tolist(),
-        "per_channel_rows": per_channel_rows,
+        "spec_lin_common": spec_lin_common.tolist(),   # global (moyenne canaux)
+        "per_channel_rows": per_channel_rows,          # long CSV
+        "spec_chan": spec_chan,                        # PSD interp par canal
     }
 
 # ---------- Plots groupes (globaux) ----------
@@ -509,6 +521,109 @@ def main():
         with open(out_root / "patients_unknown_category.txt", "w") as f:
             for b in sorted(set(missing)): f.write(f"{b}\n")
         print(f"[INFO] {len(set(missing))} patient(s) sans catégorie connue -> patients_unknown_category.txt")
+
+    # ---------- Figures inter-groupes **par canal** (moy ± p10–p90), une image par canal ----------
+    # Collecte: channel -> { base -> spec_lin_common (lin) }
+    chan_map = {}  # dict[str, dict[base:str, np.ndarray]]
+    for r in results:
+        if not r.get("ok"): 
+            continue
+        base = r["base"]
+        # sauter les patients absents du df (sécurité)
+        if base not in df.index:
+            continue
+        for item in r.get("spec_chan", []):
+            ch = item.get("channel")
+            spec_list = item.get("spec_lin_common")
+            if ch is None or spec_list is None:
+                continue
+            arr = np.asarray(spec_list, dtype=float)
+            if arr.shape[0] != COMMON_FREQS.shape[0]:
+                continue
+            chan_map.setdefault(ch, {})[base] = arr
+
+    # Filtrer canaux avec effectif suffisant
+    min_pat = args.min_patients_per_channel
+    eligible_channels = sorted([ch for ch, d in chan_map.items() if len(d) >= min_pat])
+    if not eligible_channels:
+        print("[WARN] Aucun canal avec effectif suffisant pour figures inter-groupes par canal.")
+    else:
+        print(f"[INFO] Figures inter-groupes par canal pour {len(eligible_channels)} canaux (min {min_pat} patients).")
+
+    # Helper d'index pour corriger l'erreur d'indexation vue précédemment
+    # (on mappe base -> rang dans SPEC_CH pour chaque canal)
+    for ch in eligible_channels:
+        base_to_spec = chan_map[ch]  # dict base -> spec_lin (lin)
+        # Aligner sur les bases disponibles dans df
+        bases_ch = [b for b in df.index if b in base_to_spec]
+        if not bases_ch:
+            continue
+
+        SPEC_CH = np.vstack([base_to_spec[b] for b in bases_ch])  # (n_patients_ch, n_freq)
+        eps = np.finfo(float).tiny
+        SPEC_CH_DB = 10.0 * np.log10(np.maximum(SPEC_CH, eps))
+
+        DF_CH = df.loc[bases_ch].copy()  # pour les groupes
+        row_index = {b: i for i, b in enumerate(bases_ch)}  # base -> ligne SPEC_CH
+
+        fig, axes = plt.subplots(3, 2, figsize=(18, 10)); axes = axes.ravel()
+        fig.suptitle(f"PSD REM - canal {ch} - courbes par bande, superposées par groupe (moy ± p10–p90)", fontsize=14, y=0.98)
+
+        band_list = list(BANDS.items())
+        for i, (name, (lo, hi)) in enumerate(band_list):
+            ax = axes[i]
+            idx = band_indices(COMMON_FREQS, lo, hi)
+            if idx.size == 0:
+                ax.set_visible(False); 
+                continue
+
+            # Parcours des groupes
+            for grp, idx_labels in DF_CH.groupby("group").groups.items():
+                if len(idx_labels) == 0:
+                    continue
+                # indices entiers robustes (corrige l'IndexError des labels string)
+                idx_int = np.array([row_index[b] for b in idx_labels if b in row_index], dtype=int)
+                if idx_int.size == 0:
+                    continue
+
+                sub = SPEC_CH_DB[idx_int][:, idx]  # (n_grp, n_freq_band)
+                if sub.size == 0:
+                    continue
+
+                m   = np.nanmean(sub, axis=0)
+                p10 = np.nanpercentile(sub, 10, axis=0)
+                p90 = np.nanpercentile(sub, 90, axis=0)
+
+                color = color_for_group(grp)
+                ax.plot(COMMON_FREQS[idx], m, lw=2, label=f"{short_label(grp)}", color=color)
+                ax.fill_between(COMMON_FREQS[idx], p10, p90, alpha=0.12, color=color)
+
+            ax.set_xscale("log")
+            lo_i = max(1, int(np.ceil(lo))); hi_i = int(np.floor(hi))
+            ticks = list(range(lo_i, hi_i + 1))
+            if ticks:
+                ax.xaxis.set_major_locator(FixedLocator(ticks))
+                ax.minorticks_off()
+            ax.xaxis.set_major_formatter(ScalarFormatter())
+            ax.set_xlabel("Fréquence (Hz)")
+            ax.set_ylabel("PSD (dB re µV²/Hz)")
+            ax.set_title(f"{name}  [{lo:.1f}-{hi:.1f}] Hz")
+            ax.grid(True, alpha=0.2)
+
+        if len(band_list) < len(axes):
+            axes[-1].axis("off")
+
+        # Légende globale (si dispo)
+        handles, labels = axes[0].get_legend_handles_labels()
+        if handles:
+            fig.legend(handles, labels, loc="lower center", ncol=5, frameon=False)
+
+        plt.tight_layout(rect=[0, 0.04, 1, 0.96])
+        out_png = out_root / f"group_psd_bands_chan_{sanitize_name(ch)}.png"
+        fig.savefig(out_png, dpi=230)
+        plt.close(fig)
+        print(f">>> {out_png}")
+
 
 if __name__ == "__main__":
     main()

@@ -484,6 +484,12 @@ def _worker_one_patient(base: str, cat: str, rem_dir: str, clean_dir: str, annot
                                     "freqs": next(iter(tfr.values()))["freqs"]}
     return base, cat, res
 
+# --------- Alignement des matrices (min freq & time) ---------
+def _stack_aligned(mats: list[np.ndarray]) -> np.ndarray:
+    min_f = min(a.shape[0] for a in mats)
+    min_t = min(a.shape[1] for a in mats)
+    return np.stack([a[:min_f, :min_t] for a in mats], axis=0)
+
 # --------- Main pipeline ---------
 def main():
     parser = argparse.ArgumentParser(description="Moyennes TFR par catégorie de patient (par canal, par stage) depuis un Excel.")
@@ -650,9 +656,14 @@ def main():
 
             stage_out = root_group / _sanitize(cat) / st
             for ch, mats in ch_dict.items():
-                Zmean = aggregate_category(mats)
-                if Zmean is None:
+                if not mats:
                     continue
+                # Pile alignée et moyenne
+                stack = _stack_aligned(mats)  # (n_subj, F, T)
+                Zmean = stack.mean(axis=0)
+
+                # Sauvegardes
+                np.save(stage_out / f"stack_{_sanitize(ch)}.npy", stack)
                 save_group_outputs(stage_out, st, ch, Zmean, times, freqs, cat)
                 n_groups += 1
 
