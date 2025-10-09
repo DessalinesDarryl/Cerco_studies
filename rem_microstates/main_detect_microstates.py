@@ -1,7 +1,4 @@
-# ==========================
-#   Parallélisation & CPU
-# ==========================
-# À définir AVANT d'importer numpy/scipy/mne
+
 import os
 os.environ.setdefault("OMP_NUM_THREADS", "1")
 os.environ.setdefault("MKL_NUM_THREADS", "1")
@@ -13,14 +10,14 @@ import multiprocessing as mp
 import faulthandler; faulthandler.enable()  # log des crashes natifs
 
 # ==========================
-#   Imports standard
+#   Imports 1
 # ==========================
 import platform
 from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib
-matplotlib.use("Agg")  # backend non interactif, sûr en multiprocess
+matplotlib.use("Agg") 
 import matplotlib.pyplot as plt
 import argparse
 import math
@@ -31,10 +28,10 @@ import traceback
 import gc
 
 # ==========================
-#   Imports projet
+#   Imports 2
 # ==========================
 from signal_processing.loader import load_signals_and_annotations
-from signal_processing.windowing import segment_rem_in_windows  # générateur WindowProxy
+from signal_processing.windowing import segment_rem_in_windows  
 from signal_processing.eog_analysis import detect_eog_microstate
 from signal_processing.annotation import annotate_microstates
 from signal_processing.filters import apply_custom_filters  # si utilisé ailleurs
