@@ -14,8 +14,8 @@ def detect_eog_microstate(
     Classer une fenêtre (~4 s) en 'phasic' / 'tonic' / 'ignore' via deux canaux EOG.
 
     Compat:
-    - win proxy léger avec attributs {raw, tmin, tmax}  ➜ streaming (recommandé)
-    - win MNE (Raw/Epochs/Evoked de 4 s)               ➜ fallback
+    - win proxy léger avec attributs {raw, tmin, tmax}  -> streaming
+    - win MNE (Raw/Epochs/Evoked de 4 s)               -> fallback
     """
     try:
         # --- Chemin streaming : WindowProxy-like (raw + tmin/tmax)
@@ -77,11 +77,15 @@ def detect_eog_microstate(
                     j += 1
             return cnt
 
+        ########## Critère phasic ##########
+        # Si au moins une paire de pics synchrones et de signe opposé dans chaque moitié de la fenêtre -> phasic
+
+        # Split en deux moitiés
         mid = eog1.shape[-1] // 2
         left_pairs  = count_valid_pairs(eog1[:mid],  eog2[:mid])
         right_pairs = count_valid_pairs(eog1[mid:], eog2[mid:])
-
-        # Critère tonic: faible activité globale sur chaque EOG (sur la même fenêtre)
+    
+        # Valeur absolue max dans la fenêtre (µv)
         max_abs1 = float(np.max(np.abs(eog1)))
         max_abs2 = float(np.max(np.abs(eog2)))
 
@@ -89,14 +93,20 @@ def detect_eog_microstate(
         del data, eog1, eog2
         gc.collect()
 
+        # Application
         if left_pairs >= 1 and right_pairs >= 1:
             return "phasic"
 
+        ########## Critère tonic ##########
+        # Sinon, si aucune déflexion > silent_max_uv = 25µV dans toute la fenêtre -> tonic
+
         no_defl_1 = max_abs1 < silent_max_uv
         no_defl_2 = max_abs2 < silent_max_uv
+
+        # Application
         if no_defl_1 and no_defl_2:
             return "tonic"
-
+        ####################################
         return "ignore"
 
     except Exception as exc:

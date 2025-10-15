@@ -22,7 +22,8 @@ else:
     raise RuntimeError("Système non supporté.")
 
 # Dossier des fichiers FIF annotés
-base_dir = Path(f"{disque}/EEG/raw") 
+disque = Path("/home/darryld/documents")
+base_dir = Path(f"{disque}/EEG/preprocessed/bipolaire/2_rem_only/gp2") 
 fif_dir = st.sidebar.text_input("Dossier des fichiers .fif annotés", base_dir)
 
 if not os.path.isdir(fif_dir):
@@ -35,7 +36,8 @@ if not fif_files:
     st.warning("Aucun fichier .fif trouvé dans ce dossier.")
     st.stop()
 
-# Sélection du fichier
+# Sélection du fichier rangé par ordre alphabétique
+fif_files.sort()
 selected_file = st.sidebar.selectbox("Sélectionner un patient :", fif_files)
 raw_path = os.path.join(fif_dir, selected_file)
 base_name = get_base_name(selected_file)
@@ -62,22 +64,41 @@ if band_name != "Aucune":
     l_freq, h_freq = bands[band_name]
     raw_display = filter_band(raw_display, l_freq, h_freq)
     st.markdown(f"Filtrage appliqué : **{band_name}**")
+else: 
+    l_freq, h_freq = 0.3, 80.0
+    raw_display = filter_band(raw_display, l_freq, h_freq)
+    st.markdown("Aucun filtrage appliqué.")
 
 # Affichage des annotations
 if st.checkbox("Afficher les annotations tonic/phasic (détectées automatiquement)"):
-    if raw.annotations and any(a in ["tonic", "phasic"] for a in raw.annotations.description):
-        st.success(f"{len(raw.annotations)} annotations trouvées.")
+    if raw.annotations and any(a in ["REM_tonic", "REM_phasic"] for a in raw.annotations.description):
+        # Affichier le nombre d'annotations trouvées contenant "REM_tonic" ou "REM_phasic"
+        tonic_count = sum(1 for a in raw.annotations if a['description'] == 'REM_tonic')
+        phasic_count = sum(1 for a in raw.annotations if a['description'] == 'REM_phasic')
+        st.markdown(f"**Annotations trouvées :** {tonic_count} tonic, {phasic_count} phasic")
     else:
-        st.warning("Aucune annotation 'tonic' ou 'phasic' trouvée dans ce fichier.")
+        st.warning("Aucune annotation 'REM_tonic' ou 'REM_phasic' trouvée dans ce fichier.")
 
 # Initialisation de l'amplitude
 if "amplitude" not in st.session_state:
-    st.session_state.amplitude = 25.0
+    st.session_state.amplitude = 50.0
 
 # Contrôle interactif de l'amplitude
-amplitude = st.number_input("Amplitude (µV)", min_value=1.0, max_value=5000000.0,
+# Amplitude EEG
+amplitude_eeg = st.number_input("Amplitude (µV)", min_value=1.0, max_value=5000000.0,
                             value=st.session_state.amplitude, step=1.0)
-st.session_state.amplitude = amplitude
+st.session_state.amplitude = amplitude_eeg
+
+# Amplitude EOG
+amplitude_eog = st.number_input("Amplitude EOG (µV)", min_value=1.0, max_value=5000000.0,
+                            value=amplitude_eeg, step=1.0)
+st.session_state.amplitude_eog = amplitude_eog
+
+# Amplitude EMG
+amplitude_emg = st.number_input("Amplitude EMG (µV)", min_value=1.0, max_value=5000000.0,
+                            value=amplitude_eeg, step=1.0)
+st.session_state.amplitude_emg = amplitude_emg
+
 
 # Affichage temporel
 duration = st.slider("Durée affichée (secondes)", 5, 60, 20)
@@ -89,8 +110,9 @@ fig = raw_display.plot(
     start=start_time,
     duration=duration,
     scalings=dict(
-        eeg=amplitude * 1e-6,
-        eog=amplitude * 1e-6
+        eeg=amplitude_eeg * 1e-6,
+        eog=amplitude_eog * 1e-6,
+        emg=amplitude_emg * 1e-6,
         ),
     remove_dc=True,
     show=False,

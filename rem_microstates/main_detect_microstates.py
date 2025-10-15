@@ -1,3 +1,4 @@
+# main_detect_microstates.py
 
 import os
 os.environ.setdefault("OMP_NUM_THREADS", "1")
@@ -17,11 +18,9 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib
-matplotlib.use("Agg") 
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import argparse
-import math
-import re
 import shutil
 import tempfile
 import traceback
@@ -31,14 +30,11 @@ import gc
 #   Imports 2
 # ==========================
 from signal_processing.loader import load_signals_and_annotations
-from signal_processing.windowing import segment_rem_in_windows  
+from signal_processing.windowing import segment_rem_in_windows
 from signal_processing.eog_analysis import detect_eog_microstate
 from signal_processing.annotation import annotate_microstates
-from signal_processing.filters import apply_custom_filters  # si utilisé ailleurs
-from utils.preprocessing_bip import apply_custom_bipolar_montage  # si utilisé ailleurs
-
-# --- Import comparaison .mat robuste
-from utils.compare_mat import compare_with_mat, _load_rem_phasic_intervals as load_rem_intervals
+from signal_processing.filters import apply_custom_filters  # noqa: F401 (si non utilisé)
+from utils.preprocessing_bip import apply_custom_bipolar_montage  # noqa: F401 (si non utilisé)
 
 import mne
 mne.set_config('MNE_MEMMAP_MIN_SIZE', '1M', set_env=True)  # favorise memmap
@@ -48,15 +44,9 @@ mne.set_config('MNE_MEMMAP_MIN_SIZE', '1M', set_env=True)  # favorise memmap
 # Utilitaires
 # -------------------------------------------------------------------
 
-def _is_inside(start: float, end: float, intervals, tol: float = 0.5) -> bool:
-    s = float(start); e = float(end)
-    for a, b in intervals:
-        if (a - tol) <= s and e <= (b + tol):
-            return True
-    return False
-
 def _free_gb(path: Path) -> float:
     return shutil.disk_usage(path).free / (1024 ** 3)
+
 
 def _free_big(*objs):
     """Ferme/supprime des objets lourds et force un GC."""
@@ -72,13 +62,14 @@ def _free_big(*objs):
             pass
     gc.collect()
 
+
 def _load_microstates_excel(xlsx_path: Path) -> pd.DataFrame:
     """
     Lit un *_microstates_*.xlsx potentiellement hétérogène et renvoie un DataFrame
     standardisé: colonnes ['tmin','tmax','label'] en numériques.
     Lignes non convertibles supprimées avec log.
     """
-    # Lecture (engine explicite si dispo)
+    # Étape: Lecture et normalisation de l'Excel existant
     try:
         df = pd.read_excel(xlsx_path, engine="openpyxl")
     except Exception:
@@ -118,9 +109,11 @@ def _load_microstates_excel(xlsx_path: Path) -> pd.DataFrame:
 
 
 # =========================================================
-#                 TRAITEMENT PAR PATIENT
+#                 TRAITEMENT PAR PATIENT (sans comparaison .mat)
 # =========================================================
-def process_patient(fif_path: Path, raw_dir: Path, out_dir: Path, montage: str, seuil: int):
+
+def process_patient(fif_path: Path, raw_dir: Path, out_dir: Path, seuil: int):
+    # ===== SECTION: PATIENT =====
     patient_id = fif_path.stem.split("_")[0]
 
     if patient_id == "." or not patient_id.isalnum():
@@ -133,10 +126,10 @@ def process_patient(fif_path: Path, raw_dir: Path, out_dir: Path, montage: str, 
     xlsx_out = out_patient_dir / f"{patient_id}_microstates_{seuil}.xlsx"
     raw_annotated_path = out_patient_dir / f"{patient_id}_annotated_{seuil}.fif"
 
-    # --- Détecte si on a déjà les sorties automatiques ---
+    # Étape: Vérification des sorties existantes
     outputs_exist = xlsx_out.exists() and raw_annotated_path.exists()
 
-    # --- Trouve l'annotation hypnogramme seulement si on doit (re)traiter ---
+    # Étape: Recherche de l'hypnogramme (txt/csv) si nécessaire
     annot_path = None
     if not outputs_exist:
         for ext in (".txt", ".csv"):
@@ -149,14 +142,14 @@ def process_patient(fif_path: Path, raw_dir: Path, out_dir: Path, montage: str, 
             if not xlsx_out.exists():
                 return
 
-    # --- (Re)traitement seulement si nécessaire ---
+    # Étape: (Re)traitement seulement si nécessaire
     if not outputs_exist:
-        # Espace disque minimal (sécurité)
+        # Sécurité disque libre >= 5 Go
         if _free_gb(out_patient_dir) < 5.0:
             print(f"[SKIP] {patient_id}: espace insuffisant (<5 Go) sur {out_patient_dir}")
             return
 
-        # Charge les signaux + segments REM (memmap, preload=False dans loader)
+        # Chargement des signaux + segments REM
         raw, rem_segments = load_signals_and_annotations(fif_path, annot_path)
 
         if not rem_segments:
@@ -166,7 +159,7 @@ def process_patient(fif_path: Path, raw_dir: Path, out_dir: Path, montage: str, 
 
         print(f"[{patient_id}] {len(rem_segments)} segments REM détectés.")
 
-        # --- Streaming des fenêtres: pas de liste 'windows' en RAM
+        # Étape: Streaming fenêtres 4s et détection micro-états
         labels = []
         valid_times = []  # liste de tuples (tmin, tmax)
         skip_to = 0
@@ -180,11 +173,9 @@ def process_patient(fif_path: Path, raw_dir: Path, out_dir: Path, montage: str, 
                 labels.append(label)
             # saut de 2 si phasic, sinon 1
             skip_to = idx + (2 if label == "phasic" else 1)
+        print(f"[{patient_id}] Fenêtres retenues: {len(valid_times)} ({labels.count('phasic')} phasic / {labels.count('tonic')} tonic)")
 
-        print(f"[{patient_id}] {len(valid_times)} fenêtres retenues "
-              f"({labels.count('phasic')} phasic / {labels.count('tonic')} tonic)")
-
-        # Écriture via répertoire temporaire + moves atomiques
+        # Étape: Annotation du Raw et sauvegardes atomiques (raw + Excel)
         with tempfile.TemporaryDirectory(prefix=f"{patient_id}_", dir=out_patient_dir) as td:
             tdir = Path(td)
 
@@ -192,7 +183,7 @@ def process_patient(fif_path: Path, raw_dir: Path, out_dir: Path, montage: str, 
             annotate_microstates(
                 raw, valid_times, labels, window_sec=4,
                 mode="add",
-                prefix="microstate_"
+                prefix="REM_"
             )
 
             # 1) Sauvegarde du Raw annoté -> temp -> destination
@@ -208,109 +199,15 @@ def process_patient(fif_path: Path, raw_dir: Path, out_dir: Path, montage: str, 
             df.to_excel(tmp_xlsx, index=False, engine="xlsxwriter")
             os.replace(tmp_xlsx, xlsx_out)
 
-        # Libère RAM
         _free_big(raw, df, valid_times, labels)
 
     else:
-        print(f"[{patient_id}] Sorties auto déjà présentes, on saute le pipeline et on charge l'Excel.")
+        # Étape: Sorties déjà présentes -> relecture de l'Excel
         try:
             df = _load_microstates_excel(xlsx_out)
         except Exception as e:
-            print(f"[{patient_id}] Impossible de lire {xlsx_out.name} pour la comparaison : {e}")
+            print(f"[{patient_id}] Impossible de lire {xlsx_out.name} : {e}")
             return
-
-    # =========================
-    # Comparaison avec .mat (robuste via compare_mat)
-    # =========================
-    mat_candidates = sorted((raw_dir / patient_id).glob(f"events_{patient_id}*.mat"))
-    print(f"[{patient_id}] {len(mat_candidates)} fichiers .mat trouvés pour comparaison. chemin = {mat_candidates}")
-    if mat_candidates:
-        mat_path = max(mat_candidates, key=lambda p: p.stat().st_mtime)
-
-        # 1) Sauvegarde des erreurs via compare_with_mat (suffixe avec seuil, comme avant)
-        errors_suffix = f"_microstates_errors_{seuil}.xlsx"
-        _ = compare_with_mat(
-            df_windows=df,
-            raw_dir=raw_dir,
-            patient_id=patient_id,
-            out_patient_dir=out_patient_dir,
-            glob_pattern="events_{pid}*.mat",
-            inside_tol_sec=0.5,
-            pad_sec_if_single_time=2.0,
-            errors_xlsx_suffix=errors_suffix,
-            verbose=True,
-        )
-
-        # 2) Stats + figure locales (loader robuste)
-        rem_phasic = load_rem_intervals(mat_path, pad_sec=2.0)
-
-        erreurs = []
-        bons = []
-        for _, row in df.iterrows():
-            start, end, pred = float(row["tmin"]), float(row["tmax"]), str(row["label"]).strip().lower()
-            true = "phasic" if _is_inside(start, end, rem_phasic, tol=0.5) else "tonic"
-            result = {"tmin": start, "tmax": end, "auto_label": pred, "true_label": true}
-            (bons if pred == true else erreurs).append(result)
-
-        # --- Stats globales & par classe ---
-        n_good = len(bons)
-        n_bad = len(erreurs)
-        n_eval = n_good + n_bad
-        n_total = len(df)
-        pct_good = (100.0 * n_good / n_eval) if n_eval else 0.0
-        pct_bad  = (100.0 * n_bad  / n_eval) if n_eval else 0.0
-
-        from collections import Counter
-        true_counts = Counter([r["true_label"] for r in bons + erreurs])
-        good_counts = Counter([r["true_label"] for r in bons])
-        bad_counts  = Counter([r["true_label"] for r in erreurs])
-
-        def _pct(x, denom): return (100.0 * x / denom) if denom else 0.0
-
-        print(
-            f"[{patient_id}] Comparaison .mat — "
-            f"Évaluées: {n_eval}/{n_total} | "
-            f"Bonnes: {n_good} ({pct_good:.2f}%) | "
-            f"Mauvaises: {n_bad} ({pct_bad:.2f}%)"
-        )
-        for cls in ("phasic", "tonic"):
-            tc = true_counts.get(cls, 0)
-            gc = good_counts.get(cls, 0)
-            bc = bad_counts.get(cls, 0)
-            print(
-                f"    {cls}: vrais={tc} | "
-                f"bons={gc} ({_pct(gc, tc):.2f}%) | "
-                f"mauvais={bc} ({_pct(bc, tc):.2f}%)"
-            )
-
-        # --- Visualisation du summary (PNG) ---
-        try:
-            fig, ax = plt.subplots(figsize=(6, 4))
-            categories = ["Bonnes", "Mauvaises"]
-            values = [pct_good, pct_bad]
-            bars = ax.bar(categories, values)
-            ax.set_ylim(0, 100)
-            ax.set_ylabel("Pourcentage (%)")
-            ax.set_title(f"{patient_id} — microstates ({seuil})\nÉvaluées: {n_eval}/{n_total}")
-            for rect, count in zip(bars, [n_good, n_bad]):
-                height = rect.get_height()
-                ax.text(rect.get_x() + rect.get_width() / 2.0, height,
-                        f"{height:.1f}%\n(n={count})",
-                        ha="center", va="bottom", fontsize=9)
-            out_png = out_patient_dir / f"{patient_id}_microstates_eval_summary_{seuil}.png"
-            with tempfile.TemporaryDirectory(prefix=f"{patient_id}_", dir=out_patient_dir) as td:
-                tmp_png = Path(td) / out_png.name
-                fig.savefig(tmp_png, dpi=150, bbox_inches="tight")
-                os.replace(tmp_png, out_png)
-            plt.close(fig)
-            print(f"[{patient_id}] Visualisation summary sauvegardée → {out_png.name}")
-        except Exception as e:
-            print(f"[{patient_id}] Plot skipped: {e}")
-
-        _free_big(erreurs, bons, rem_phasic)
-
-    else:
-        print(f"[{patient_id}] Pas d’événements .mat pour comparaison manuelle. (comparaison sautée)")
 
     print(f"[{patient_id}] Traitement terminé.\n")
 
@@ -318,7 +215,8 @@ def process_patient(fif_path: Path, raw_dir: Path, out_dir: Path, montage: str, 
 # =========================================================
 #  FONCTION WORKER TOP-LEVEL (picklable pour spawn)
 # =========================================================
-def run_one(path_str: str, raw_dir_str: str, out_dir_str: str, montage: str, seuil: int):
+
+def run_one(path_str: str, raw_dir_str: str, out_dir_str: str, seuil: int):
     """Wrapper: exécution par patient (mémoire isolée)."""
     try:
         mpl_cache = os.path.join(tempfile.gettempdir(), f"mplcache_{os.getpid()}")
@@ -328,182 +226,32 @@ def run_one(path_str: str, raw_dir_str: str, out_dir_str: str, montage: str, seu
         pass
     try:
         return process_patient(
-            Path(path_str), Path(raw_dir_str), Path(out_dir_str), montage, seuil
+            Path(path_str), Path(raw_dir_str), Path(out_dir_str), seuil
         )
     except Exception as e:
-        # Trace complète depuis le worker (remonte côté parent)
         raise RuntimeError(f"Worker error on {Path(path_str).name}: {e}\n{traceback.format_exc()}") from e
-
-
-# =========================================================
-#         AGRÉGAT GLOBAL (radar multi-seuils + Excel)
-# =========================================================
-def aggregate_and_plot_overview_all_seuils(raw_dir: Path, out_dir: Path):
-    """
-    Scanne out_dir/*/ pour tous les *_microstates_*.xlsx.
-    Recalcule les stats à partir des .mat, exporte un Excel global,
-    et trace un radar multi-polygones (un par seuil).
-    """
-    from collections import defaultdict, Counter
-
-    def _pct(x, denom): return (100.0 * x / denom) if denom else 0.0
-    pattern = re.compile(r"_microstates_(\d+)\.xlsx$", re.IGNORECASE)
-
-    overview_rows = []
-    radar_data = defaultdict(dict)   # seuil -> {patient_id: pct_good}
-    processed_any = False
-
-    for pdir in sorted([p for p in out_dir.iterdir() if p.is_dir()]):
-        pid = pdir.name
-        for xlsx_path in sorted(pdir.glob(f"{pid}_microstates_*.xlsx")):
-            m = pattern.search(xlsx_path.name)
-            if not m:
-                continue
-            seuil = int(m.group(1))
-
-            # Charger l'xlsx (sanitizer)
-            try:
-                df = _load_microstates_excel(xlsx_path)
-            except Exception as e:
-                print(f"[{pid}] lecture {xlsx_path.name} impossible: {e}")
-                continue
-
-            # .mat candidats
-            mat_candidates = sorted((raw_dir / pid).glob(f"events_{pid}*.mat"))
-            if not mat_candidates:
-                print(f"[{pid}] pas de .mat — ignoré pour stats, errors_{seuil}.xlsx vide créé.")
-                pd.DataFrame(columns=["tmin", "tmax", "auto_label", "true_label"]).to_excel(
-                    pdir / f"{pid}_microstates_errors_{seuil}.xlsx", index=False, engine="xlsxwriter"
-                )
-                continue
-
-            mat_path = max(mat_candidates, key=lambda q: q.stat().st_mtime)
-
-            # Intervalles robustes
-            rem_phasic = load_rem_intervals(mat_path, pad_sec=2.0)
-
-            erreurs, bons = [], []
-            for _, row in df.iterrows():
-                start, end, pred = float(row["tmin"]), float(row["tmax"]), str(row["label"]).strip().lower()
-                true = "phasic" if _is_inside(start, end, rem_phasic, tol=0.5) else "tonic"
-                result = {"tmin": float(start), "tmax": float(end), "auto_label": pred, "true_label": true}
-                (bons if pred == true else erreurs).append(result)
-
-            n_good, n_bad = len(bons), len(erreurs)
-            n_eval = n_good + n_bad
-            n_total = len(df)
-            pct_good = (100.0 * n_good / n_eval) if n_eval else np.nan
-            pct_bad  = 100.0 - pct_good if n_eval and not np.isnan(pct_good) else np.nan
-
-            from collections import Counter
-            true_counts = Counter([r["true_label"] for r in bons + erreurs])
-            good_counts = Counter([r["true_label"] for r in bons])
-            bad_counts  = Counter([r["true_label"] for r in erreurs])
-
-            overview_rows.append({
-                "patient_id": pid,
-                "seuil": seuil,
-                "mat_file": str(mat_path.name),
-                "n_total_windows": n_total,
-                "n_evaluated": n_eval,
-                "n_good": n_good,
-                "n_bad": n_bad,
-                "pct_good": pct_good,
-                "pct_bad": pct_bad,
-                "true_phasic": true_counts.get("phasic", 0),
-                "true_tonic":  true_counts.get("tonic", 0),
-                "good_phasic": good_counts.get("phasic", 0),
-                "good_tonic":  good_counts.get("tonic", 0),
-                "bad_phasic":  bad_counts.get("phasic", 0),
-                "bad_tonic":   bad_counts.get("tonic", 0),
-            })
-
-            # Fichier d'erreurs (même si vide)
-            pd.DataFrame(erreurs, columns=["tmin", "tmax", "auto_label", "true_label"]).to_excel(
-                pdir / f"{pid}_microstates_errors_{seuil}.xlsx", index=False, engine="xlsxwriter"
-            )
-            print(f"[{pid}] errors_{seuil}.xlsx sauvegardé ({len(erreurs)} erreurs).")
-
-            radar_data[seuil][pid] = pct_good
-            processed_any = True
-
-    if not processed_any:
-        print("[AGRÉGAT] Aucun couple (patient, seuil) éligible (xlsx + .mat).")
-        return
-
-    # --- Export Excel global (tous seuils)
-    df_overview = pd.DataFrame(overview_rows)
-    out_excel = out_dir / "microstates_eval_overview_all.xlsx"
-    df_overview.to_excel(out_excel, index=False, engine="xlsxwriter")
-    print(f"[AGRÉGAT] Export récap → {out_excel}")
-
-    # --- Radar multi-polygones (un par seuil) ---
-    all_patients = sorted({pid for d in radar_data.values() for pid in d.keys()})
-    N = len(all_patients)
-    angles = np.linspace(0, 2 * math.pi, N, endpoint=False).tolist()
-    angles_closed = angles + [angles[0]]
-
-    fig, ax = plt.subplots(subplot_kw=dict(polar=True), figsize=(7, 7))
-    ax.set_ylim(0, 100)
-    ax.set_xticks(angles)
-    ax.set_xticklabels(all_patients, fontsize=9)
-    ax.set_yticks([20, 40, 60, 80, 100])
-    ax.set_yticklabels([str(v) for v in [20, 40, 60, 80, 100]])
-    ax.set_title("Pourcentage de bonnes prédictions — tous seuils", va="bottom")
-
-    seuils_sorted = sorted(radar_data.keys())
-    two_standard = (len(seuils_sorted) == 2 and set(seuils_sorted) == {100, 150})
-    color_map = {100: "tab:blue", 150: "tab:orange"} if two_standard else {}
-
-    for s in seuils_sorted:
-        data = radar_data[s]
-        vals = [data.get(pid, np.nan) for pid in all_patients]
-        vals_closed = vals + [vals[0]]
-        color = color_map.get(s, None)  # None => couleur auto
-        ax.plot(angles_closed, vals_closed, linewidth=2, label=f"seuil {s}", color=color)
-        ax.fill(angles_closed, vals_closed, alpha=0.15, color=color)
-
-    ax.legend(loc="upper right", bbox_to_anchor=(1.25, 1.1))
-    out_png = out_dir / "microstates_eval_radar_all.png"
-    with tempfile.TemporaryDirectory(prefix="_overview_", dir=out_dir) as td:
-        tmp_png = Path(td) / out_png.name
-        fig.savefig(tmp_png, dpi=150, bbox_inches="tight")
-        os.replace(tmp_png, out_png)
-    plt.close(fig)
-    print(f"[AGRÉGAT] Radar multi-seuils sauvegardé → {out_png}")
 
 
 # =========================================================
 #                        MAIN
 # =========================================================
+
 if __name__ == "__main__":
-    # --- Parsing des arguments CLI ---
+    # ===== SECTION: CONFIGURATION =====
+
+    # Étape: Parsing des arguments CLI minimaux
     parser = argparse.ArgumentParser()
     parser.add_argument("--seuil", type=int, default=150,
                         help="Valeur de seuil pour le nommage des fichiers (ex: 100 ou 150)")
-    parser.add_argument("--aggregate", action="store_true",
-                        help="Mode agrégat : radar multi-seuils + Excel récap, sans retraiter les FIF.")
-    parser.add_argument("--workers", type=int, default=4,
+    parser.add_argument("--workers", type=int, default=10,
                         help="Nb de processus en parallèle (0 => CPU-1)")
-    parser.add_argument("--montage", choices=["bipolaire", "monopolaire"], default=None,
-                        help="Montage à utiliser sans invite interactive.")
     args = parser.parse_args()
     seuil = args.seuil
 
-    # --- Choix du montage ---
-    def choose_montage(args):
-        if args.aggregate:
-            return args.montage or "bipolaire"
-        if args.montage in {"bipolaire", "monopolaire"}:
-            return args.montage
-        resp = input("Montage bipolaire ? (y/n) : ").strip().lower()
-        if resp not in {"y", "n"}:
-            print("Réponse invalide. Tape 'y' ou 'n'."); raise SystemExit(1)
-        return "bipolaire" if resp == "y" else "monopolaire"
+    # Étape: Montage fixé à bipolaire (info)
+    print("[INFO] Montage fixé: bipolaire")
 
-    montage = choose_montage(args)
-
-    # --- Détection du disque selon OS (ici forcé) ---
+    # Étape: Détection/choix du disque (forcé)
     """
     system = platform.system()
     if system == "Darwin":
@@ -517,17 +265,21 @@ if __name__ == "__main__":
     """
     disque = "/home/darryld/documents"
 
-    root_preproc = Path(f"{disque}/EEG/preprocessed/{montage}/full/")
+    # Étape: Racines d'E/S
+    # Lecture: dossiers patients sous 1_noArtefacts/gp2/
+    root_preproc = Path(f"{disque}/EEG/preprocessed/bipolaire/1_noArtefacts/gp2/")
+    # Sortie: vers 2_rem_only/gp2/<patient>/
+    root_out     = Path(f"{disque}/EEG/preprocessed/bipolaire/2_rem_only/gp2/")
+    # Hypnogrammes (inchangé)
     root_raw     = Path(f"{disque}/EEG/raw")
-    root_out     = Path(f"{disque}/EEG/preprocessed/{montage}/rem_only")
 
-    # Vérif d'existence + création
+    # Étape: Vérification des dossiers d'entrée/sortie
     for p in [root_preproc, root_raw]:
         if not p.exists():
             raise SystemExit(f"[CONFIG] Dossier introuvable: {p}")
     root_out.mkdir(parents=True, exist_ok=True)
 
-    # --- Warm-up Matplotlib pour éviter la création concurrente du cache
+    # Étape: Warm-up Matplotlib (éviter concurrence cache)
     def _warmup_matplotlib():
         import matplotlib
         import matplotlib.pyplot as plt
@@ -542,33 +294,43 @@ if __name__ == "__main__":
 
     _warmup_matplotlib()
 
-    if args.aggregate:
-        aggregate_and_plot_overview_all_seuils(raw_dir=root_raw, out_dir=root_out)
-    else:
-        fif_paths = [
-            p for p in root_preproc.rglob("*_preprocessed_*.fif")
+    # ===== SECTION: DÉCOUVERTE & MULTIPROCESS =====
+
+    # Étape: Découverte des fichiers FIF
+    # On cible les fichiers contenant 'art_annotated'
+    patterns = ("*art_annotated*.fif",)
+    found = []
+    for pat in patterns:
+        found += [
+            p for p in root_preproc.rglob(pat)
             if not p.name.startswith("._") and not p.name.startswith(".")
         ]
-        print(f"{len(fif_paths)} fichiers trouvés dans {root_preproc}")
+    # dédoublonner tout en conservant l'ordre
+    seen = set()
+    fif_paths = []
+    for p in found:
+        if p not in seen:
+            fif_paths.append(p)
+            seen.add(p)
 
-        if not fif_paths:
-            raise SystemExit(0)
+    print(f"{len(fif_paths)} fichier(s) trouvés dans {root_preproc} (patterns: {', '.join(patterns)})")
+    if not fif_paths:
+        raise SystemExit(0)
 
-        # Calcul du nombre de workers
-        cpu = os.cpu_count() or 1
-        max_workers = (cpu - 1) if args.workers in (0, None) else max(1, args.workers)
-        max_workers = min(max_workers, len(fif_paths))
-        print(f"[INFO] Lancement en multiprocess avec {max_workers} worker(s) (CPU={cpu}) (maxtasksperchild=1)")
+    # Étape: Configuration du multiprocess
+    cpu = os.cpu_count() or 1
+    max_workers = (cpu - 1) if args.workers in (0, None) else max(1, args.workers)
+    max_workers = min(max_workers, len(fif_paths))
+    print(f"[INFO] Lancement en multiprocess avec {max_workers} worker(s) (CPU={cpu}) (maxtasksperchild=1)")
 
-        # Prépare les arguments (strings picklables)
-        args_list = [(str(p), str(root_raw), str(root_out), montage, seuil) for p in fif_paths]
+    # Préparation des arguments picklables
+    args_list = [(str(p), str(root_raw), str(root_out), seuil) for p in fif_paths]
 
-        # Pool recyclable + Option A: STARMAP (pas de wrapper local)
-        ctx = mp.get_context("spawn")
-        with ctx.Pool(processes=max_workers, maxtasksperchild=1) as pool:
-            try:
-                # starmap renvoie les résultats dans l'ordre; on itère pour exécuter/propager les erreurs
-                for _ in pool.starmap(run_one, args_list, chunksize=1):
-                    pass
-            except Exception as e:
-                print(f"[POOL ERROR] {e}\n{traceback.format_exc()}")
+    # Étape: Exécution parallèle (pool.starmap)
+    ctx = mp.get_context("spawn")
+    with ctx.Pool(processes=max_workers, maxtasksperchild=1) as pool:
+        try:
+            for _ in pool.starmap(run_one, args_list, chunksize=1):
+                pass
+        except Exception as e:
+            print(f"[POOL ERROR] {e}\n{traceback.format_exc()}")

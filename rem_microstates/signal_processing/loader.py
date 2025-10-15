@@ -82,7 +82,7 @@ def load_signals_and_annotations(fif_path: Path, annot_path: Path | None):
     print(f"Durée fichier FIF : {t_end:.2f} secondes")
     if rem_segments:
         t0, t1 = rem_segments[0]
-        print(f"Premier segment REM : {t0:.2f} s → {t1:.2f} s ({(t1 - t0):.1f} s)")
+        print(f"Premier segment REM : {t0:.2f} s -> {t1:.2f} s ({(t1 - t0):.1f} s)")
     else:
         print("[INFO] Aucun segment REM détecté dans l'annotation.")
 
