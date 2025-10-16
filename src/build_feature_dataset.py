@@ -4,9 +4,7 @@ import sys
 import os
 import numpy as np
 import pandas as pd
-import platform
 from pathlib import Path
-from cohort import load_patient_groups
 
 def flatten_npz_dict(d):
     """Transforme un dict .npz (matriciel) en dict 1D à plat."""
@@ -22,6 +20,31 @@ def flatten_npz_dict(d):
                     flat[f"{k}_{i}_{j}"] = v[i, j]
     return flat
 
+def load_and_clean_patient_info(path_csv: str) -> pd.DataFrame:
+    df = pd.read_csv(path_csv, dtype=str).rename(columns=str.strip)
+    required = {"id_patient", "label", "age", "genre"}
+    missing_cols = required - set(df.columns)
+    if missing_cols:
+        raise ValueError(f"Colonnes manquantes dans {path_csv}: {sorted(missing_cols)}")
+
+    # Trim espaces
+    for c in ["id_patient", "label", "genre"]:
+        df[c] = df[c].astype(str).str.strip()
+
+    # Harmonise les 'nan' textuels et vides
+    df.replace({"": np.nan, "nan": np.nan, "NaN": np.nan, "None": np.nan}, inplace=True)
+
+    # Age numérique
+    df["age"] = pd.to_numeric(df["age"], errors="coerce")
+
+    # Genre normalisé (h/f)
+    df["genre"] = df["genre"].str.lower().map(
+        {"h": "h", "m": "h", "homme": "h", "male": "h",
+         "f": "f", "femme": "f", "female": "f"}
+    ).fillna(df["genre"])  # si autre codage, on le conserve
+
+    return df
+
 def main():
     # Demande du montage
     response = input("Le montage est-il bipolaire ? (y/n) : ").strip().lower()
@@ -30,70 +53,58 @@ def main():
         sys.exit(1)
     montage = "bipolaire" if response == "y" else "monopolaire"
 
-
-    excel_path = "data/Tableau_synthese_patients0.xlsx"
     features_root = Path(f"features/{montage}/rem_only")
     output_features = f"data/features_{montage}.csv"
-    output_info = "data/patient_info.csv"
+    info_csv = "data/patient_info.csv"
 
-    # 1. Charger les métadonnées
-    print("[INFO] Chargement des métadonnées...")
-    df_excel, group_map, demographics_map = load_patient_groups(excel_path, sheet_index=0)
+    # 1) Lire les infos patients depuis le CSV
+    print(f"[INFO] Lecture des infos patients depuis {info_csv} ...")
+    df_info = load_and_clean_patient_info(info_csv)
 
-    full_info_map = {}
-    for patient_id in group_map:
-        label = group_map.get(patient_id)
-        demo = demographics_map.get(patient_id)
-        if label is not None and demo is not None:
-            full_info_map[patient_id] = {
-                "label": label,
-                "age": demo.get("age", np.nan),
-                "genre": demo.get("genre", np.nan)
-            }
-
-    # 2. Construction des features
+    # 2) Construire les features
     rows = []
-    info_rows = {}
     for npz_file in features_root.rglob("*.npz"):
-        subject = npz_file.parent.name
-        if subject not in full_info_map:
-            print(f"[WARNING] Sujet {subject} absent du fichier Excel. Ignoré.")
-            continue
-
+        subject = npz_file.parent.name  # dossier du sujet
         data = dict(np.load(npz_file))
         flat = flatten_npz_dict(data)
         flat["id_patient"] = subject
         flat["segment"] = npz_file.name.replace("_features.npz", "")
         rows.append(flat)
 
-        if subject not in info_rows:
-            info = {"id_patient": subject}
-            info.update(full_info_map[subject])
-            info_rows[subject] = info
+    if not rows:
+        print(f"[ERROR] Aucune feature trouvée sous {features_root} (*.npz).")
+        sys.exit(1)
 
     df_features = pd.DataFrame(rows)
-    df_info = pd.DataFrame(info_rows.values())
 
-    # 3. Jointure finale
-    print("[INFO] Fusion features + info pour reconstituer le dataset final...")
+    # 3) Sanity checks avant merge
+    missing_in_info = sorted(set(df_features["id_patient"]) - set(df_info["id_patient"]))
+    if missing_in_info:
+        print(f"[WARNING] {len(missing_in_info)} sujet(s) des features absents de {info_csv} : {missing_in_info[:10]}{' ...' if len(missing_in_info)>10 else ''}")
+
+    # 4) Fusion finale
+    print("[INFO] Fusion features + info ...")
     df_final = pd.merge(df_features, df_info, on="id_patient", how="left")
 
-    # Vérification des colonnes
-    if df_final[["label", "age", "genre"]].isnull().any().any():
-        print("[WARNING] Des colonnes label/age/genre contiennent des NaNs après fusion.")
+    # 5) Supprimer les lignes avec NaN dans label/age/genre
+    df_final = df_final.dropna(subset=["label", "age", "genre"])
+    print(f"[INFO] Lignes incomplètes supprimées. Dataset final : {df_final.shape[0]} lignes restantes.")
 
-    # Réorganisation des colonnes
+
+    # 6) Réorganisation des colonnes (5 colonnes info d'abord)
     info_cols = ["id_patient", "segment", "label", "age", "genre"]
     feature_cols = [c for c in df_final.columns if c not in set(info_cols)]
     df_final = df_final[info_cols + feature_cols]
 
-    # 4. Sauvegarde
-    df_final.to_csv(output_features, index=False)
-    df_info.to_csv(output_info, index=False)
+    # Assertion douce pour s'assurer de l'ordre voulu
+    expected_head = ["id_patient", "segment", "label", "age", "genre"]
+    assert list(df_final.columns[:5]) == expected_head, f"En-tête inattendu: {df_final.columns[:5]}"
 
-    print(f"[OK] Fichier final : {output_features} ({df_final.shape[0]} lignes)")
-    print(f"[OK] Infos patient (unique) : {output_info} ({df_info.shape[0]} patients)")
+    # 7) Sauvegarde
+    df_final.to_csv(output_features, index=False)
+    print(f"[OK] Fichier final : {output_features} ({df_final.shape[0]} lignes, {df_final.shape[1]} colonnes)")
+    print(f"[OK] 5 premières colonnes : {expected_head}")
+    
 
 if __name__ == "__main__":
     main()
-
