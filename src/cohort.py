@@ -15,8 +15,8 @@ def load_patient_groups(xlsx_path, sheet_index=None):
     # Renommage explicite des colonnes clés
     df.rename(columns={
         df.columns[0]: 'id_patient',
-        df.columns[3]: 'genre',
-        df.columns[5]: 'age',
+        df.columns[2]: 'genre',
+        df.columns[4]: 'age',
         df.columns[6]: 'label'
     }, inplace=True)
 
@@ -38,7 +38,9 @@ def load_patient_groups(xlsx_path, sheet_index=None):
     group_map = dict(zip(df['id_patient'], df['label']))
 
     # Mapping des infos démographiques
-    demographics_map = df.set_index('id_patient')[['age', 'genre']].to_dict(orient='index')
+    df_dedup = df.drop_duplicates(subset='id_patient', keep='first')
+    demographics_map = df_dedup.set_index('id_patient')[['age','genre']].to_dict(orient='index')
+
 
     return df, group_map, demographics_map
 

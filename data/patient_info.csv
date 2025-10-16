@@ -1,67 +1,77 @@
 id_patient,label,age,genre
-CS147,narcolepsy,17.0,f
-MFJ160,autoimmune encephalitides,63.0,h
-CD164,tcspi,75.0,f
-MC154,tcspi,87.0,h
-PA139,synucleopathy,68.0,h
 CC175,tcspi,65.0,h
-CJP53,tcspi,72.0,h
-VJ149,tcspi,66.0,f
-KH113,autoimmune encephalitides,51.0,h
-TLM168,narcolepsy,14.0,h
-BA152,synucleopathy,51.0,f
+MA27,tcspi,71.0,h
 TM151,synucleopathy,75.0,h
-JP141,tcspi,69.0,h
-PJC140,tcspi,58.0,h
-SJP172,synucleopathy,79.0,h
-CM161,tcspi,74.0,f
-BF181,synucleopathy,77.0,h
-BJ138,tcspi,65.0,h
-GD170,synucleopathy,70.0,h
+CA169,tcspi,83.0,f
+MC154,tcspi,87.0,h
+TJ127,autoimmune encephalitides,72.0,h
+FP144,tcspi,63.0,h
+DI136,tcspi,,nan
+CJL159,autoimmune encephalitides,81.0,h
+BA152,synucleopathy,51.0,f
+SD134,tcspi,74.0,h
+NAL43,narcolepsy,20.0,f
 BA171,synucleopathy,71.0,h
+CP155,tcspi,75.0,h
+CM161,tcspi,74.0,f
+VA182,synucleopathy,67.0,h
 RG156,synucleopathy,72.0,h
-JLJ177,tcspi,76.0,h
+BDRE44,narcolepsy,24.0,f
+RH146,tcspi,64.0,h
+RJ42,narcolepsy,7.0,h
+AE129,narcolepsy,12.0,f
+PJC140,tcspi,58.0,h
+JB173,autoimmune encephalitides,72.0,h
+CS131,tcspi,41.0,h
+HG167,narcolepsy,35.0,f
+MP150,tcspi,67.0,h
+GD170,synucleopathy,70.0,h
+SJP172,synucleopathy,79.0,h
+CB165,tcspi,28.0,h
 MN143,tcspi,55.0,h
+JP141,tcspi,69.0,h
+BJ138,tcspi,65.0,h
+RB103,narcolepsy,37.0,h
+NGA157,synucleopathy,45.0,h
+RD158,synucleopathy,47.0,h
+KH113,autoimmune encephalitides,51.0,h
+LF126,tcspi,52.0,h
+TO145,tcspi,55.0,h
+EF130,tcspi,62.0,h
+BF181,synucleopathy,77.0,h
+MHTK39,narcolepsy,11.0,f
+MM109,tcspi,79.0,h
 DSJ112,tcspi,60.0,h
 TM142,synucleopathy,71.0,h
-MM109,tcspi,79.0,h
-VA182,synucleopathy,67.0,h
-FP144,tcspi,63.0,h
-MG16,nan,60.0,h
+MFJ160,autoimmune encephalitides,63.0,h
+DA174,tcspi,70.0,h
+LJ41,narcolepsy,32.0,f
+CJP53,tcspi,72.0,h
+SB176,tcspi,63.0,f
+VJ149,tcspi,66.0,f
+BO60,synucleopathy,58.0,h
+DA110,tcspi,82.0,h
+DJ137,tcspi,39.0,f
+GS191,nan,64.0,h
+CD164,tcspi,75.0,f
+GX111,tcspi,48.0,h
+BB114,synucleopathy,59.0,f
+RJP148,synucleopathy,76.0,h
+AN166,autoimmune encephalitides,59.0,f
+PA139,synucleopathy,68.0,h
+MRM132,tcspi,64.0,f
+GR108,tcspi,70.0,h
+CS147,narcolepsy,17.0,f
+ML135,synucleopathy,82.0,h
+TLM168,narcolepsy,14.0,h
+PF133,tcspi,56.0,h
+MN26,narcolepsy,17.0,h
+GH163,synucleopathy,73.0,h
+SB178,autoimmune encephalitides,46.0,h
+PJL153,tcspi,51.0,h
+MG16,synucleopathy,60.0,h
+LS162,tcspi,68.0,f
+IS179,tcspi,55.0,f
 CD28,tcspi,66.0,h
 MS128,synucleopathy,81.0,f
-PF133,tcspi,56.0,h
-GR108,tcspi,70.0,h
-DJ137,tcspi,39.0,f
-RB103,narcolepsy,37.0,h
-CS131,tcspi,41.0,h
-SB178,autoimmune encephalitides,46.0,h
-DI136,tcspi,60.0,f
-SB176,tcspi,63.0,f
-TO145,tcspi,55.0,h
-CP155,tcspi,75.0,h
-RJP148,synucleopathy,76.0,h
-LS162,tcspi,68.0,f
-MHTK39,narcolepsy,11.0,f
-NGA157,synucleopathy,45.0,h
-CA169,tcspi,83.0,f
-RD158,synucleopathy,47.0,h
-TJ127,autoimmune encephalitides,72.0,h
-BB114,synucleopathy,59.0,f
-SD134,tcspi,74.0,h
-HG167,narcolepsy,35.0,f
-GH163,synucleopathy,73.0,h
-AN166,autoimmune encephalitides,59.0,f
-IS179,tcspi,55.0,f
-AE129,narcolepsy,12.0,f
-CB165,tcspi,28.0,h
-RH146,tcspi,64.0,h
-DA110,tcspi,82.0,h
-ML135,synucleopathy,82.0,h
-MA27,tcspi,71.0,h
-JB173,autoimmune encephalitides,72.0,h
-MP150,tcspi,67.0,h
-BO60,synucleopathy,58.0,h
-EF130,tcspi,62.0,h
-DA174,tcspi,70.0,h
-MRM132,tcspi,64.0,f
+JLJ177,tcspi,76.0,h

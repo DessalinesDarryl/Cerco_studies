@@ -30,16 +30,8 @@ def main():
         sys.exit(1)
     montage = "bipolaire" if response == "y" else "monopolaire"
 
-    # Détection du système
-    system = platform.system()
-    if system == "Darwin":
-        disque = "/Volumes/Crucial X6"
-    elif system == "Windows":
-        disque = "D:"
-    else:
-        raise RuntimeError("Système non supporté.")
 
-    excel_path = "data/Tableau_synthese_patients.xlsx"
+    excel_path = "data/Tableau_synthese_patients0.xlsx"
     features_root = Path(f"features/{montage}/rem_only")
     output_features = f"data/features_{montage}.csv"
     output_info = "data/patient_info.csv"
@@ -91,9 +83,9 @@ def main():
         print("[WARNING] Des colonnes label/age/genre contiennent des NaNs après fusion.")
 
     # Réorganisation des colonnes
-    feature_cols = [col for col in df_final.columns if col not in {"id_patient", "label", "age", "genre"}]
-    ordered_cols = ["id_patient", "label", "age", "genre"] + feature_cols
-    df_final = df_final[ordered_cols]
+    info_cols = ["id_patient", "segment", "label", "age", "genre"]
+    feature_cols = [c for c in df_final.columns if c not in set(info_cols)]
+    df_final = df_final[info_cols + feature_cols]
 
     # 4. Sauvegarde
     df_final.to_csv(output_features, index=False)

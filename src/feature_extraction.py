@@ -87,7 +87,7 @@ def batch_process(input_dir, output_dir):
     input_dir = Path(input_dir)
 
     for fif_file in input_dir.rglob("*.fif"):
-        if not fif_file.name.endswith(".fif") or fif_file.name.startswith("._"):
+        if not fif_file.name.endswith("REM_concat.fif") or fif_file.name.startswith("._"):
             continue
 
         print(f"Processing {fif_file}...")
@@ -103,24 +103,6 @@ def batch_process(input_dir, output_dir):
         print(f"Saved: {save_path}")
 
 if __name__ == "__main__":
-    # On demande à l'utilisateur si le montage est bipolaire
-    response = input("Le montage est-il bipolaire ? (y/n) : ").strip().lower()
-    if response not in {"y", "n"}:
-        print("Réponse invalide. Veuillez entrer 'y' pour oui ou 'n' pour non.")
-        sys.exit(1)
-
-    montage = "bipolaire" if response == "y" else "monopolaire"
-    print(f"montage défini={montage}")
-
-    # Adaptation système
-    system = platform.system()
-    if system == "Darwin":  # macOS
-        disque = "/Volumes/Crucial X6"
-    elif system == "Windows":
-        disque = "D:"
-    else:
-        raise RuntimeError("Système non supporté.")
-
-    input_dir = Path(f"{disque}/EEG/preprocessed/{montage}/rem_only")
-    output_dir = f"features/{montage}/rem_only"
+    input_dir = Path(f"../documents/EEG/preprocessed/bipolaire/2_rem_only/gp2")
+    output_dir = f"features/bipolaire/rem_only"
     batch_process(input_dir, output_dir)

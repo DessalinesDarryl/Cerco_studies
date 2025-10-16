@@ -8,6 +8,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report, confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
+import sys
 
 from models import get_model  # suppose que tu as un fichier models.py avec get_model()
 
@@ -25,14 +26,6 @@ if __name__ == "__main__":
     montage = "bipolaire" if response == "y" else "monopolaire"
     print(f"montage défini={montage}")
 
-    # Adaptation système
-    system = platform.system()
-    if system == "Darwin":  # macOS
-        disque = "/Volumes/Crucial X6"
-    elif system == "Windows":
-        disque = "D:"
-    else:
-        raise RuntimeError("Système non supporté.")
 
     print("[INFO] Chargement des données...")
     path_csv = f"data/features_{montage}.csv"
