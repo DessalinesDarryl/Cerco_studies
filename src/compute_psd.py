@@ -9,6 +9,7 @@ Entrées :
 
 Sorties :
   - out_root/{BASE}/{BASE}_psd_bands.png                 (global, inchangé)
+  - out_root/{BASE}/{BASE}_psd_full_0p5_80.png           (global plein spectre, moy ± p10-p90)
   - out_root/{BASE}/{BASE}_psd_bands_{CANAL}.png         (une figure par **canal complet**)
   - out_root/all_band_powers.csv                         (agrégats globaux patient)
   - out_root/per_channel_band_powers.csv                 (long : base, channel, band, abs, rel, total_abs_channel)
@@ -16,6 +17,8 @@ Sorties :
   - out_root/group_band_power_rel.png                    (global relatif par groupe)
   - out_root/perband_abs_chan_{CANAL}_{BAND}.png         (inter-catégories par **canal complet**)
   - out_root/perband_rel_chan_{CANAL}_{BAND}.png         (inter-catégories par **canal complet**)
+  - out_root/group_psd_bands.png                         (inter-groupes 3x2 par bandes)
+  - out_root/group_psd_full_0p5_80.png                   (inter-groupes plein spectre)
   - out_root/group_means_abs.csv / group_means_rel.csv
   - out_root/patients_unknown_category.txt
 """
@@ -39,14 +42,14 @@ import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.ticker import ScalarFormatter, FixedLocator
+from matplotlib.ticker import ScalarFormatter, FixedLocator, LogLocator
 
 import mne
 mne.set_config('MNE_MEMMAP_MIN_SIZE', '1M', set_env=True)
 
 # ---------- Defaults ----------
 REM_DIR_DEFAULT  = "/home/darryld/documents/EEG/preprocessed/bipolaire/2_rem_only/gp2"
-OUT_ROOT_DEFAULT = "/home/darryld/documents/EEG/preprocessed/bipolaire/3_results_analysis/gp2"
+OUT_ROOT_DEFAULT = "/home/darryld/documents/EEG/preprocessed/bipolaire/3_results_analysis/gp2_PSD"
 
 BANDS = {
     "Delta": (0.5, 4.0),
@@ -135,7 +138,7 @@ def make_patient_fig_global(base: str, freqs, psd_lin, out_png: Path, bands=BAND
     psd_db = 10.0 * np.log10(np.maximum(psd_lin, eps))
     band_list = list(bands.items())
     fig, axes = plt.subplots(3, 2, figsize=(10, 9)); axes = axes.ravel()
-    fig.suptitle(f"{base} - PSD REM (tous canaux) - moy ± p10–p90", fontsize=14, y=0.98)
+    fig.suptitle(f"{base} - PSD REM (tous canaux) - moy ± p10-p90", fontsize=14, y=0.98)
     for i, (name, (lo, hi)) in enumerate(band_list):
         ax = axes[i]
         idx = np.where((freqs >= lo) & (freqs < hi))[0]
@@ -144,7 +147,7 @@ def make_patient_fig_global(base: str, freqs, psd_lin, out_png: Path, bands=BAND
         m = np.nanmean(band_db, axis=0)
         p10 = np.nanpercentile(band_db, 10, axis=0)
         p90 = np.nanpercentile(band_db, 90, axis=0)
-        ax.plot(band_f, m, lw=2); ax.fill_between(band_f, p10, p90, alpha=0.25)
+        ax.plot(band_f, m, lw=2); ax.fill_between(band_f, p10, p90, alpha=0.08)
         ax.set_xscale("log")
         lo_i = max(1, int(np.ceil(lo))); hi_i = int(np.floor(hi))
         ticks = list(range(lo_i, hi_i + 1))
@@ -177,6 +180,30 @@ def make_patient_fig_channel(base: str, ch_label: str, freqs, psd_lin_channel, o
         ax.set_xlabel("Fréquence (Hz)"); ax.set_ylabel("PSD (dB re µV²/Hz)")
         ax.set_title(f"{name}  [{lo:.1f}-{hi:.1f}] Hz"); ax.grid(True, alpha=0.2)
     plt.tight_layout(rect=[0, 0, 1, 0.96]); plt.savefig(out_png, dpi=210); plt.close()
+
+def make_patient_full_spectrum(base: str, freqs, psd_lin, out_png: Path):
+    """Une seule figure : PSD REM (moyenne ± p10-p90) sur 0.5-80 Hz."""
+    eps = np.finfo(float).tiny
+    psd_db = 10.0 * np.log10(np.maximum(psd_lin, eps))  # (n_chan, n_freq)
+    m   = np.nanmean(psd_db, axis=0)
+    p10 = np.nanpercentile(psd_db, 10, axis=0)
+    p90 = np.nanpercentile(psd_db, 90, axis=0)
+
+    major = [0.5, 1, 2, 4, 8, 13, 30, 50, 80]
+
+    fig, ax = plt.subplots(1, 1, figsize=(8.5, 4.8))
+    (line,) = ax.plot(freqs, m, lw=2)
+    ax.fill_between(freqs, p10, p90, alpha=0.08, color=line.get_color(), linewidth=0)
+    ax.set_xscale("log"); ax.set_xlim(0.5, 80)
+    ax.xaxis.set_major_locator(FixedLocator(major))
+    ax.minorticks_off()
+    ax.xaxis.set_major_formatter(ScalarFormatter())
+    ax.tick_params(axis="x", labelsize=10)
+    ax.set_xlabel("Fréquence (Hz)")
+    ax.set_ylabel("PSD (dB re µV²/Hz)")
+    ax.set_title(f"{base} - PSD REM (0.5-80 Hz) - moy ± p10-p90")
+    ax.grid(True, alpha=0.2)
+    plt.tight_layout(); fig.savefig(out_png, dpi=230); plt.close(fig)
 
 def interp_to_common_grid(freqs: np.ndarray, psd_lin_mean: np.ndarray,
                           grid: np.ndarray = COMMON_FREQS) -> np.ndarray:
@@ -216,11 +243,17 @@ def process_one(base: str, rem_dir: Path, out_root: Path):
     rel_mean_global = {k: float(np.nanmean(v)) for k, v in band_rel_ch.items()}
     total_mean_global = float(np.nanmean(total_abs_ch))
 
-    # --- figure globale patient
+    # --- figure globale patient (3x2 par bandes)
     try:
         make_patient_fig_global(base_n, freqs, psd_lin, out_dir / f"{base_n}_psd_bands.png", bands=BANDS)
     except Exception as e:
         print(f"[{base_n}] figure globale erreur: {e}")
+
+    # --- figure "plein spectre" (0.5-80 Hz) en une seule courbe (moy ± p10-p90)
+    try:
+        make_patient_full_spectrum(base_n, freqs, psd_lin, out_dir / f"{base_n}_psd_full_0p5_80.png")
+    except Exception as e:
+        print(f"[{base_n}] figure plein spectre erreur: {e}")
 
     # --- figures PAR CANAL + table longue + PSD interp par canal
     per_channel_rows = []
@@ -251,7 +284,6 @@ def process_one(base: str, rem_dir: Path, out_root: Path):
         except Exception:
             spec_lin_common_chan = np.full_like(COMMON_FREQS, np.nan, dtype=float)
         spec_chan.append({"channel": ch, "spec_lin_common": spec_lin_common_chan.tolist()})
-
 
     # --- ligne CSV patient (agrégats globaux)
     row = {"base": base_n, "total_abs": total_mean_global}
@@ -437,7 +469,7 @@ def main():
     else:
         df_ch = pd.DataFrame(columns=["base","channel","band","abs","rel","total_abs_channel","group"])
 
-    # PSD interpolées pour figure inter-groupes (globale) - inchangé
+    # PSD interpolées pour figures inter-groupes (globale)
     spec_map = {r["base"]: np.array(r["spec_lin_common"], dtype=float)
                 for r in results if r.get("ok") and "spec_lin_common" in r}
     bases_ok = [b for b in df.index if b in spec_map]
@@ -447,43 +479,97 @@ def main():
         eps = np.finfo(float).tiny
         SPEC_DB = 10.0 * np.log10(np.maximum(SPEC, eps))
 
-        fig, axes = plt.subplots(3, 2, figsize=(11, 9)); axes = axes.ravel()
-        fig.suptitle("PSD REM - courbes par bande, superposées par groupe (moy ± p10–p90)", fontsize=14, y=0.98)
+        # --- Figure inter-groupes 3x2 (par bandes)
+        fig_bands, axes_bands = plt.subplots(3, 2, figsize=(11, 9)); axes = axes_bands.ravel()
+        fig_bands.suptitle("PSD REM - courbes par bande, superposées par groupe (moy ± p10-p90)", fontsize=14, y=0.98)
 
         band_list = list(BANDS.items())
         for i, (name, (lo, hi)) in enumerate(band_list):
             ax = axes[i]
             idx = band_indices(COMMON_FREQS, lo, hi)
-            if idx.size == 0: ax.set_visible(False); continue
+            if idx.size == 0:
+                ax.set_visible(False); 
+                continue
             for grp, idx_labels in DF_ALIGNED.groupby("group").groups.items():
-                if len(idx_labels) == 0: continue
+                if len(idx_labels) == 0: 
+                    continue
                 idx_int = np.array([DF_ALIGNED.index.get_loc(b) for b in idx_labels], dtype=int)
-                if idx_int.size == 0: continue
+                if idx_int.size == 0: 
+                    continue
                 sub = SPEC_DB[idx_int][:, idx]
-                if sub.size == 0: continue
+                if sub.size == 0: 
+                    continue
                 m   = np.nanmean(sub, axis=0)
                 p10 = np.nanpercentile(sub, 10, axis=0)
                 p90 = np.nanpercentile(sub, 90, axis=0)
                 color = color_for_group(grp)
                 ax.plot(COMMON_FREQS[idx], m, lw=2, label=f"{short_label(grp)}", color=color)
-                ax.fill_between(COMMON_FREQS[idx], p10, p90, alpha=0.12, color=color)
+                ax.fill_between(COMMON_FREQS[idx], p10, p90, alpha=0.08, color=color)
 
             ax.set_xscale("log")
             lo_i = max(1, int(np.ceil(lo))); hi_i = int(np.floor(hi))
             ticks = list(range(lo_i, hi_i + 1))
-            if ticks: ax.xaxis.set_major_locator(FixedLocator(ticks)); ax.minorticks_off()
+            if ticks: 
+                ax.xaxis.set_major_locator(FixedLocator(ticks)); 
+                ax.minorticks_off()
             ax.xaxis.set_major_formatter(ScalarFormatter())
             ax.set_xlabel("Fréquence (Hz)")
             ax.set_ylabel("PSD (dB re µV²/Hz)")
             ax.set_title(f"{name}  [{lo:.1f}-{hi:.1f}] Hz")
             ax.grid(True, alpha=0.2)
 
-        if len(band_list) < len(axes): axes[-1].axis("off")
+        if len(band_list) < len(axes): 
+            axes[-1].axis("off")
+
+        # Légende + sauvegarde de la 3x2
         handles, labels = axes[0].get_legend_handles_labels()
-        if handles: plt.legend(handles, labels, loc="lower center", ncol=5, frameon=False)
+        if handles:
+            fig_bands.legend(handles, labels, loc="lower center", ncol=5, frameon=False)
         plt.tight_layout(rect=[0, 0.04, 1, 0.96])
         out_png = out_root / "group_psd_bands.png"
-        plt.savefig(out_png, dpi=230); plt.close(); print(f">>> {out_png}")
+        fig_bands.savefig(out_png, dpi=230)
+        plt.close(fig_bands)
+        print(f">>> {out_png}")
+
+        # --- Figure inter-groupes plein spectre (0.5-80 Hz)
+        fig_full, ax_full = plt.subplots(1, 1, figsize=(9, 5))
+        for grp, idx_labels in DF_ALIGNED.groupby("group").groups.items():
+            if len(idx_labels) == 0:
+                continue
+            idx_int = np.array([DF_ALIGNED.index.get_loc(b) for b in idx_labels], dtype=int)
+            sub = SPEC_DB[idx_int]  # dB
+            if sub.size == 0:
+                continue
+            m   = np.nanmean(sub, axis=0)
+            p10 = np.nanpercentile(sub, 10, axis=0)
+            p90 = np.nanpercentile(sub, 90, axis=0)
+            c = color_for_group(grp)
+            ax_full.plot(COMMON_FREQS, m, lw=2, label=short_label(grp), color=c)
+            ax_full.fill_between(COMMON_FREQS, p10, p90, alpha=0.08, color=c)
+
+        # Axe X lisible (suggestion A)
+        major_ticks = [0.5, 1, 2, 4, 8, 13, 30, 50, 80]
+        ax_full.set_xscale("log"); ax_full.set_xlim(0.5, 80)
+        ax_full.xaxis.set_major_locator(FixedLocator(major_ticks))
+        ax_full.xaxis.set_major_formatter(ScalarFormatter())
+        ax_full.xaxis.set_minor_locator(LogLocator(base=10, subs=(2, 3, 5, 7)))
+        ax_full.tick_params(axis="x", labelsize=10, length=6, pad=3)
+
+        # Grille
+        ax_full.grid(True, which="major", alpha=0.25)
+        ax_full.grid(True, which="minor", alpha=0.07)
+
+        ax_full.set_xlabel("Fréquence (Hz)")
+        ax_full.set_ylabel("PSD (dB re µV²/Hz)")
+        ax_full.set_title("PSD REM (0.5-80 Hz) - plein spectre par groupe (moy ± p10-p90)")
+        ax_full.legend(ncol=5, frameon=False)
+
+        plt.tight_layout()
+        out_png = out_root / "group_psd_full_0p5_80.png"
+        fig_full.savefig(out_png, dpi=230)
+        plt.close(fig_full)
+        print(f">>> {out_png}")
+
     else:
         print("[WARN] Aucune PSD interpolée récupérée, skip figure inter-groupes.")
 
@@ -522,7 +608,7 @@ def main():
             for b in sorted(set(missing)): f.write(f"{b}\n")
         print(f"[INFO] {len(set(missing))} patient(s) sans catégorie connue -> patients_unknown_category.txt")
 
-    # ---------- Figures inter-groupes **par canal** (moy ± p10–p90), une image par canal ----------
+    # ---------- Figures inter-groupes **par canal** (moy ± p10-p90), une image par canal ----------
     # Collecte: channel -> { base -> spec_lin_common (lin) }
     chan_map = {}  # dict[str, dict[base:str, np.ndarray]]
     for r in results:
@@ -551,7 +637,6 @@ def main():
         print(f"[INFO] Figures inter-groupes par canal pour {len(eligible_channels)} canaux (min {min_pat} patients).")
 
     # Helper d'index pour corriger l'erreur d'indexation vue précédemment
-    # (on mappe base -> rang dans SPEC_CH pour chaque canal)
     for ch in eligible_channels:
         base_to_spec = chan_map[ch]  # dict base -> spec_lin (lin)
         # Aligner sur les bases disponibles dans df
@@ -566,8 +651,8 @@ def main():
         DF_CH = df.loc[bases_ch].copy()  # pour les groupes
         row_index = {b: i for i, b in enumerate(bases_ch)}  # base -> ligne SPEC_CH
 
-        fig, axes = plt.subplots(3, 2, figsize=(18, 10)); axes = axes.ravel()
-        fig.suptitle(f"PSD REM - canal {ch} - courbes par bande, superposées par groupe (moy ± p10–p90)", fontsize=14, y=0.98)
+        fig_ch, axes_ch = plt.subplots(3, 2, figsize=(18, 10)); axes = axes_ch.ravel()
+        fig_ch.suptitle(f"PSD REM - canal {ch} - courbes par bande, superposées par groupe (moy ± p10-p90)", fontsize=14, y=0.98)
 
         band_list = list(BANDS.items())
         for i, (name, (lo, hi)) in enumerate(band_list):
@@ -581,7 +666,6 @@ def main():
             for grp, idx_labels in DF_CH.groupby("group").groups.items():
                 if len(idx_labels) == 0:
                     continue
-                # indices entiers robustes (corrige l'IndexError des labels string)
                 idx_int = np.array([row_index[b] for b in idx_labels if b in row_index], dtype=int)
                 if idx_int.size == 0:
                     continue
@@ -596,7 +680,7 @@ def main():
 
                 color = color_for_group(grp)
                 ax.plot(COMMON_FREQS[idx], m, lw=2, label=f"{short_label(grp)}", color=color)
-                ax.fill_between(COMMON_FREQS[idx], p10, p90, alpha=0.12, color=color)
+                ax.fill_between(COMMON_FREQS[idx], p10, p90, alpha=0.08, color=color)
 
             ax.set_xscale("log")
             lo_i = max(1, int(np.ceil(lo))); hi_i = int(np.floor(hi))
@@ -616,12 +700,55 @@ def main():
         # Légende globale (si dispo)
         handles, labels = axes[0].get_legend_handles_labels()
         if handles:
-            fig.legend(handles, labels, loc="lower center", ncol=5, frameon=False)
+            fig_ch.legend(handles, labels, loc="lower center", ncol=5, frameon=False)
 
         plt.tight_layout(rect=[0, 0.04, 1, 0.96])
         out_png = out_root / f"group_psd_bands_chan_{sanitize_name(ch)}.png"
-        fig.savefig(out_png, dpi=230)
-        plt.close(fig)
+        fig_ch.savefig(out_png, dpi=230)
+        plt.close(fig_ch)
+
+        # --- Figure inter-groupes plein spectre **par canal** (0.5-80 Hz)
+        fig_full_ch, ax_fc = plt.subplots(1, 1, figsize=(11, 5))
+        for grp, idx_labels in DF_CH.groupby("group").groups.items():
+            if len(idx_labels) == 0:
+                continue
+            idx_int = np.array([row_index[b] for b in idx_labels if b in row_index], dtype=int)
+            if idx_int.size == 0:
+                continue
+
+            sub = SPEC_CH_DB[idx_int]  # dB sur tout le spectre (n_sujets_grp × n_freq)
+            if sub.size == 0:
+                continue
+
+            m   = np.nanmean(sub, axis=0)
+            p10 = np.nanpercentile(sub, 10, axis=0)
+            p90 = np.nanpercentile(sub, 90, axis=0)
+
+            c = color_for_group(grp)
+            ax_fc.plot(COMMON_FREQS, m, lw=2, label=short_label(grp), color=c)
+            ax_fc.fill_between(COMMON_FREQS, p10, p90, alpha=0.08, color=c)
+
+        # Axe X lisible (suggestion A : ticks pertinents)
+        major_ticks = [0.5, 1, 2, 4, 8, 13, 30, 50, 80]
+        ax_fc.set_xscale("log"); ax_fc.set_xlim(0.5, 80)
+        ax_fc.xaxis.set_major_locator(FixedLocator(major_ticks))
+        ax_fc.xaxis.set_major_formatter(ScalarFormatter())
+        ax_fc.xaxis.set_minor_locator(LogLocator(base=10, subs=(2, 3, 5, 7)))
+        ax_fc.tick_params(axis="x", labelsize=10, length=6, pad=3)
+
+        # Grille
+        ax_fc.grid(True, which="major", alpha=0.25)
+        ax_fc.grid(True, which="minor", alpha=0.07)
+
+        ax_fc.set_xlabel("Fréquence (Hz)")
+        ax_fc.set_ylabel("PSD (dB re µV²/Hz)")
+        ax_fc.set_title(f"PSD REM - canal {ch} (0.5-80 Hz) - plein spectre par groupe (moy ± p10-p90)")
+        ax_fc.legend(ncol=5, frameon=False)
+
+        plt.tight_layout()
+        out_png = out_root / f"group_psd_full_0p5_80_chan_{sanitize_name(ch)}.png"
+        fig_full_ch.savefig(out_png, dpi=230)
+        plt.close(fig_full_ch)
         print(f">>> {out_png}")
 
 
