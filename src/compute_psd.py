@@ -60,7 +60,7 @@ BANDS = {
     "Gamma_Bas": (30.0, 50.0),
     "Gamma_Haut": (50.0, 80.0),
 }
-FMIN, FMAX = 0.5, 80.0
+FMIN, FMAX = 10, 100.0
 COMMON_NFREQ = 400
 COMMON_FREQS = np.linspace(FMIN, FMAX, COMMON_NFREQ)
 
@@ -108,27 +108,27 @@ def _welch_psd_array(data: np.ndarray, sfreq: float, fmin: float, fmax: float,
     Welch PSD sur array (n_chan, n_times) en µV, avec garde-fous :
       - n_per_seg = min(n_times, round(sfreq*win_sec)), clampé à >= 8
       - n_overlap = round(overlap * n_per_seg), clampé à [0, n_per_seg-1]
-      - n_fft = n_per_seg (évite tout mismatch interne MNE)
+      - n_fft = n_per_seg (pour éviter tout mismatch interne MNE)
     """
     from mne.time_frequency import psd_array_welch
 
     n_times = int(data.shape[1])
-    # fenêtre cible (ex: 4 s) mais clampée par la longueur réelle
+    # fenêtre cible de 4s mais clampée par la longueur réelle
     n_per_seg = int(round(float(sfreq) * float(win_sec)))
     n_per_seg = max(8, min(n_per_seg, n_times))
 
-    # overlap en fraction de la fenêtre (ex: 50%) puis clamp dur
+    # overlap 50% puis clamp dur
     n_overlap = int(round(float(overlap) * n_per_seg))
     if n_overlap >= n_per_seg:
         n_overlap = max(0, n_per_seg - 1)
 
-    # petit log pour traçabilité
+    # petit log 
     print(f"[PSD] sf={sfreq:.3f}Hz | n_times={n_times} | n_per_seg={n_per_seg} | n_overlap={n_overlap}")
 
     psd, freqs = psd_array_welch(
         data, sfreq,
         fmin=float(fmin), fmax=float(fmax),
-        n_fft=n_per_seg,            # <— crucial
+        n_fft=n_per_seg,          
         n_per_seg=n_per_seg,
         n_overlap=n_overlap,
         average="mean",
@@ -139,8 +139,6 @@ def _welch_psd_array(data: np.ndarray, sfreq: float, fmin: float, fmax: float,
 
 def compute_psd(raw: mne.io.BaseRaw, fmin=FMIN, fmax=FMAX,
                 include_emg: bool = False, emg_band=(30.0, 100.0)):
-    """Version SANS Raw.compute_psd : utilise psd_array_welch sur des arrays."""
-    print(">>> USING compute_psd: psd_array_welch (no Raw.compute_psd)")
     all_freqs = None
     all_psd, all_names = [], []
 
@@ -258,19 +256,19 @@ def make_patient_full_spectrum(base: str, freqs, psd_lin, out_png: Path):
     p10 = np.nanpercentile(psd_db, 10, axis=0)
     p90 = np.nanpercentile(psd_db, 90, axis=0)
 
-    major = [0.5, 1, 2, 4, 8, 13, 30, 50, 80]
+    major = [10, 13, 30, 50, 80, 100]
 
     fig, ax = plt.subplots(1, 1, figsize=(8.5, 4.8))
     (line,) = ax.plot(freqs, m, lw=2)
     ax.fill_between(freqs, p10, p90, alpha=0.08, color=line.get_color(), linewidth=0)
-    ax.set_xscale("log"); ax.set_xlim(0.5, 80)
+    ax.set_xscale("log"); ax.set_xlim(10, 100)
     ax.xaxis.set_major_locator(FixedLocator(major))
     ax.minorticks_off()
     ax.xaxis.set_major_formatter(ScalarFormatter())
     ax.tick_params(axis="x", labelsize=10)
     ax.set_xlabel("Fréquence (Hz)")
     ax.set_ylabel("PSD (dB re µV²/Hz)")
-    ax.set_title(f"{base} - PSD REM (0.5-80 Hz) - moy ± p10-p90")
+    ax.set_title(f"{base} - PSD REM (10-100 Hz) - moy ± p10-p90")
     ax.grid(True, alpha=0.2)
     plt.tight_layout(); fig.savefig(out_png, dpi=230); plt.close(fig)
 
@@ -818,25 +816,28 @@ def main():
             ax_fc.plot(COMMON_FREQS, m, lw=2, label=short_label(grp), color=c)
             ax_fc.fill_between(COMMON_FREQS, p10, p90, alpha=0.08, color=c)
 
-        # Axe X lisible (suggestion A : ticks pertinents)
-        major_ticks = [0.5, 1, 2, 4, 8, 13, 30, 50, 80]
-        ax_fc.set_xscale("log"); ax_fc.set_xlim(0.5, 80)
+        # Axe X lisible 
+        major_ticks = [30, 40, 50, 60, 70, 80, 90, 100]
+        ax_fc.set_xscale("log"); ax_fc.set_xlim(30, 100)
         ax_fc.xaxis.set_major_locator(FixedLocator(major_ticks))
         ax_fc.xaxis.set_major_formatter(ScalarFormatter())
         ax_fc.xaxis.set_minor_locator(LogLocator(base=10, subs=(2, 3, 5, 7)))
         ax_fc.tick_params(axis="x", labelsize=10, length=6, pad=3)
+
+        # Axe Y lisible (-40, 20)
+        ax_fc.set_ylim(-40, 20)
 
         # Grille
         ax_fc.grid(True, which="major", alpha=0.25)
         ax_fc.grid(True, which="minor", alpha=0.07)
 
         ax_fc.set_xlabel("Fréquence (Hz)")
-        ax_fc.set_ylabel("PSD (dB re µV²/Hz)")
-        ax_fc.set_title(f"PSD REM - canal {ch} (0.5-80 Hz) - plein spectre par groupe (moy ± p10-p90)")
+        ax_fc.set_ylabel("PSD (dB rel µV²/Hz)")
+        ax_fc.set_title(f"PSD REM - canal {ch} (30-100 Hz) - plein spectre par groupe (moy ± p10-p90)")
         ax_fc.legend(ncol=5, frameon=False)
 
         plt.tight_layout()
-        out_png = out_root / f"group_psd_full_0p5_80_chan_{sanitize_name(ch)}.png"
+        out_png = out_root / f"group_psd_full_30_100_chan_{sanitize_name(ch)}.png"
         fig_full_ch.savefig(out_png, dpi=230)
         plt.close(fig_full_ch)
         print(f">>> {out_png}")
