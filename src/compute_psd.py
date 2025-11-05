@@ -31,6 +31,7 @@ os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
 os.environ.setdefault("NUMEXPR_NUM_THREADS", "1")
 os.environ.setdefault("VECLIB_MAXIMUM_THREADS", "1")
 
+import sys
 import multiprocessing as mp
 import faulthandler; faulthandler.enable()
 
@@ -48,8 +49,8 @@ import mne
 mne.set_config('MNE_MEMMAP_MIN_SIZE', '1M', set_env=True)
 
 # ---------- Defaults ----------
-REM_DIR_DEFAULT  = "/home/darryld/documents/EEG/preprocessed/bipolaire/2_rem_only/gp2"
-OUT_ROOT_DEFAULT = "/home/darryld/documents/EEG/preprocessed/bipolaire/3_results_analysis/gp2_PSD"
+REM_DIR_DEFAULT  = "/home/darryld/documents/EEG/preprocessed/bipolaire/1bis_RBD/method_95percentile"
+OUT_ROOT_DEFAULT = "/home/darryld/documents/EEG/preprocessed/bipolaire/3_results_analysis/gp2_PSD_RBD/95percentile"
 
 BANDS = {
     "Delta": (0.5, 4.0),
@@ -85,10 +86,14 @@ def list_patients(rem_dir: Path) -> list[str]:
     return sorted(bases)
 
 def find_rem_fif(base: str, rem_dir: Path) -> Path | None:
-    p = rem_dir / base / f"{base}_REM_concat.fif"
-    if p.exists(): return p
-    p2 = rem_dir / f"{base}_REM_concat.fif"
-    return p2 if p2.exists() else None
+    candidates = [
+        rem_dir / base / f"{base}_REM_concat.fif",
+        rem_dir / base / f"{base}_RBD_concat.fif",
+        rem_dir / f"{base}_REM_concat.fif",
+        rem_dir / f"{base}_RBD_concat.fif",
+    ]
+    return next((p for p in candidates if p.exists()), None)
+
 
 # --------- Chargement des catégories ---------
 def load_groups_from_excel(xlsx_path: Path, sheet_index: int | None):
@@ -97,27 +102,91 @@ def load_groups_from_excel(xlsx_path: Path, sheet_index: int | None):
     return {str(k).strip().upper(): str(v).strip().lower() for k, v in group_map.items()}
 
 # ---------- PSD helpers ----------
-def compute_psd(raw: mne.io.BaseRaw, fmin=FMIN, fmax=FMAX):
-    inst = raw.copy().pick_types(meg=False, eeg=True, eog=False, ecg=False, emg=False,
-                                 stim=False, misc=False, resp=False, seeg=False, ecog=False, fnirs=False)
-    if len(inst.ch_names) == 0:
-        raise RuntimeError("Aucun canal EEG")
-    inst.load_data()
-    picks = mne.pick_types(inst.info, eeg=True, meg=False, eog=False, ecg=False, emg=False)
-    inst.apply_function(lambda x: x * 1e6, picks=picks, channel_wise=True)  # µV
-    try: inst.set_unit("eeg", "uV")
-    except Exception: pass
+def _welch_psd_array(data: np.ndarray, sfreq: float, fmin: float, fmax: float,
+                     win_sec: float = 4.0, overlap: float = 0.50):
+    """
+    Welch PSD sur array (n_chan, n_times) en µV, avec garde-fous :
+      - n_per_seg = min(n_times, round(sfreq*win_sec)), clampé à >= 8
+      - n_overlap = round(overlap * n_per_seg), clampé à [0, n_per_seg-1]
+      - n_fft = n_per_seg (évite tout mismatch interne MNE)
+    """
+    from mne.time_frequency import psd_array_welch
 
-    sf = float(inst.info["sfreq"])
-    n_times = int(inst.n_times)
-    n_per_seg = max(2, min(int(sf*4), n_times))   # ~4 s
-    n_overlap = max(0, min(n_per_seg//2, n_per_seg-1))
+    n_times = int(data.shape[1])
+    # fenêtre cible (ex: 4 s) mais clampée par la longueur réelle
+    n_per_seg = int(round(float(sfreq) * float(win_sec)))
+    n_per_seg = max(8, min(n_per_seg, n_times))
 
-    psd = inst.compute_psd(method="welch", fmin=float(fmin), fmax=float(fmax),
-                           n_per_seg=n_per_seg, n_overlap=n_overlap, verbose="ERROR")
-    freqs = psd.freqs
-    data  = psd.get_data()  # (n_chan, n_freq) en µV²/Hz
-    return freqs, data, inst.ch_names
+    # overlap en fraction de la fenêtre (ex: 50%) puis clamp dur
+    n_overlap = int(round(float(overlap) * n_per_seg))
+    if n_overlap >= n_per_seg:
+        n_overlap = max(0, n_per_seg - 1)
+
+    # petit log pour traçabilité
+    print(f"[PSD] sf={sfreq:.3f}Hz | n_times={n_times} | n_per_seg={n_per_seg} | n_overlap={n_overlap}")
+
+    psd, freqs = psd_array_welch(
+        data, sfreq,
+        fmin=float(fmin), fmax=float(fmax),
+        n_fft=n_per_seg,            # <— crucial
+        n_per_seg=n_per_seg,
+        n_overlap=n_overlap,
+        average="mean",
+        verbose="ERROR",
+    )
+    return np.asarray(freqs, dtype=float), np.asarray(psd, dtype=float)
+
+
+def compute_psd(raw: mne.io.BaseRaw, fmin=FMIN, fmax=FMAX,
+                include_emg: bool = False, emg_band=(30.0, 100.0)):
+    """Version SANS Raw.compute_psd : utilise psd_array_welch sur des arrays."""
+    print(">>> USING compute_psd: psd_array_welch (no Raw.compute_psd)")
+    all_freqs = None
+    all_psd, all_names = [], []
+
+    # --- EEG ---
+    eeg_picks = mne.pick_types(raw.info, meg=False, eeg=True, eog=False, ecg=False, emg=False,
+                               stim=False, misc=False, resp=False, seeg=False, ecog=False, fnirs=False, exclude=())
+    if eeg_picks.size > 0:
+        data = raw.get_data(picks=eeg_picks) * 1e6  # µV
+        sf = float(raw.info["sfreq"])
+        freqs_eeg, psd_eeg = _welch_psd_array(data, sf, fmin, fmax)
+        all_freqs = freqs_eeg
+        all_psd.append(psd_eeg)                    # (n_eeg, n_freq)
+        all_names.extend([raw.ch_names[i] for i in eeg_picks])
+
+    # --- EMG (optionnel) ---
+    if include_emg:
+        emg_picks = mne.pick_types(raw.info, meg=False, eeg=False, eog=False, ecg=False, emg=True,
+                                   stim=False, misc=False, resp=False, seeg=False, ecog=False, fnirs=False, exclude=())
+        if emg_picks.size > 0:
+            # On filtre sur une copie Raw limitée aux EMG pour rester fidèle à ta logique
+            emg_inst = raw.copy().pick(emg_picks)
+            lo, hi = float(emg_band[0]), float(emg_band[1])
+            emg_inst.filter(l_freq=lo, h_freq=hi, picks="all", method="fir", verbose="ERROR")
+            data = emg_inst.get_data(picks="all") * 1e6  # µV
+            sf = float(emg_inst.info["sfreq"])
+            freqs_emg, psd_emg = _welch_psd_array(data, sf, fmin, fmax)
+
+            # ré-échantillonnage fréquentiel si nécessaire
+            if all_freqs is None:
+                all_freqs = freqs_emg
+            elif not np.allclose(all_freqs, freqs_emg, rtol=0, atol=1e-12):
+                # interp chaque ligne de psd_emg sur all_freqs
+                psd_emg = np.vstack([
+                    np.interp(all_freqs, freqs_emg, row, left=row[0], right=row[-1])
+                    for row in psd_emg
+                ])
+
+            all_psd.append(psd_emg)
+            all_names.extend(emg_inst.ch_names)
+
+    if not all_psd:
+        raise RuntimeError("Aucun canal EEG/EMG disponible pour la PSD (après sélection).")
+
+    psd_lin = np.vstack(all_psd)   # (n_chan, n_freq)
+    return all_freqs, psd_lin, all_names
+
 
 def integrate_band_powers(freqs, psd_lin, bands: dict[str, tuple[float,float]]):
     idx_all = np.where((freqs >= FMIN) & (freqs <= FMAX))[0]
@@ -216,7 +285,8 @@ def band_indices(grid: np.ndarray, lo: float, hi: float) -> np.ndarray:
     return np.where((grid >= lo) & (grid < hi))[0]
 
 # ---------- Worker ----------
-def process_one(base: str, rem_dir: Path, out_root: Path):
+def process_one(base: str, rem_dir: Path, out_root: Path, include_emg: bool, emg_band: tuple):
+    import os as _os
     base_n = normalize_id(base)
     out_dir = out_root / base_n
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -227,11 +297,19 @@ def process_one(base: str, rem_dir: Path, out_root: Path):
 
     try:
         raw = mne.io.read_raw_fif(fif, preload=True, verbose="ERROR")
+        print(f"[{base_n}] running PID={_os.getpid()} file={__file__}")
+        print(f"[{base_n}] types:", pd.Series(raw.get_channel_types()).value_counts().to_dict())
+        print(f"[{base_n}] EEG picks ->", raw.copy().pick_types(eeg=True, emg=False, eog=False, ecg=False).ch_names[:5], "…")
+        print(f"[{base_n}] EMG picks ->", raw.copy().pick_types(eeg=False, emg=True, eog=False, ecg=False).ch_names)
     except Exception as e:
         return {"base": base_n, "ok": False, "reason": f"read_error: {e}"}
 
     try:
-        freqs, psd_lin, ch_names = compute_psd(raw, fmin=FMIN, fmax=FMAX)   # psd_lin: (n_chan, n_freq)
+        print(f"[{base_n}] about to call compute_psd")
+        freqs, psd_lin, ch_names = compute_psd(
+            raw, fmin=FMIN, fmax=FMAX,
+            include_emg=include_emg,
+            emg_band=emg_band)   # psd_lin: (n_chan, n_freq)
         total_abs_ch, band_abs_ch, band_rel_ch = integrate_band_powers(freqs, psd_lin, BANDS)
         psd_lin_mean = np.nanmean(psd_lin, axis=0)
         spec_lin_common = interp_to_common_grid(freqs, psd_lin_mean, COMMON_FREQS)
@@ -393,11 +471,23 @@ def parse_args():
     p.add_argument("--sheet-index", type=int, default=2)
     p.add_argument("--min-patients-per-channel", type=int, default=MIN_PATIENTS_PER_CHANNEL,
                    help="min sujets/chan pour barplots inter-catégories par canal")
+    p.add_argument("--include-emg", action="store_true",
+               help="Inclure les canaux EMG dans les PSD et figures (filtre 30–100 Hz).")
+    p.add_argument("--emg-band", type=float, nargs=2, metavar=("LO","HI"),
+                default=(30.0, 100.0), help="Bande EMG pour le filtrage avant PSD.")
+
     return p.parse_args()
 
 def main():
     mne.set_log_level("WARNING")
+    # Sentinelles d'amorçage
+    print("[BOOT] __file__ =", __file__)
+    print("[BOOT] sys.argv  =", sys.argv)
+
     args = parse_args()
+
+    INCLUDE_EMG = args.include_emg
+    EMG_BAND    = tuple(args.emg_band)
 
     rem_dir  = Path(args.rem_dir)
     out_root = Path(args.out_root)
@@ -433,7 +523,7 @@ def main():
 
     ctx = mp.get_context("spawn")
     with ctx.Pool(processes=n_workers, maxtasksperchild=1) as pool:
-        results = pool.starmap(process_one, [(b, rem_dir, out_root) for b in bases])
+        results = pool.starmap(process_one, [(b, rem_dir, out_root, INCLUDE_EMG, EMG_BAND) for b in bases])
 
     # Compile
     rows, missing, per_channel_all = [], [], []
@@ -603,6 +693,8 @@ def main():
         per_channel_barplots_long(df_ch, out_root, bands=BANDS, kind="rel",
                                   min_patients=args.min_patients_per_channel)
 
+    # Patients sans catégorie
+    missing = [b for b in df.index if group_map.get(b, "unknown") == "unknown"]
     if missing:
         with open(out_root / "patients_unknown_category.txt", "w") as f:
             for b in sorted(set(missing)): f.write(f"{b}\n")
@@ -615,7 +707,6 @@ def main():
         if not r.get("ok"): 
             continue
         base = r["base"]
-        # sauter les patients absents du df (sécurité)
         if base not in df.index:
             continue
         for item in r.get("spec_chan", []):
@@ -636,7 +727,6 @@ def main():
     else:
         print(f"[INFO] Figures inter-groupes par canal pour {len(eligible_channels)} canaux (min {min_pat} patients).")
 
-    # Helper d'index pour corriger l'erreur d'indexation vue précédemment
     for ch in eligible_channels:
         base_to_spec = chan_map[ch]  # dict base -> spec_lin (lin)
         # Aligner sur les bases disponibles dans df

@@ -43,7 +43,7 @@ PALETTE = {
 }
 
 GROUP_ORDER = ["autoimmune encephalitides", "narcolepsy", "synucleopathy", "tcspi", "unknown"]
-OUT_ROOT_DEFAULT = "/home/darryld/documents/EEG/preprocessed/bipolaire/3_results_analysis/gp2"
+OUT_ROOT_DEFAULT = "/home/darryld/documents/EEG/preprocessed/bipolaire/3_results_analysis/gp2_PSD_RBD/95percentile/_boxplot95percentile"
 
 def color_for_group(label: str) -> str:
     return PALETTE.get(str(label).strip().lower(), PALETTE["unknown"])
@@ -375,14 +375,14 @@ def detect_outliers_iqr(df: pd.DataFrame, value_col: str,
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--csv", type=str, required=False,
-                   default="/home/darryld/documents/EEG/preprocessed/bipolaire/3_results_analysis/gp2/all_band_powers.csv")
+                   default="/home/darryld/documents/EEG/preprocessed/bipolaire/3_results_analysis/gp2_PSD_RBD/95percentile/all_band_powers.csv")
     p.add_argument("--out-root",  type=str, default=OUT_ROOT_DEFAULT)
-    p.add_argument("--kind", type=str, default="both", choices=["abs", "rel", "both"],
+    p.add_argument("--kind", type=str, default="rel", choices=["abs", "rel", "both"],
                    help="Type de boxplots globaux à produire")
     p.add_argument("--logy", action="store_true", help="Échelle Y logarithmique pour l'absolu")
     # --- Options PAR CANAL ---
     p.add_argument("--per-channel-csv", type=str, required=False,
-                   default="/home/darryld/documents/EEG/preprocessed/bipolaire/3_results_analysis/gp2/per_channel_band_powers.csv")
+                   default="/home/darryld/documents/EEG/preprocessed/bipolaire/3_results_analysis/gp2_PSD_RBD/95percentile/per_channel_band_powers.csv")
     p.add_argument("--min-patients-per-channel", type=int, default=5,
                    help="Min de patients ayant un canal pour l’inclure")
     p.add_argument("--channels", type=str, nargs="*", default=None,
