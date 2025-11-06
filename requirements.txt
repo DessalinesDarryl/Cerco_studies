@@ -10,3 +10,13 @@ numpy==2.2
 python-picard
 PyWavelets
 xgboost
+pandas
+scipy
+matplotlib
+pyriemann
+torch
+torchaudio
+pythorch-lightning
+captum
+tqdm
+jinja2

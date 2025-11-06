@@ -1,0 +1,6 @@
+# configs/eval/report.yaml
+xai_root: outputs/xai
+stats_root: outputs/stats
+fig_root: outputs/figures
+out_dir: outputs/reports
+title: "EEG/EMG/ECG XAI – Résultats"

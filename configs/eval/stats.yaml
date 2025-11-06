@@ -1,0 +1,11 @@
+# configs/eval/stats.yaml
+xai_root: outputs/xai
+out_dir: outputs/stats
+anova:
+  enabled: true
+cbpt:
+  enabled: true
+  n_perm: 1000
+  p_cluster: 0.05
+graphs:
+  enabled: true

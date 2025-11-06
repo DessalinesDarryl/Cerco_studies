@@ -1,0 +1,10 @@
+# configs/xai/attributions.yaml
+features_root: data/processed/features
+ckpt: models/checkpoint.pt
+out_dir: outputs/xai/attributions
+method: deeplift   # deeplift | ig
+topk: 10
+aggregate:
+  by_band: true
+  by_channel: true
+  by_modality: true  # EEG/EMG/ECG

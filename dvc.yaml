@@ -1,0 +1,22 @@
+stages:
+  preprocess:
+    cmd: python scripts/preprocess.py
+    deps:
+      - scripts/preprocess.py
+      - data/raw/
+    outs:
+      - data/processed/
+  train:
+    cmd: python scripts/train.py
+    deps:
+      - data/processed/
+      - scripts/train.py
+    outs:
+      - models/checkpoint.pt
+  xai:
+    cmd: python scripts/xai_attributions.py
+    deps:
+      - models/checkpoint.pt
+      - data/processed/
+    outs:
+      - outputs/xai/

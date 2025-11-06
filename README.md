@@ -1,32 +1,13 @@
-# Cerco_studies
-Ce repo concerne mes travaux réalisés dans le cadre de mon stage de §mois réalisé au Cerco-CNRS pour l'analyse de signaux neurophysioloqigues dans le Trouble du Comportement en Sommeil Paradoxal (TCSP).
+# README.md
+# EEG XAI Pipeline (MVP)
 
-Structure : 
+Pipeline complet:
+1) preprocess → 2) segment_rem → 3) extract_features → 4) train → 5) infer → 6) xai_attributions → 7) xai_attention_maps → 8) group_stats → 9) build_reports
 
-CERCO_STUDIES/
-├── data/
-│   ├── raw/                         # Fichiers .edf bruts
-│   ├── preprocessed/               # Fichiers nettoyés ICA (.fif)
-│   ├── rem_segments/               # Segments EEG/EMG/ECG extraits pendant REM
-│   ├── features/                   # Fichiers .csv ou .npz contenant les features par sujet
-│   └── nv_patientsRBD_identifiants.xlsx  # Données patient
-│
-├── notebooks/
-│   ├── eeg_exploring.ipynb         # Explorations manuelles
-│   ├── feature_analysis.ipynb      # Visualisation et stats
-│   └── sleep_staging.ipynb         # Détection automatique des phases REM (si besoin)
-│
-├── src/                            # Code source
-│   ├── __init__.py
-│   ├── preprocessing.py            # ICA, filtres, nettoyage
-│   ├── segment_rem.py              # Extraction REM
-│   ├── feature_extraction.py       # EEG/EMG/ECG features
-│   ├── stats_analysis.py           # Stats inter-patho
-│   └── utils.py                    # Fonctions utiles (ex: loader, synchroniseur, etc.)
-│
-├── results/
-│   ├── figures/
-│   └── tables/
-│
-├── README.md
-└── requirements.txt
+Usage rapide:
+- make all
+- make train
+- make xai_attr
+
+Chemins:
+- Données brutes lues depuis $EEG_RAW_ROOT (ou à configurer dans configs/*).

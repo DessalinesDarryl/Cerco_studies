@@ -1,0 +1,4 @@
+# configs/eval/infer.yaml
+features_root: data/processed/features
+ckpt: models/checkpoint.pt
+out_csv: outputs/predictions/preds.csv

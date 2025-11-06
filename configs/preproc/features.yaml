@@ -1,0 +1,17 @@
+# configs/preproc/features.yaml
+in_root: data/processed/rem_segments
+out_root: data/processed/features
+bands:
+  delta: [1, 4]
+  theta: [4, 8]
+  alpha: [8, 12]
+  beta:  [12, 30]
+  gamma: [30, 45]
+stats: [mean, var, skew, kurt]
+connectivity:
+  coh: false
+emg:
+  hp: 30.0
+  notch: 50.0
+ecg:
+  hrv: false
