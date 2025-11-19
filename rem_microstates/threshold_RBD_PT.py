@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Detect RBD markers (PHASIC & TONIC RSWA) from EMG during REM sleep
-— CALCULS PAR CANAL, sur ÉPOQUES REM non chevauchantes de 4 s (par défaut).
+- CALCULS PAR CANAL, sur ÉPOQUES REM non chevauchantes de 4 s (par défaut).
 
 Adapté de Grenot et al., SLEEP 2024 (logique de seuil P95 NREM, >=0.5 s, fusion <0.5 s).
 
@@ -238,7 +238,7 @@ def load_raw_with_emg(path: str, emg_channels: Optional[List[str]]):
 def build_emg_envelopes(raw: mne.io.BaseRaw, emg_chs: List[str]) -> Tuple[np.ndarray, List[str], float]:
     """
     Retourne:
-      - envs: array (n_ch, n_samples) = enveloppe par canal (PB 30–100 Hz, rectif, lissage 1 s)
+      - envs: array (n_ch, n_samples) = enveloppe par canal (PB 30-100 Hz, rectif, lissage 1 s)
       - chs:  liste des noms de canaux dans le même ordre
       - sfreq: fréquence d'échantillonnage
     """
@@ -253,7 +253,7 @@ def build_emg_envelopes(raw: mne.io.BaseRaw, emg_chs: List[str]) -> Tuple[np.nda
     return envs, emg.ch_names, sfreq
 
 # =========================
-# 4) OUTILS PHASIC/TONIC — PAR CANAL
+# 4) OUTILS PHASIC/TONIC - PAR CANAL
 # =========================
 def detect_phasic_events_ch(envelope: np.ndarray, sfreq: float,
                             rem_start: int, rem_end: int,
@@ -281,7 +281,7 @@ def detect_phasic_events_ch(envelope: np.ndarray, sfreq: float,
     if not events:
         return events
     merged = [events[0]]
-    max_gap = int(np.floor(0.5 * sfreq))
+    max_gap = int(np.floor(1.0 * sfreq))
     for s, e in events[1:]:
         ps, pe = merged[-1]
         if (s - pe) <= max_gap:
@@ -324,7 +324,7 @@ def compute_tonic_ratio_epoch_ch(
     Paramètres
     ----------
     envelope : np.ndarray
-        Enveloppe EMG du canal (après filtrage 30–100 Hz, rectification, lissage 1 s).
+        Enveloppe EMG du canal (après filtrage 30-100 Hz, rectification, lissage 1 s).
         Forme (n_samples,).
     sfreq : float
         Fréquence d'échantillonnage en Hz (ex. 500.0).
@@ -335,7 +335,7 @@ def compute_tonic_ratio_epoch_ch(
         Bouffées phasiques (indices absolus) **intersectionnées** à l’époque [w0, w1).
         Chaque tuple (s, e) respecte 0 <= w0 <= s < e <= w1.
     nrem_ref_start, nrem_ref_end : int
-        Indices échantillons de la fenêtre NREM de référence (strictement avant le REM), typiquement 20–30 s.
+        Indices échantillons de la fenêtre NREM de référence (strictement avant le REM), typiquement 20-30 s.
         Le nettoyage se fait en tronquant au <= P95 sur cette fenêtre.
     phasic_ratio_epoch : float
         Rapport (durée phasic dans l’époque) / (durée époque), utilisé pour marquer les époques "very phasic".
@@ -379,11 +379,6 @@ def compute_tonic_ratio_epoch_ch(
     - NREM nettoyé trop court => fallback à NREM brut
     - nrem_med ≈ 0 => NaN (ou ratio très grand si tu choisis un `tiny` plus élevé)
 
-    Notes pratiques
-    ---------------
-    - Si tu veux vraiment **exclure** les époques very_phasic du calcul TONIC global,
-      fais-le à l’étape d’agrégation (p.ex. filtrer `very_phasic_flag` avant toute moyenne/stat).
-    - Tu peux ajuster `nrem_clip_percentile` (p.ex. 90–98) selon le niveau de bruit du NREM.
     """
     # ---------- 1) REM : extraction & masque phasic ----------
     rem_env = envelope[w0:w1].copy()
@@ -416,7 +411,7 @@ def compute_tonic_ratio_epoch_ch(
 
     # ---------- 3) Médians & ratio ----------
     rem_med = float(np.median(rem_clean)) if rem_clean.size else np.nan
-    nrem_med = float(np.median(nrem_clean)) if nrem_clean.size else np.nan
+    nrem_med = float(np.median(nrem_ref)) if nrem_ref.size else np.nan ########## nrem_clean >> nrem_ref
 
     if not np.isfinite(rem_med) or not np.isfinite(nrem_med) or nrem_med <= 0:
         return (np.nan, phasic_ratio_epoch > 0.75)
@@ -526,7 +521,7 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
                     tonic_ratio_epoch, tonic_excluded_epoch = compute_tonic_ratio_epoch_ch(
                         env, sfreq, w0, w1, phasic_in_win, nrem_ref_start, nrem_ref_end, phasic_ratio_epoch
                     )
-                    rswa_epoch = (not np.isnan(tonic_ratio_epoch)) and (tonic_ratio_epoch > 1.0)
+                    rswa_epoch = (not np.isnan(tonic_ratio_epoch)) and (tonic_ratio_epoch > 1.3)
 
                     rows.append({
                         "patient_id": patient_id,
@@ -560,7 +555,7 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
 # 7) CLI & MAIN
 # =========================
 def main():
-    parser = argparse.ArgumentParser(description="Detect phasic bursts & RSWA during REM on 4s epochs — per channel.")
+    parser = argparse.ArgumentParser(description="Detect phasic bursts & RSWA during REM on 4s epochs - per channel.")
     parser.add_argument("--input_dir", default=GP2_ROOT, help="Directory containing patient subfolders.")
     parser.add_argument("--output_csv", default="/home/darryld/Cerco_studies/data/rbd_emg_events_and_summary_4s_per_channel.csv",
                         help="Path to write the CSV (events + per-epoch summaries, per channel).")
