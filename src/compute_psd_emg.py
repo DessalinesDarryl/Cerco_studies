@@ -214,6 +214,10 @@ def process_patient(base: str, gp2_root: Path, rswa_df: pd.DataFrame, out_root: 
         "nonrswa_spec": [...],       # PSD moyenne (lin) REM_sans_RSWA sur COMMON_FREQS
       }
     """
+    # --- NEW: stockage des PSD par canal (RSWA / nonRSWA) ---
+    chan_specs_rswa = []   # liste de dicts {base, channel, spec}
+    chan_specs_non  = []   # idem pour REM sans RSWA
+
     base_n = normalize_id(base)
     fif = find_fif_for_patient(base_n, gp2_root)
     if fif is None:
@@ -302,9 +306,21 @@ def process_patient(base: str, gp2_root: Path, rswa_df: pd.DataFrame, out_root: 
                 all_freqs_rswa = freqs_r
             else:
                 if not np.allclose(all_freqs_rswa, freqs_r):
-                    psd_ch_rswa = np.interp(all_freqs_rswa, freqs_r, psd_ch_rswa[0, :])[np.newaxis, :]
+                    psd_ch_rswa = np.interp(
+                        all_freqs_rswa, freqs_r, psd_ch_rswa[0, :]
+                    )[np.newaxis, :]
             if all_freqs_rswa is None:
                 all_freqs_rswa = freqs_r
+
+            # --- NEW: PSD de ce canal interpolée sur COMMON_FREQS (RSWA) ---
+            spec_rswa_chan_common = interp_to_common_grid(
+                all_freqs_rswa, psd_ch_rswa[0, :], COMMON_FREQS
+            )
+            chan_specs_rswa.append({
+                "base": base_n,
+                "channel": ch_name,
+                "spec": spec_rswa_chan_common.tolist(),
+            })
 
             psd_list_rswa.append(psd_ch_rswa[0, :])
             ch_names_rswa.append(ch_name)
@@ -317,6 +333,7 @@ def process_patient(base: str, gp2_root: Path, rswa_df: pd.DataFrame, out_root: 
             out_png_ch = out_dir / f"{base_n}_emg_psd_rswa_{sanitize_name(ch_name)}.png"
             make_patient_fig_channel(base_n, ch_name, all_freqs_rswa, psd_ch_rswa[0, :], out_png_ch)
 
+
         # --- non-RSWA : PSD pour le spectre moyen ---
         if has_non:
             data_cat_non = np.concatenate(segments_non, axis=1)   # (1, n_times_concat)
@@ -326,11 +343,24 @@ def process_patient(base: str, gp2_root: Path, rswa_df: pd.DataFrame, out_root: 
                 all_freqs_non = freqs_n
             else:
                 if not np.allclose(all_freqs_non, freqs_n):
-                    psd_ch_non = np.interp(all_freqs_non, freqs_n, psd_ch_non[0, :])[np.newaxis, :]
+                    psd_ch_non = np.interp(
+                        all_freqs_non, freqs_n, psd_ch_non[0, :]
+                    )[np.newaxis, :]
             if all_freqs_non is None:
                 all_freqs_non = freqs_n
 
+            # --- NEW: PSD de ce canal interpolée sur COMMON_FREQS (nonRSWA) ---
+            spec_non_chan_common = interp_to_common_grid(
+                all_freqs_non, psd_ch_non[0, :], COMMON_FREQS
+            )
+            chan_specs_non.append({
+                "base": base_n,
+                "channel": ch_name,
+                "spec": spec_non_chan_common.tolist(),
+            })
+
             psd_list_non.append(psd_ch_non[0, :])
+
 
     # ---------- post-traitement RSWA ----------
     rswa_spec_common = None
@@ -383,6 +413,8 @@ def process_patient(base: str, gp2_root: Path, rswa_df: pd.DataFrame, out_root: 
         "rows_chan": rows_chan,
         "rswa_spec": rswa_spec_common.tolist() if rswa_spec_common is not None else None,
         "nonrswa_spec": nonrswa_spec_common.tolist() if nonrswa_spec_common is not None else None,
+        "rswa_spec_by_channel": chan_specs_rswa,
+        "nonrswa_spec_by_channel": chan_specs_non,
     }
 
 
@@ -450,6 +482,77 @@ def plot_group_condition_spectra(df_info: pd.DataFrame,
     plt.close(fig)
     print(">>>", out_path)
 
+def plot_group_condition_spectra_per_channel(
+    channel: str,
+    df_info: pd.DataFrame,
+    spec_map: dict,
+    condition_label: str,
+    out_path: Path,
+):
+    """
+    Figure pour **un canal donné** :
+      - x : fréquence 30–100 Hz (log)
+      - y : PSD (dB)
+      - une courbe par catégorie de patients (+ p10–p90)
+
+    df_info  : DataFrame index=base, colonne 'group'
+    spec_map : dict {base -> np.ndarray (PSD linéaire sur COMMON_FREQS)}
+    """
+    print(
+        f"[DEBUG] plot_group_condition_spectra_per_channel: canal={channel}, "
+        f"condition={condition_label}, n_patients={len(spec_map)}"
+    )
+
+    # Patients pour lesquels on a un spectre pour ce canal
+    bases_ok = [b for b in df_info.index if b in spec_map]
+    if not bases_ok:
+        print(f"[WARN] Aucun spectre disponible pour {condition_label} canal {channel}")
+        return
+
+    SPEC = np.vstack([spec_map[b] for b in bases_ok])  # (n_pat, n_freq)
+    eps = np.finfo(float).tiny
+    SPEC_DB = 10.0 * np.log10(np.maximum(SPEC, eps))
+
+    # Masque pour supprimer la zone du notch 50 Hz
+    mask = (COMMON_FREQS < 48) | (COMMON_FREQS > 52)
+    freqs_plot = COMMON_FREQS[mask]
+    SPEC_DB = SPEC_DB[:, mask]
+
+    DF_ALIGNED = df_info.loc[bases_ok].copy()
+
+    fig, ax = plt.subplots(1, 1, figsize=(8, 5))
+
+    for grp, idx_labels in DF_ALIGNED.groupby("group").groups.items():
+        if len(idx_labels) == 0:
+            continue
+        idx_int = np.array([DF_ALIGNED.index.get_loc(b) for b in idx_labels], dtype=int)
+        sub = SPEC_DB[idx_int, :]
+        if sub.size == 0:
+            continue
+
+        m   = np.nanmean(sub, axis=0)
+        p10 = np.nanpercentile(sub, 10, axis=0)
+        p90 = np.nanpercentile(sub, 90, axis=0)
+        c   = color_for_group(grp)
+
+        ax.plot(freqs_plot, m, lw=2, label=short_label(grp), color=c)
+        ax.fill_between(freqs_plot, p10, p90, alpha=0.08, color=c)
+
+    ax.set_xscale("log")
+    ax.set_xlim(FMIN, FMAX)
+    ticks = list(range(int(FMIN), int(FMAX) + 1, 10))
+    ax.xaxis.set_major_locator(FixedLocator(ticks))
+    ax.xaxis.set_major_formatter(ScalarFormatter())
+    ax.set_xlabel("Fréquence (Hz)")
+    ax.set_ylabel("PSD (dB re µV²/Hz)")
+    ax.set_title(f"EMG {condition_label} - canal {channel} (30–100 Hz) moy ± p10-p90 par catégorie")
+    ax.grid(True, alpha=0.25)
+    ax.legend(ncol=3, frameon=False)
+
+    plt.tight_layout()
+    fig.savefig(out_path, dpi=230)
+    plt.close(fig)
+    print(">>>", out_path)
 
 
 def plot_global_rswa_vs_nonrswa(spec_map_rswa: dict, spec_map_non: dict, out_path: Path):
@@ -585,13 +688,21 @@ def main():
     rows_chan_all = []
     spec_map_rswa = {}
     spec_map_non  = {}
+    chan_rswa_records = []   # NEW
+    chan_non_records  = []   # NEW
 
     for r in results:
         if r is None or not isinstance(r, dict):
             continue
+
+        # --- NEW: PSD par canal ---
+        chan_rswa_records.extend(r.get("rswa_spec_by_channel", []))
+        chan_non_records.extend(r.get("nonrswa_spec_by_channel", []))
+
         if not r.get("ok"):
             print(f"[{r.get('base')}] SKIP: {r.get('reason')}")
             continue
+
         base = r["base"]
 
         # patient-level power row
@@ -609,17 +720,30 @@ def main():
 
     # ---------- CSV : puissances RSWA ----------
     if rows_pat:
-        df_pat = pd.DataFrame(rows_pat).set_index("base").sort_index()
+        df_pat = pd.DataFrame(rows_pat)
+        df_pat["group"] = df_pat["base"].map(lambda b: group_map.get(b, "unknown"))
+        df_pat = df_pat.set_index("base").sort_index()
         df_pat.to_csv(out_root / "emg_rswa_patient_power_30_100.csv", float_format="%.8e")
         print(">>>", out_root / "emg_rswa_patient_power_30_100.csv")
+
     else:
         print("Aucun résultat de puissance RSWA à sauvegarder (emg_rswa_patient_power_30_100.csv vide).")
 
     if rows_chan_all:
         df_ch = pd.DataFrame(rows_chan_all)
-        df_ch.to_csv(out_root / "emg_rswa_channel_power_30_100.csv",
-                     index=False, float_format="%.8e")
-        print(">>>", out_root / "emg_rswa_channel_power_30_100.csv")
+
+        # Ajout de la catégorie du patient
+        df_ch["group"] = df_ch["base"].map(lambda b: group_map.get(b, "unknown"))
+
+        csv_path = out_root / "emg_rswa_channel_power_30_100.csv"
+        xlsx_path = out_root / "emg_rswa_channel_power_30_100.xlsx"
+
+        df_ch.to_csv(csv_path, index=False, float_format="%.8e")
+        df_ch.to_excel(xlsx_path, index=False)  # pour ton notebook/Excel
+
+        print(">>>", csv_path)
+        print(">>>", xlsx_path)
+
 
     print(f"[DEBUG] len(rows_pat)      = {len(rows_pat)}")
     print(f"[DEBUG] len(spec_map_rswa) = {len(spec_map_rswa)}")
@@ -641,6 +765,24 @@ def main():
     print(f"[DEBUG] df_info (bases pour figures groupales) = {len(df_info)}")
     print(f"[DEBUG] groups présents = {df_info['group'].value_counts().to_dict()}")
 
+    # --- NEW: préparation des spectres par canal (channel -> base -> spec) ---
+    from collections import defaultdict
+
+    chan_map_rswa = defaultdict(dict)   # {channel: {base: np.array}}
+    chan_map_non  = defaultdict(dict)
+
+    for rec in chan_rswa_records:
+        base = rec["base"]
+        ch   = rec["channel"]
+        spec = np.asarray(rec["spec"], float)
+        chan_map_rswa[ch][base] = spec
+
+    for rec in chan_non_records:
+        base = rec["base"]
+        ch   = rec["channel"]
+        spec = np.asarray(rec["spec"], float)
+        chan_map_non[ch][base] = spec
+
     # RSWA par groupe
     if spec_map_rswa:
         out_png_rswa = out_root / "group_emg_psd_rswa_30_100.png"
@@ -659,6 +801,33 @@ def main():
         print("Plot 'global_emg_psd_rswa_vs_nonrswa_30_100' en cours...")
         plot_global_rswa_vs_nonrswa(spec_map_rswa, spec_map_non, out_png_global)
 
+    # --- NEW: figures par canal et par catégorie ---
+    per_channel_dir = out_root / "per_channel_group_psd"
+    per_channel_dir.mkdir(parents=True, exist_ok=True)
+
+    # RSWA par canal
+    for ch, spec_map_ch in chan_map_rswa.items():
+        out_png = per_channel_dir / f"emg_psd_rswa_{sanitize_name(ch)}_by_group_30_100.png"
+        print(f"[INFO] Plot RSWA par canal pour {ch} ...")
+        plot_group_condition_spectra_per_channel(
+            channel=ch,
+            df_info=df_info,
+            spec_map=spec_map_ch,
+            condition_label="RSWA",
+            out_path=out_png,
+        )
+
+    # REM sans RSWA par canal
+    for ch, spec_map_ch in chan_map_non.items():
+        out_png = per_channel_dir / f"emg_psd_nonrswa_{sanitize_name(ch)}_by_group_30_100.png"
+        print(f"[INFO] Plot nonRSWA par canal pour {ch} ...")
+        plot_group_condition_spectra_per_channel(
+            channel=ch,
+            df_info=df_info,
+            spec_map=spec_map_ch,
+            condition_label="REM sans RSWA",
+            out_path=out_png,
+        )
 
 if __name__ == "__main__":
     main()
