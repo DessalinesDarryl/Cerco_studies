@@ -128,16 +128,18 @@ def apply_montage_gp2(raw: mne.io.BaseRaw) -> mne.io.BaseRaw:
     )
     raw_bip = mne.io.RawArray(data_bip, info_new, verbose=False)
 
-    # Conserver les annotations existantes, en normalisant orig_time
+    # Conserver les annotations existantes en les reconstruisant avec orig_time=None
     if raw_in.annotations is not None and len(raw_in.annotations) > 0:
-        ann_existing = raw_in.annotations.copy()
-        # On passe en temps relatif (comme ailleurs)
-        ann_existing.orig_time = None
+        ann_old = raw_in.annotations
+        ann_existing = mne.Annotations(
+            onset=ann_old.onset.tolist(),
+            duration=ann_old.duration.tolist(),
+            description=ann_old.description.tolist(),
+            orig_time=None,
+        )
         raw_bip.set_annotations(ann_existing)
 
     return raw_bip
-
-
 
 
 # ======================================================================
@@ -326,7 +328,6 @@ def _find_hypno_file(base: str, hypno_root: Path) -> Optional[Path]:
     return max(candidates, key=lambda p: p.stat().st_size)
 
 
-
 def load_hypnogram(base_name: str, hypno_root: Optional[Path]) -> Tuple[Optional[np.ndarray], Optional[float]]:
     if hypno_root is None:
         return None, None
@@ -393,12 +394,6 @@ def add_rem_annotations(raw: mne.io.BaseRaw, hypno_epochs: np.ndarray, epoch_len
     onset = [s for s, _ in rem_int]
     duration = [e - s for s, e in rem_int]
 
-    existing = raw.annotations if getattr(raw, "annotations", None) is not None else None
-
-    # On force tout en orig_time=None pour éviter le conflit meas_date=None
-    if existing is not None and existing.orig_time is not None:
-        existing.orig_time = None
-
     ann = mne.Annotations(
         onset=onset,
         duration=duration,
@@ -406,8 +401,18 @@ def add_rem_annotations(raw: mne.io.BaseRaw, hypno_epochs: np.ndarray, epoch_len
         orig_time=None,
     )
 
-    raw.set_annotations(existing + ann if existing is not None else ann)
+    existing = raw.annotations if getattr(raw, "annotations", None) is not None else None
 
+    if existing is not None and len(existing) > 0:
+        existing_new = mne.Annotations(
+            onset=existing.onset.tolist(),
+            duration=existing.duration.tolist(),
+            description=existing.description.tolist(),
+            orig_time=None,
+        )
+        raw.set_annotations(existing_new + ann)
+    else:
+        raw.set_annotations(ann)
 
 
 # ======================================================================
@@ -499,12 +504,6 @@ def annotate_artifacts(raw: mne.io.BaseRaw, windows_s: List[Tuple[float, float]]
     onset = [s for s, _ in windows_s]
     duration = [e - s for _, e in windows_s]
 
-    existing = raw.annotations if getattr(raw, "annotations", None) is not None else None
-
-    # Normalisation : on travaille en temps relatif (orig_time=None)
-    if existing is not None and existing.orig_time is not None:
-        existing.orig_time = None
-
     ann = mne.Annotations(
         onset=onset,
         duration=duration,
@@ -512,9 +511,20 @@ def annotate_artifacts(raw: mne.io.BaseRaw, windows_s: List[Tuple[float, float]]
         orig_time=None,
     )
 
-    raw.set_annotations(existing + ann if existing is not None else ann)
-    return raw
+    existing = raw.annotations if getattr(raw, "annotations", None) is not None else None
 
+    if existing is not None and len(existing) > 0:
+        existing_new = mne.Annotations(
+            onset=existing.onset.tolist(),
+            duration=existing.duration.tolist(),
+            description=existing.description.tolist(),
+            orig_time=None,
+        )
+        raw.set_annotations(existing_new + ann)
+    else:
+        raw.set_annotations(ann)
+
+    return raw
 
 
 # ======================================================================
