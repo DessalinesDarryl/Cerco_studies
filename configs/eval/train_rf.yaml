@@ -1,0 +1,39 @@
+# configs/eval/train_rf.yaml
+
+# ---------- Données ----------
+features_csv: data/processed/features/features.csv
+
+# Excel avec labels patients
+labels_excel: data/BDD_RBD_patients_updated.xlsx
+labels_sheet: "classification"   # ou l’index numérique
+labels_header_row: 3             # si l'entête est sur la 4e ligne
+label_id_col: "identifiant"
+label_col: "groupe_diag"
+
+# Mapping explicite des groupes vers des entiers
+label_map:
+  "CTRL": 0
+  "RBD_idiopathique": 1
+  "RBD_synucléinopathie": 2
+  "Autre": 3
+
+# ---------- Sorties ----------
+out_dir: models
+ckpt_name: checkpoint_rf.joblib
+
+metrics_out: outputs/stats/train_metrics_rf.csv
+
+# ---------- Cross-validation ----------
+cv:
+  n_splits: 5
+  group_by_patient: true
+  shuffle: false
+  random_state: 42
+
+# ---------- Modèle RandomForest ----------
+rf_params:
+  n_estimators: 300
+  max_depth: null       # pas de limite
+  n_jobs: -1
+  random_state: 42
+  class_weight: "balanced"

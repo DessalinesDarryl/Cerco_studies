@@ -1,15 +1,19 @@
-# configs/preproc/default.yaml
-raw_root: ${EEG_RAW_ROOT:/data/EEG/raw}
-out_root: data/processed
+raw_root: /home/darryld/documents/EEG/raw
+out_root: /home/darryld/documents/EEG/preprocessed/XAI/data
+hypno_root: /home/darryld/documents/EEG/raw   
+
 eeg:
-  l_freq: 10.0
-  h_freq: 100.0
+  l_freq: 0.5
+  h_freq: 80.0
   notch: 50.0
-  ref: A1
-  resample_hz: 250
-ica:
-  enabled: true
+
+emg:
+  hp: 30.0
+  lp: 100.0
+  notch: 50.0
+
 yasa:
-  artifact_removal: true
-segmentation:
-  epoch_len_s: 4.0
+  win_sec: 4.0
+  method: covar      # ou "std"
+  threshold: 3.0
+  include: sleep     # sleep / rem / all

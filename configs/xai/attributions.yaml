@@ -1,10 +1,40 @@
-# configs/xai/attributions.yaml
-features_root: data/processed/features
-ckpt: models/checkpoint.pt
+# =============== 1) SOURCES ===================
+
+# CSV final contenant toutes les features EEG + EMG-RBD
+features_csv: data/processed/features/features.csv
+features_id_col: "patient_id"
+
+# Excel contenant l'étiquette patient
+labels_excel: data/BDD_RBD_patients_updated.xlsx
+labels_sheet: "classification"        # nom de feuille (ou un index)
+labels_header_row: 3                  # ligne 4 dans Excel
+label_id_col: "identifiant"           # colonne identifiant patient
+label_col: "groupe_diag"              # colonne diagnostic
+
+# Mapping texte -> entiers
+# (indispensable pour les classif sklearn)
+label_map:
+  "CTRL": 0
+  "RBD_idiopathique": 1
+  "RBD_synucléinopathie": 2
+  "Autre": 3
+
+# =============== 2) MODELE ====================
+model_path: models/checkpoint_rf.joblib    # RF / XGB / SVM (joblib)
+
+# =============== 3) PARAMÈTRES DE XAI ==========
+task_type: multiclass          # multiclass -> moyennage SHAP par classe
+random_state: 42
+
+xai:
+  max_samples: 2000            # on limite SHAP aux 2000 premiers samples
+  n_background: 200            # pour KernelExplainer (SVM)
+  nsamples_kernel: 200         # SHAP kernel = nsamples
+  do_permutation: true
+  n_perm_repeats: 30
+
+# =============== 4) SORTIES =====================
 out_dir: outputs/xai/attributions
-method: deeplift   # deeplift | ig
-topk: 10
-aggregate:
-  by_band: true
-  by_channel: true
-  by_modality: true  # EEG/EMG/ECG
+
+# Fig. dans reports
+top_k_features: 10

@@ -1,0 +1,12 @@
+# configs/eval/plots_metrics.yaml
+
+ckpt_path: models/checkpoint_rf.joblib
+features_csv: data/processed/features/features.csv
+
+labels_excel: data/BDD_RBD_patients_updated.xlsx
+labels_sheet: "classification"
+labels_header_row: 3
+label_id_col: "identifiant"
+label_col: "groupe_diag"
+
+fig_dir: outputs/figures/metrics

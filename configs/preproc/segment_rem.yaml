@@ -1,15 +1,3 @@
-# configs/preproc/default.yaml
-raw_root: ${EEG_RAW_ROOT:/data/EEG/raw}
-out_root: data/processed
-eeg:
-  l_freq: 10.0
-  h_freq: 100.0
-  notch: 50.0
-  ref: A1
-  resample_hz: 250
-ica:
-  enabled: true
-yasa:
-  artifact_removal: true
-segmentation:
-  epoch_len_s: 4.0
+in_root: data/processed/0_preproc
+out_root: data/processed/1_rem_4s
+epoch_len_s: 4.0

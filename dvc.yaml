@@ -1,22 +1,52 @@
 stages:
+
   preprocess:
-    cmd: python scripts/preprocess.py
+    cmd: python scripts/preprocess.py --config configs/preproc/default.yaml
     deps:
       - scripts/preprocess.py
+      - src/data/preprocessing.py
+      - configs/preproc/default.yaml
       - data/raw/
     outs:
-      - data/processed/
-  train:
-    cmd: python scripts/train.py
+      - data/processed/preprocessed/     # <-- Output du preprocessing (à adapter)
+
+  segment_rem:
+    cmd: python scripts/segment_rem.py --config configs/preproc/segment_rem.yaml
     deps:
-      - data/processed/
-      - scripts/train.py
+      - scripts/segment_rem.py
+      - src/data/preprocessing.py
+      - configs/preproc/segment_rem.yaml
+      - data/processed/preprocessed/      # <-- dépend du preprocess
     outs:
-      - models/checkpoint.pt
-  xai:
-    cmd: python scripts/xai_attributions.py
+      - data/processed/rem_epochs/         # <-- ICI seront les fichiers *_REM-epo.fif
+
+  extract_features:
+    cmd: python scripts/extract_features.py --config configs/preproc/features.yaml
     deps:
+      - scripts/extract_features.py
+      - configs/preproc/features.yaml
+      - data/processed/rem_epochs/
+    outs:
+      - data/processed/features/features.csv
+
+  train:
+    cmd: python scripts/train.py --config configs/model/classical.yaml
+    deps:
+      - scripts/train.py
+      - configs/model/classical.yaml
+      - data/processed/features/features.csv
+      - data/BDD_RBD_patients_updated.xlsx
+    outs:
+      - models/checkpoint_rf.joblib
+      - outputs/reports/metrics_rf.json
+
+
+  xai:
+    cmd: python scripts/xai_attributions.py --config configs/xai/attributions.yaml
+    deps:
+      - scripts/xai_attributions.py
+      - configs/xai/attributions.yaml
       - models/checkpoint.pt
-      - data/processed/
+      - data/processed/rem_epochs/
     outs:
       - outputs/xai/

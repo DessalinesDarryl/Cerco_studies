@@ -1,6 +1,0 @@
-# configs/xai/attention.yaml
-features_root: data/processed/features
-ckpt: models/checkpoint.pt
-out_dir: outputs/xai/attention
-layers: [0, 1]
-average_over_time: true
