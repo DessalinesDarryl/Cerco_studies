@@ -78,6 +78,8 @@ def main(cfg):
 
     log.info(f"{len(edfs)} fichiers EDF trouvés. Lancement avec n_workers={n_workers}.")
 
+    skipped_missing = []  # (base_name, missing_channels)
+
     with ProcessPoolExecutor(max_workers=n_workers) as ex:
         futures = {
             ex.submit(
@@ -98,7 +100,24 @@ def main(cfg):
             try:
                 fut.result()
             except Exception as e:
-                log.error(f"[ERREUR] lors du prétraitement de {p}: {e}")
+                msg = str(e)
+                log.error(f"[ERREUR] lors du prétraitement de {p}: {msg}")
+
+                # Détection de l'erreur "canaux manquants"
+                if msg.startswith("MISSING_CHANNELS:"):
+                    try:
+                        _, base_name, missing_str = msg.split(":", 2)
+                    except ValueError:
+                        base_name = p.stem.split("_")[0]
+                        missing_str = "???"
+                    skipped_missing.append((base_name, missing_str))
+
+    # Récap des patients skip pour canaux manquants
+    if skipped_missing:
+        log.warning("Patients SKIP pour canaux manquants (montage gp2 impossible) :")
+        for base_name, missing_str in skipped_missing:
+            log.warning(f"  - {base_name} : manquants = {missing_str}")
+
 
 
 if __name__ == "__main__":

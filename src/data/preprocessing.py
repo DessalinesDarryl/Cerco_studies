@@ -72,7 +72,7 @@ MONTAGE_GP2 = Montage(
 )
 
 
-def apply_montage_gp2(raw: mne.io.BaseRaw) -> mne.io.BaseRaw:
+def apply_montage_gp2(raw: mne.io.BaseRaw, base_name: str) -> mne.io.BaseRaw:
     """
     Crée un montage bipolaire gp2 à partir du Raw.
     - Les paires bipolaires sont calculées : anode - cathode.
@@ -88,7 +88,7 @@ def apply_montage_gp2(raw: mne.io.BaseRaw) -> mne.io.BaseRaw:
     # Construire les canaux bipolaires définis par MONTAGE_GP2
     for anode, cathode, new_name in MONTAGE_GP2.pairs:
         if anode not in raw_in.ch_names or cathode not in raw_in.ch_names:
-            print(f"[Montage GP2] Skip {new_name} : canal manquant ({anode} ou {cathode})")
+            print(f"[{base_name}] Skip {new_name} : canal manquant ({anode} ou {cathode})")
             continue
 
         try:
@@ -97,7 +97,7 @@ def apply_montage_gp2(raw: mne.io.BaseRaw) -> mne.io.BaseRaw:
             sig_anode = raw_in.get_data(picks=[a_idx])[0]
             sig_cath  = raw_in.get_data(picks=[c_idx])[0]
         except Exception as e:
-            print(f"[Montage GP2] Skip {new_name} : erreur lors de l'accès au signal ({e})")
+            print(f"[{base_name}] Skip {new_name} : erreur lors de l'accès au signal ({e})")
             continue
 
         bip = sig_anode - sig_cath
@@ -526,6 +526,24 @@ def annotate_artifacts(raw: mne.io.BaseRaw, windows_s: List[Tuple[float, float]]
 
     return raw
 
+def _check_required_gp2_channels(raw: mne.io.BaseRaw, base_name: str):
+    """
+    Vérifie que tous les canaux nécessaires au montage gp2 sont présents.
+    Si des canaux manquent, lève une RuntimeError marquée 'MISSING_CHANNELS'
+    pour permettre au script appelant de skipper proprement le patient.
+    """
+    missing = set()
+    for anode, cathode, _ in MONTAGE_GP2.pairs:
+        if anode not in raw.ch_names:
+            missing.add(anode)
+        if cathode not in raw.ch_names:
+            missing.add(cathode)
+
+    if missing:
+        # message parsable côté preprocess.py
+        missing_str = ",".join(sorted(missing))
+        raise RuntimeError(f"MISSING_CHANNELS:{base_name}:{missing_str}")
+
 
 # ======================================================================
 # 5) Orchestrateur : PREPROCESS COMPLET
@@ -542,6 +560,7 @@ def preprocess_record(
     """
     Prétraitement complet d'un enregistrement :
 
+    0. Correction des noms et vérification des canaux nécessaires au montage gp2
     1. Montages bipolaire gp2
     2. Filtres EEG (0.5-80 + notch 50) et EMG (30-100 + notch 50)
     3. Hypnogramme (txt/EXP/csv) -> codes YASA par epoch + epoch_len
@@ -560,8 +579,20 @@ def preprocess_record(
     emg_params = emg_params or dict(hp=30.0, lp=100.0, notch=50.0)
     yasa_params = yasa_params or dict(win_sec=4.0, method="covar", threshold=3.0, include="sleep")
 
+    # 0) vérification des canaux + correction 
+
+    # correction
+    rename_dict = {ch: ch.replace("EEG ", "") for ch in raw.ch_names if ch.startswith("EEG ")}
+    if rename_dict:
+        raw.rename_channels(rename_dict)
+        print(f"[{base_name}] Canaux renommés : {rename_dict}")
+
+    # vérification
+    _check_required_gp2_channels(raw, base_name)
+
     # 1) montage gp2
-    raw = apply_montage_gp2(raw)
+    raw = apply_montage_gp2(raw, base_name)
+
 
     # 2) filtres EEG / EMG
     eeg_picks = filter_eeg(raw, **eeg_params)

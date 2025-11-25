@@ -20,6 +20,11 @@ Principe :
     - On enlève les fenêtres ARTEFACT de ce masque.
     - On époche par fenêtres fixes de 4 s.
 """
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.append(str(ROOT))
 
 import os
 import argparse

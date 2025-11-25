@@ -4,7 +4,7 @@ RAW_ROOT ?= ../documents/EEG/raw
 PROC_ROOT ?= ../documents/EEG/preprocessed/XAI/data
 
 LOG_DIR = logs
-NWORKERS ?= 15
+NWORKERS ?= 10
 
 # Assure que le dossier logs existe pour chaque règle
 $(LOG_DIR):
@@ -24,9 +24,10 @@ segment_rem: | $(LOG_DIR)
 		2>&1 | tee $(LOG_DIR)/logs_segment_rem.txt
 
 rbd_emg: | $(LOG_DIR)
-	$(PY) scripts/emg_rbd.py \
-		--input_dir $(PROC_ROOT)/0_preproc \
-		--output_csv $(PROC_ROOT)/rbd/rbd_emg_per_epoch.csv \
+	$(PY) src/features/emg_rbd.py \
+		--input_dir $(PROC_ROOT) \
+		--output_csv data/rbd/rbd_emg_per_epoch.csv \
+		--emg_channels Menton JAMBG JAMBD EMG1 EMG2 \
 		2>&1 | tee $(LOG_DIR)/logs_rbd_emg.txt
 
 features: | $(LOG_DIR)
