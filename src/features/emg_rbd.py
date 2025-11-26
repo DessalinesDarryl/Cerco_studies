@@ -14,8 +14,8 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 import mne
 
 # Emplacements (adapter si besoin)
-GP2_ROOT  = "data/processed/0_preproc"
-RAW_ROOT  = "/data/lab/projet_X/raw"
+GP2_ROOT  = "/home/darryld/documents/EEG/preprocessed/XAI/data"
+RAW_ROOT  = "/home/darryld/documents/EEG/raw"
 FIF_GLOB_PATTERNS = ["*_art_annotated.fif", "*.fif"]
 HYPNO_CANDIDATES  = ["{pid}_hypnoEXP.txt", "{pid}_hypnoEXP.csv", "{pid}_hypno.txt", "{pid}_hypnogram.txt"]
 
@@ -24,7 +24,7 @@ STAGE_MAP = {
     "N1": "NREM", "S1": "NREM", "1": "NREM",
     "N2": "NREM", "S2": "NREM", "2": "NREM",
     "N3": "NREM", "S3": "NREM", "S4": "NREM", "N4": "NREM", "3": "NREM", "4": "NREM",
-    "NREM": "NREM", "REM": "REM", "R": "REM"
+    "NREM": "NREM", "REM": "REM", "R": "REM", "SP": "REM"
 }
 
 
@@ -497,7 +497,40 @@ def main():
                         help="Durée minimale (s) pour conserver un événement PHASIC (>= 0.5 s).")
     args = parser.parse_args()
 
+
+        # --- Check 1: input_dir / GP2_ROOT existe ---
+    if not os.path.isdir(args.input_dir):
+        print(f"[ERREUR] Le dossier input_dir n'existe pas : {args.input_dir}", file=sys.stderr)
+        sys.exit(1)
+
+    # --- Check 2: RAW_ROOT existe ---
+    if not os.path.isdir(RAW_ROOT):
+        print(f"[ERREUR] Le dossier RAW_ROOT (hypnogrammes) n'existe pas : {RAW_ROOT}", file=sys.stderr)
+        sys.exit(1)
+
+    # --- Check 3: recherche des dossiers patients ---
     patients = find_patient_dirs(args.input_dir)
+    if not patients:
+        print(f"[ERREUR] Aucun dossier patient trouvé dans : {args.input_dir}", file=sys.stderr)
+        sys.exit(1)
+
+    # --- Check 4: vérifier qu'au moins 1 patient contient un enregistrement .fif/edf ---
+    valid_patients = []
+    for p in patients:
+        rec = find_recording_file(p)
+        if rec is not None:
+            valid_patients.append(p)
+
+    if not valid_patients:
+        print(f"[ERREUR] Aucun fichier .fif/.edf trouvé dans les dossiers patients de : {args.input_dir}", file=sys.stderr)
+        print("[ERREUR] Vérifie que GP2_ROOT pointe vers les bons fichiers prétraités.")
+        sys.exit(1)
+
+    # on remplace la liste patients par seulement ceux valides
+    patients = valid_patients
+    print(f"[CHECK] {len(patients)} patients valides trouvés.")
+
+
     if not patients:
         print("[ERREUR] Aucun dossier patient trouvé.", file=sys.stderr)
         sys.exit(1)

@@ -7,38 +7,40 @@ build_dataset.py
 Fusionne :
   - features EEG par époque REM
   - indicateurs EMG-RBD (phasic/tonic/RSWA) par époque REM
-  - labels patients (Excel)
+  - labels patients (fichier texte patient_id,label_str)
 et produit un dataset final prêt pour l'entraînement.
 
 Entrées (par défaut) :
   --eeg-features  : data/processed/features/eeg_features.csv
   --emg-rbd       : data/rbd_emg_events_and_summary_4s_per_channel.csv
-  --labels-xlsx   : data/BDD_RBD_patients_updated.xlsx
-  --labels-sheet  : "classification"
+  --labels-txt    : data/labels_macro.txt
   --out-csv       : data/processed/features/dataset_final.csv
 
 Hypothèses :
-  - EEG features : une ligne par (patient_id, epoch_index)
+  - EEG features : une ligne par patient (ou par (patient_id, epoch_index))
       colonnes minimales attendues :
         * patient_id
-        * epoch_index
+        * (optionnel) epoch_index
         * (optionnel) epoch_start_sec
   - EMG-RBD CSV : produit par ton script emg_rbd, avec lignes "REM_EPOCH_4S"
       colonnes clés :
         * patient_id
         * type == "REM_EPOCH_4S"
-        * epoch_index
+        * epoch_index (optionnel si alignement par temps)
         * epoch_start_sec, epoch_end_sec
         * phasic_ratio, tonic_ratio, rswa, phasic_count, very_phasic, ...
-  - Labels Excel : colonne "identifiant" pour l'ID patient
-                   + une colonne de catégorie (voir heuristique plus bas).
+  - Labels TXT : 2 colonnes patient_id,label_str (éventuellement sans header)
 """
 
 from __future__ import annotations
 
-import argparse
+import sys
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.append(str(ROOT))
+
+import argparse
 import numpy as np
 import pandas as pd
 
@@ -46,57 +48,87 @@ from src.utils.logging import get_logger
 
 
 # ---------------------------------------------------------------------
-# Utilitaires labels
+# Utilitaires labels (depuis un fichier .txt / .csv)
 # ---------------------------------------------------------------------
 
 
-def load_labels_from_excel(xlsx_path: Path, sheet: str = "classification"):
+def load_labels_from_txt(txt_path: Path) -> pd.DataFrame:
     """
-    Lit l'Excel des patients et retourne un DataFrame avec :
-      - patient_id (str)
-      - label_str  (str, catégorie textuelle)
-      - label_id   (int, encodage 0..K-1)
+    Lit un fichier texte / CSV contenant au moins :
+        patient_id,label_str
+
+    - Accepte un fichier AVEC ou SANS header.
+    - Normalise l'ID patient (string, strip).
+    - Crée label_id en fixant l'ordre des classes :
+        SYN=0, Narco=1, TCSPi=2, EAI=3
+      Les autres labels éventuels auront un code -1.
     """
-    df = pd.read_excel(xlsx_path, sheet_name=sheet)
+    if not txt_path.exists():
+        raise FileNotFoundError(f"Fichier labels TXT introuvable : {txt_path}")
 
-    cols = {c.lower(): c for c in df.columns}
+    # On essaie d'abord avec header, sinon sans header
+    try:
+        df = pd.read_csv(txt_path)
+        cols_lower = {c.lower(): c for c in df.columns}
+        if "patient_id" not in cols_lower and "identifiant" not in cols_lower:
+            # Pas de colonnes explicites → on relit sans header
+            raise ValueError("Pas de colonnes patient_id/identifiant détectées, on tente sans header.")
+        # On mappe vers noms canoniques
+        id_col = cols_lower.get("patient_id") or cols_lower.get("identifiant")
+        if "label_str" in cols_lower:
+            label_col = cols_lower["label_str"]
+        elif "diagnostic" in cols_lower:
+            label_col = cols_lower["diagnostic"]
+        elif "label" in cols_lower:
+            label_col = cols_lower["label"]
+        else:
+            # si une seule autre colonne, on la prend comme label
+            other_cols = [c for c in df.columns if c != id_col]
+            if len(other_cols) != 1:
+                raise ValueError("Impossible d'inférer la colonne de label dans le fichier TXT.")
+            label_col = other_cols[0]
 
-    # ID patient : on cherche des choses type "identifiant", "id", "patient"
-    id_col = (
-        cols.get("identifiant")
-        or cols.get("id_patient")
-        or cols.get("patient_id")
-        or cols.get("patient")
-        or cols.get("id")
-    )
-    if id_col is None:
-        raise ValueError(
-            f"Aucune colonne ID patient trouvée dans {xlsx_path}. "
-            f"Colonnes disponibles : {list(df.columns)}"
-        )
+        out = pd.DataFrame()
+        out["patient_id"] = df[id_col].astype(str).str.strip()
+        out["label_str"] = df[label_col].astype(str).str.strip()
 
-    # Colonne de catégorie : on teste plusieurs noms usuels
-    label_col = (
-        cols.get("categorie")
-        or cols.get("catégorie")
-        or cols.get("category")
-        or cols.get("groupe")
-        or cols.get("group")
-        or cols.get("diagnostic")
-        or cols.get("diag")
-    )
-    if label_col is None:
-        raise ValueError(
-            f"Aucune colonne de label trouvée dans {xlsx_path}. "
-            f"Essaye de renommer en 'categorie' ou 'groupe'."
-        )
+    except Exception:
+        # Lecture brute sans header : patient_id,label_str
+        df = pd.read_csv(txt_path, header=None, names=["patient_id", "label_str"])
+        out = pd.DataFrame()
+        out["patient_id"] = df["patient_id"].astype(str).str.strip()
+        out["label_str"] = df["label_str"].astype(str).str.strip()
 
-    out = pd.DataFrame()
-    out["patient_id"] = df[id_col].astype(str).str.strip()
-    out["label_str"] = df[label_col].astype(str).str.strip()
+    # On garde un seul label par patient (au cas où)
+    out = out.drop_duplicates(subset=["patient_id"], keep="first")
 
-    # Encodage numérique des labels
-    cats = pd.Categorical(out["label_str"])
+    # Encodage numérique des labels avec ordre fixe
+    macro_order = ["SYN", "Narco", "TCSPi", "EAI"]
+    # On met tout en forme propre pour la catégorisation
+    norm = out["label_str"].astype(str).str.strip()
+    # On force la casse pour la catégorisation mais on garde label_str tel quel
+    norm_upper = norm.str.upper()
+
+    # On mappe vers macro (au cas où certains labels seraient déjà "PARK", etc.)
+    def _to_macro(s_up: str, s_raw: str) -> str:
+        if "PARK" in s_up or "MPI" in s_up or "AMS" in s_up or "DCL" in s_up or "DLB" in s_up or "PAF" in s_up:
+            return "SYN"
+        if "NARCO" in s_up:
+            return "Narco"
+        if "TCSP" in s_up or "RBDI" in s_up:
+            return "TCSPi"
+        if "EAI" in s_up or "ENCEPHALITE" in s_up:
+            return "EAI"
+        # Si déjà une macro propre, on la garde
+        if s_up in {"SYN", "NARCO", "TCSPi".upper(), "EAI"}:
+            return "TCSPi" if s_up == "TCSPI" else s_raw
+        return s_raw
+
+    out["label_str"] = [
+        _to_macro(up, raw) for up, raw in zip(norm_upper, norm)
+    ]
+
+    cats = pd.Categorical(out["label_str"], categories=macro_order)
     out["label_id"] = cats.codes.astype(int)
 
     return out
@@ -128,13 +160,11 @@ def aggregate_emg_rbd(emg_df: pd.DataFrame, log, time_tol: float = 0.25):
         log.warning("EMG-RBD DataFrame vide.")
         return emg_df
 
-    # On ne garde que les lignes par époque REM
     df_ep = emg_df[emg_df["type"] == "REM_EPOCH_4S"].copy()
     if df_ep.empty:
         log.warning("Aucune ligne type 'REM_EPOCH_4S' trouvée dans EMG-RBD.")
         return df_ep
 
-    # Colonnes indispensables
     required = [
         "patient_id",
         "epoch_start_sec",
@@ -149,7 +179,6 @@ def aggregate_emg_rbd(emg_df: pd.DataFrame, log, time_tol: float = 0.25):
     if missing:
         raise ValueError(f"Colonnes manquantes dans EMG-RBD (REM_EPOCH_4S) : {missing}")
 
-    # On force types
     df_ep["patient_id"] = df_ep["patient_id"].astype(str).str.strip()
     df_ep["epoch_start_sec"] = df_ep["epoch_start_sec"].astype(float)
     df_ep["epoch_end_sec"] = df_ep["epoch_end_sec"].astype(float)
@@ -159,8 +188,6 @@ def aggregate_emg_rbd(emg_df: pd.DataFrame, log, time_tol: float = 0.25):
     df_ep["rswa"] = df_ep["rswa"].astype(bool)
     df_ep["very_phasic"] = df_ep["very_phasic"].astype(bool)
 
-    # Agrégation sur (patient_id, epoch_start_sec arrondi)
-    # -> ça gère le cas où plusieurs canaux EMG existent
     df_ep["epoch_start_round"] = (df_ep["epoch_start_sec"] / time_tol).round().astype(int)
 
     grp = df_ep.groupby(["patient_id", "epoch_start_round"], as_index=False)
@@ -187,8 +214,7 @@ def aggregate_emg_rbd(emg_df: pd.DataFrame, log, time_tol: float = 0.25):
 def build_dataset(
     eeg_features_csv: Path,
     emg_rbd_csv: Path,
-    labels_xlsx: Path,
-    labels_sheet: str,
+    labels_txt: Path,
     out_csv: Path,
     time_tol: float,
     log,
@@ -197,7 +223,7 @@ def build_dataset(
     log.info(f"Lecture EEG features : {eeg_features_csv}")
     eeg = pd.read_csv(eeg_features_csv)
 
-    required_eeg = ["patient_id", "epoch_index"]
+    required_eeg = ["patient_id"]
     missing_eeg = [c for c in required_eeg if c not in eeg.columns]
     if missing_eeg:
         raise ValueError(f"Colonnes manquantes dans EEG features : {missing_eeg}")
@@ -205,6 +231,7 @@ def build_dataset(
     eeg["patient_id"] = eeg["patient_id"].astype(str).str.strip()
 
     has_time = "epoch_start_sec" in eeg.columns
+    has_epoch_index = "epoch_index" in eeg.columns
     if has_time:
         eeg["epoch_start_sec"] = eeg["epoch_start_sec"].astype(float)
 
@@ -212,7 +239,12 @@ def build_dataset(
 
     # 2) EMG-RBD
     log.info(f"Lecture EMG-RBD : {emg_rbd_csv}")
-    emg = pd.read_csv(emg_rbd_csv)
+    if emg_rbd_csv.exists():
+        emg = pd.read_csv(emg_rbd_csv)
+    else:
+        log.warning(f"Fichier EMG-RBD introuvable : {emg_rbd_csv} → EMG ignoré.")
+        emg = pd.DataFrame()
+
     if emg.empty:
         log.warning("EMG-RBD CSV vide → dataset sans features EMG.")
         emg_agg = None
@@ -220,16 +252,17 @@ def build_dataset(
         emg_agg = aggregate_emg_rbd(emg, log, time_tol=time_tol)
         log.info(f"EMG-RBD agrégé : {emg_agg.shape[0]} lignes.")
 
-    # 3) Labels
-    log.info(f"Lecture labels Excel : {labels_xlsx} (feuille '{labels_sheet}')")
-    labels = load_labels_from_excel(labels_xlsx, sheet=labels_sheet)
-    log.info(f"Labels : {labels['patient_id'].nunique()} patients, "
-             f"{labels['label_str'].nunique()} classes.")
+    # 3) Labels (depuis TXT)
+    log.info(f"Lecture labels TXT : {labels_txt}")
+    labels = load_labels_from_txt(labels_txt)
+    log.info(
+        f"Labels : {labels['patient_id'].nunique()} patients, "
+        f"{labels['label_str'].nunique()} classes."
+    )
 
     # 4) Merge EEG + EMG (si EMG dispo)
     if emg_agg is not None and not emg_agg.empty:
         if has_time:
-            # Merge par patient + temps approx (via epoch_start_round)
             emg_agg["epoch_start_round"] = (emg_agg["epoch_start_sec"] / time_tol).round().astype(int)
             eeg["epoch_start_round"] = (eeg["epoch_start_sec"] / time_tol).round().astype(int)
 
@@ -238,16 +271,14 @@ def build_dataset(
                 emg_agg.drop(columns=["epoch_start_sec", "epoch_end_sec"]),
                 on=["patient_id", "epoch_start_round"],
                 how="left",
-                validate="m:1",
             )
             dataset.drop(columns=["epoch_start_round"], inplace=True)
             log.info("Fusion EEG+EMG réalisée via (patient_id, epoch_start_sec ~).")
         else:
-            # Fallback : merge sur (patient_id, epoch_index)
-            if "epoch_index" not in emg.columns:
+            if (not has_epoch_index) or ("epoch_index" not in emg.columns):
                 log.warning(
-                    "Pas de epoch_start_sec dans EEG features et pas de epoch_index dans EMG-RBD. "
-                    "Impossible d'aligner correctement EEG et EMG. EMG sera ignoré."
+                    "Pas de epoch_start_sec dans EEG features ou pas de epoch_index dans EEG/EMG-RBD. "
+                    "Impossible d'aligner correctement EEG et EMG par époque. EMG sera ignoré."
                 )
                 dataset = eeg.copy()
             else:
@@ -264,26 +295,41 @@ def build_dataset(
     else:
         dataset = eeg.copy()
 
-    # 5) Merge avec labels patients
+    # 5) Merge avec labels patients (TXT)
     dataset = pd.merge(
         dataset,
         labels,
         on="patient_id",
         how="left",
-        validate="m:1",
     )
 
     # 6) Validation de la couverture
     n_total = dataset.shape[0]
     n_no_label = dataset["label_str"].isna().sum()
     if n_no_label > 0:
-        log.warning(f"{n_no_label}/{n_total} lignes sans label patient (Excel).")
+        log.warning(f"{n_no_label}/{n_total} lignes sans label patient (labels TXT).")
 
-    if emg_agg is not None:
-        cols_emg = [c for c in dataset.columns if c.startswith("emg_")]
-        if cols_emg:
-            n_no_emg = dataset[cols_emg].isna().all(axis=1).sum()
-            log.info(f"{n_no_emg}/{n_total} lignes sans features EMG-RBD (alignement manquant ou EMG absent).")
+        # --- Liste des patients sans label ---
+        missing_patients = (
+            dataset.loc[dataset["label_str"].isna(), "patient_id"]
+            .astype(str)
+            .dropna()
+            .unique()
+        )
+        missing_patients = sorted(missing_patients)
+
+        log.info(f"Patients sans label ({len(missing_patients)}): "
+                 + ", ".join(missing_patients))
+
+        # Sauvegarde dans un fichier texte à côté du dataset
+        missing_path = out_csv.parent / "patients_without_labels.txt"
+        with open(missing_path, "w", encoding="utf-8") as f:
+            for pid in missing_patients:
+                f.write(f"{pid}\n")
+        log.info(f"Liste des patients sans label écrite dans : {missing_path}")
+    else:
+        log.info("Tous les patients du dataset ont un label.")
+
 
     # 7) Sauvegarde
     out_csv.parent.mkdir(parents=True, exist_ok=True)
@@ -291,12 +337,16 @@ def build_dataset(
     log.info(f"Dataset final écrit : {out_csv} (shape = {dataset.shape})")
 
     # 8) Petit rapport d’alignement
-    report_path = out_csv.with_suffix("_alignment_report.csv")
-    rep_cols = ["patient_id", "epoch_index"]
+    report_path = out_csv.parent / (out_csv.stem + "_alignment_report.csv")
+
+    rep_cols = ["patient_id"]
+    if "epoch_index" in dataset.columns:
+        rep_cols.append("epoch_index")
     if "epoch_start_sec" in dataset.columns:
         rep_cols.append("epoch_start_sec")
-    if "emg_phasic_ratio_mean" in dataset.columns:
-        rep_cols += ["emg_phasic_ratio_mean", "emg_tonic_ratio_mean", "emg_rswa_any"]
+    for c in ["emg_phasic_ratio_mean", "emg_tonic_ratio_mean", "emg_rswa_any"]:
+        if c in dataset.columns:
+            rep_cols.append(c)
     if "label_str" in dataset.columns:
         rep_cols.append("label_str")
 
@@ -311,30 +361,26 @@ def build_dataset(
 
 
 def parse_args():
-    p = argparse.ArgumentParser(description="Construire le dataset final EEG + EMG-RBD + labels.")
+    p = argparse.ArgumentParser(
+        description="Construire le dataset final EEG + EMG-RBD + labels (TXT)."
+    )
     p.add_argument(
         "--eeg-features",
         type=str,
         default="data/processed/features/eeg_features.csv",
-        help="CSV des features EEG par époque.",
+        help="CSV des features EEG (par patient ou par époque).",
     )
     p.add_argument(
         "--emg-rbd",
         type=str,
-        default="data/rbd_emg_events_and_summary_4s_per_channel.csv",
+        default="data/processed/rbd/rbd_emg_events_and_summary_4s_per_channel.csv",
         help="CSV EMG-RBD produit par le script emg_rbd.",
     )
     p.add_argument(
-        "--labels-xlsx",
+        "--labels-txt",
         type=str,
-        default="data/BDD_RBD_patients_updated.xlsx",
-        help="Fichier Excel des labels patients.",
-    )
-    p.add_argument(
-        "--labels-sheet",
-        type=str,
-        default="classification",
-        help="Nom de la feuille Excel contenant les labels.",
+        default="data/patient_list.txt",
+        help="Fichier texte des labels patients (patient_id,label_str).",
     )
     p.add_argument(
         "--out-csv",
@@ -357,20 +403,19 @@ def main():
     args = parse_args()
     eeg_csv = Path(args.eeg_features)
     emg_csv = Path(args.emg_rbd)
-    labels_xlsx = Path(args.labels_xlsx)
+    labels_txt = Path(args.labels_txt)
     out_csv = Path(args.out_csv)
 
     log.info(f"EEG features : {eeg_csv}")
     log.info(f"EMG-RBD      : {emg_csv}")
-    log.info(f"Labels Excel : {labels_xlsx}")
+    log.info(f"Labels TXT   : {labels_txt}")
     log.info(f"Sortie       : {out_csv}")
     log.info(f"Tolérance temps (s) : {args.time_tol}")
 
     build_dataset(
         eeg_features_csv=eeg_csv,
         emg_rbd_csv=emg_csv,
-        labels_xlsx=labels_xlsx,
-        labels_sheet=args.labels_sheet,
+        labels_txt=labels_txt,
         out_csv=out_csv,
         time_tol=args.time_tol,
         log=log,

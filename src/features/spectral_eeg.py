@@ -14,8 +14,15 @@ DEFAULT_BANDS = {
 
 
 def _spectral_base(epochs, fmin=0.5, fmax=80.0, picks=None):
-    psds, freqs = mne.time_frequency.psd_welch(
-        epochs,
+    """
+    Calcule la PSD avec l'API moderne de MNE (Epochs.compute_psd).
+
+    Retourne :
+      - psds : (n_epochs, n_channels, n_freqs)
+      - freqs : (n_freqs,)
+    """
+    psd = epochs.compute_psd(
+        method="welch",
         fmin=fmin,
         fmax=fmax,
         picks=picks,
@@ -24,8 +31,10 @@ def _spectral_base(epochs, fmin=0.5, fmax=80.0, picks=None):
         average="mean",
         verbose=False,
     )
-    # psds : (n_epochs, n_channels, n_freqs)
+    psds = psd.get_data()   # (n_epochs, n_channels, n_freqs)
+    freqs = psd.freqs       # (n_freqs,)
     return psds, freqs
+
 
 
 def compute_spectral_eeg_features(epochs: mne.Epochs,

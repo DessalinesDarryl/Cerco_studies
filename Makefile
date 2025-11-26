@@ -25,8 +25,6 @@ segment_rem: | $(LOG_DIR)
 
 rbd_emg: | $(LOG_DIR)
 	$(PY) src/features/emg_rbd.py \
-		--input_dir $(PROC_ROOT) \
-		--output_csv data/rbd/rbd_emg_per_epoch.csv \
 		--emg_channels Menton JAMBG JAMBD EMG1 EMG2 \
 		2>&1 | tee $(LOG_DIR)/logs_rbd_emg.txt
 
@@ -38,10 +36,9 @@ features: | $(LOG_DIR)
 
 dataset: | $(LOG_DIR)
 	$(PY) scripts/build_dataset.py \
-		--eeg-features $(PROC_ROOT)/features/eeg_features.csv \
-		--emg-rbd data/rbd_emg_events_and_summary_4s_per_channel.csv \
-		--labels-xlsx data/BDD_RBD_patients_updated.xlsx \
-		--out-csv $(PROC_ROOT)/features/dataset_final.csv \
+		--eeg-features data/processed/features/features.csv \
+		--emg-rbd data/processed/rbd/rbd_emg_events_and_summary_4s_per_channel.csv \
+		--out-csv data/processed/features/dataset_final.csv \
 		2>&1 | tee $(LOG_DIR)/logs_dataset.txt
 
 train: | $(LOG_DIR)

@@ -13,6 +13,11 @@ Sortie :
         * agrégats EEG (moyenne / std sur les époques REM)
         * agrégats EMG-RBD (RSWA, phasic_ratio, tonic_ratio, etc.)
 """
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.append(str(ROOT))
 
 import argparse
 from pathlib import Path
@@ -41,7 +46,9 @@ def compute_time_eeg_features(epochs: mne.Epochs):
     rms = np.sqrt((data ** 2).mean(axis=-1))
     zc = ((np.diff(np.sign(data), axis=-1) != 0) & (np.abs(np.diff(data, axis=-1)) > 0)).sum(axis=-1)
 
-    feats = np.concatenate([mean, var, rms, zc], axis=2)  # (n_epochs, n_ch, 4)
+    # ICI : empiler sur un nouvel axe (feature)
+    feats = np.stack([mean, var, rms, zc], axis=2)  # (n_epochs, n_ch, 4)
+
     n_epochs, n_ch, n_f = feats.shape
     feats = feats.reshape(n_epochs, n_ch * n_f)
 
@@ -55,6 +62,7 @@ def compute_time_eeg_features(epochs: mne.Epochs):
             f"eeg_{ch_name}_zc",
         ])
     return feats, names
+
 
 
 def aggregate_patient_features(X: np.ndarray, names: List[str]) -> Dict[str, float]:
