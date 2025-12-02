@@ -233,14 +233,25 @@ def process_patient(base: str, gp2_root: Path, rswa_df: pd.DataFrame, out_root: 
     df_rswa    = df_all[df_all["rswa"].astype(bool)]
     df_nonrswa = df_all[~df_all["rswa"].astype(bool)]
 
+    df_rswa_times = df_rswa[["epoch_start_sec", "epoch_end_sec"]].drop_duplicates()
+    df_non_times  = df_nonrswa[["epoch_start_sec", "epoch_end_sec"]].drop_duplicates()
+
     raw = mne.io.read_raw_fif(fif, preload=True, verbose="ERROR")
     sfreq = float(raw.info["sfreq"])
     first_t = float(raw.first_time)
 
+    # --- canaux EMG ---
     emg_picks = mne.pick_types(raw.info, meg=False, eeg=False, eog=False, emg=True, stim=False, misc=False)
     if emg_picks.size == 0:
         print(f"[{base_n}] aucun canal EMG")
         return {"base": base_n, "ok": False, "reason": "no_emg"}
+
+    # --- canaux EEG ---
+    eeg_picks = mne.pick_types(
+        raw.info, meg=False, eeg=True, eog=False, ecg=False,
+        emg=False, stim=False, misc=False
+    )
+
 
     out_dir = out_root / base_n
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -358,6 +369,74 @@ def process_patient(base: str, gp2_root: Path, rswa_df: pd.DataFrame, out_root: 
                 "channel": ch_name,
                 "spec": spec_non_chan_common.tolist(),
             })
+
+            psd_list_non.append(psd_ch_non[0, :])
+
+    # ---------- boucle sur les canaux EEG (spectres uniquement) ----------
+    for idx in eeg_picks:
+        ch_name = raw.ch_names[idx]
+
+        # mêmes fenêtres temporelles pour tous les canaux EEG :
+        segments_rswa = []
+        for _, row in df_rswa_times.iterrows():
+            t0 = float(row["epoch_start_sec"])
+            t1 = float(row["epoch_end_sec"])
+            s0 = int(round((t0 - first_t) * sfreq))
+            s1 = int(round((t1 - first_t) * sfreq))
+            s0 = max(0, min(s0, raw.n_times - 1))
+            s1 = max(s0 + 1, min(s1, raw.n_times))
+            seg = raw.get_data(picks=[idx], start=s0, stop=s1) * 1e6  # µV
+            segments_rswa.append(seg)
+
+        segments_non = []
+        for _, row in df_non_times.iterrows():
+            t0 = float(row["epoch_start_sec"])
+            t1 = float(row["epoch_end_sec"])
+            s0 = int(round((t0 - first_t) * sfreq))
+            s1 = int(round((t1 - first_t) * sfreq))
+            s0 = max(0, min(s0, raw.n_times - 1))
+            s1 = max(s0 + 1, min(s1, raw.n_times))
+            seg = raw.get_data(picks=[idx], start=s0, stop=s1) * 1e6  # µV
+            segments_non.append(seg)
+
+        has_rswa_eeg = len(segments_rswa) > 0
+        has_non_eeg  = len(segments_non)  > 0
+
+        if not has_rswa_eeg and not has_non_eeg:
+            continue
+
+        # --- RSWA EEG -> on enrichit psd_list_rswa (mais PAS chan_powers !) ---
+        if has_rswa_eeg:
+            data_cat_rswa = np.concatenate(segments_rswa, axis=1)   # (1, n_times)
+            freqs_r, psd_ch_rswa = _welch_psd_array(data_cat_rswa, sfreq, FMIN, FMAX)
+
+            if all_freqs_rswa is None:
+                all_freqs_rswa = freqs_r
+            elif not np.allclose(all_freqs_rswa, freqs_r):
+                psd_ch_rswa = np.interp(
+                    all_freqs_rswa, freqs_r, psd_ch_rswa[0, :]
+                )[np.newaxis, :]
+
+            if all_freqs_rswa is None:
+                all_freqs_rswa = freqs_r
+
+            psd_list_rswa.append(psd_ch_rswa[0, :])
+            # on ne touche PAS à chan_powers/chan_durs pour garder la puissance EMG only
+
+        # --- non-RSWA EEG -> enrichit psd_list_non ---
+        if has_non_eeg:
+            data_cat_non = np.concatenate(segments_non, axis=1)
+            freqs_n, psd_ch_non = _welch_psd_array(data_cat_non, sfreq, FMIN, FMAX)
+
+            if all_freqs_non is None:
+                all_freqs_non = freqs_n
+            elif not np.allclose(all_freqs_non, freqs_n):
+                psd_ch_non = np.interp(
+                    all_freqs_non, freqs_n, psd_ch_non[0, :]
+                )[np.newaxis, :]
+
+            if all_freqs_non is None:
+                all_freqs_non = freqs_n
 
             psd_list_non.append(psd_ch_non[0, :])
 
