@@ -4,32 +4,50 @@
 """
 xai_attributions.py
 
-XAI global sur ton modèle classique (RF / SVM / XGBoost) :
+XAI global sur ton modèle classique (RF / XGBoost, etc.) :
 
-- Lit les features par époque (features.csv)
-- Aligne avec les labels patients depuis l'Excel
-- Charge le modèle entraîné (joblib)
+- Lit le dataset complet (dataset_final.csv) qui contient déjà :
+    * patient_id
+    * features EEG/EMG
+    * label_id / label_str
+- Charge le checkpoint RF (bundle joblib : model + features + label_map)
 - Calcule :
     * Permutation importance (sklearn)
     * SHAP global (TreeExplainer si modèle d'arbres, sinon KernelExplainer)
 
-Sorties dans out_dir :
-    - permutation_importance.csv
-    - shap_global_meanabs.csv
-    - shap_topk.txt (liste concise pour ton rapport)
+Config YAML attendue (ex: configs/xai/attributions.yaml) :
+  model_path: models/checkpoint_rf.joblib
+  features_csv: data/processed/features/dataset_final.csv
+  label_col: "label_id"      # ou "label_str"
+
+  out_dir: outputs/xai/attributions
+
+  # options XAI :
+  do_permutation: true
+  n_perm_repeats: 30
+  random_state: 42
+
+  max_samples: 2000
+  n_background: 200
+  nsamples_kernel: 200
+  top_k_features: 20
 """
 
-import os
-import argparse
+from __future__ import annotations
+
+import sys
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.append(str(ROOT))
+
+import argparse
 import numpy as np
 import pandas as pd
 import joblib
 
 from sklearn.inspection import permutation_importance
-
-import shap  # pense à l'ajouter dans requirements
+import shap  # à mettre dans requirements
 
 from src.utils.config import load_yaml, add_common_args
 from src.utils.logging import get_logger
@@ -49,87 +67,66 @@ def _is_tree_model(model) -> bool:
     return any(k in name or k in module for k in tree_keywords)
 
 
-def load_dataset_from_cfg(cfg, log):
+def load_dataset_from_cfg(cfg, bundle, log):
     """
-    Charge features.csv + Excel labels, aligne sur patient_id et
-    retourne X (ndarray), y (ndarray), feature_names (list) et df complet.
+    Charge dataset_final.csv et reconstruit X, y en respectant les
+    mêmes colonnes de features que lors de l'entraînement.
+
+    Retourne :
+      - X (ndarray)
+      - y (ndarray)
+      - feature_names (list[str])
+      - df complet (pour debug éventuel)
     """
     feat_path = Path(cfg["features_csv"])
     if not feat_path.exists():
         raise FileNotFoundError(f"features_csv introuvable: {feat_path}")
 
-    log.info(f"Lecture features: {feat_path}")
-    df_feat = pd.read_csv(feat_path)
+    log.info(f"Lecture features (dataset_final): {feat_path}")
+    df = pd.read_csv(feat_path)
 
-    # colonnes d'identifiant
-    feat_id_col = cfg.get("features_id_col", "patient_id")
-    if feat_id_col not in df_feat.columns:
-        raise KeyError(f"Colonne '{feat_id_col}' absente de features.csv")
+    if "patient_id" not in df.columns:
+        raise KeyError("Colonne 'patient_id' absente de dataset_final.csv")
 
-    # Excel labels
-    labels_excel = Path(cfg["labels_excel"])
-    if not labels_excel.exists():
-        raise FileNotFoundError(f"labels_excel introuvable: {labels_excel}")
-
-    labels_sheet = cfg.get("labels_sheet", 0)
-    header_row = cfg.get("labels_header_row", 0)
-    id_col = cfg["label_id_col"]
-    label_col = cfg["label_col"]
-
-    log.info(f"Lecture labels Excel: {labels_excel} (sheet={labels_sheet}, header_row={header_row})")
-    df_lab = pd.read_excel(
-        labels_excel,
-        sheet_name=labels_sheet,
-        header=header_row,
-    )
-
-    if id_col not in df_lab.columns or label_col not in df_lab.columns:
+    label_col = cfg.get("label_col", "label_id")
+    if label_col not in df.columns:
         raise KeyError(
-            f"Colonnes '{id_col}' ou '{label_col}' non trouvées dans {labels_excel}. "
-            f"Colonnes dispo: {list(df_lab.columns)}"
+            f"Colonne de label '{label_col}' absente de dataset_final.csv. "
+            f"Colonnes dispo: {list(df.columns)}"
         )
 
-    # On harmonise en string pour la jointure patient
-    df_feat["_pid"] = df_feat[feat_id_col].astype(str).str.strip()
-    df_lab["_pid"] = df_lab[id_col].astype(str).str.strip()
+    # On enlève les lignes sans label
+    before = df.shape[0]
+    df = df.dropna(subset=[label_col])
+    after = df.shape[0]
+    log.info(f"Lignes avec label ({label_col}) : {before} -> {after}")
 
-    df_merge = df_feat.merge(
-        df_lab[["_pid", label_col]],
-        on="_pid",
-        how="inner",
-        suffixes=("", "_lab"),
-    )
-
-    log.info(f"Époques fusionnées (features ∩ labels): {len(df_merge)}/{len(df_feat)}")
-
-    if len(df_merge) == 0:
-        raise RuntimeError("Fusion features/labels vide : vérifier identifiants patients.")
-
-    # mapping texte -> int
-    label_map = cfg.get("label_map", None)
-    if label_map:
-        df_merge["y"] = df_merge[label_col].map(label_map)
+    # y : on force en int si possible
+    if np.issubdtype(df[label_col].dtype, np.number):
+        df[label_col] = df[label_col].astype(int)
+        y = df[label_col].to_numpy(dtype=int)
     else:
-        # factorisation automatique
-        classes, y = np.unique(df_merge[label_col].astype(str), return_inverse=True)
-        log.info(f"Label_map généré automatiquement: {dict(enumerate(classes))}")
-        df_merge["y"] = y
+        # factorisation si texte
+        df[label_col], uniques = pd.factorize(df[label_col].astype(str))
+        y = df[label_col].to_numpy(dtype=int)
+        log.info(f"Labels factorisés automatiquement : {dict(enumerate(uniques))}")
 
-    # On enlève les colonnes non-features
-    drop_cols = ["_pid", feat_id_col, label_col, "y"]
-    non_feature_cols = [c for c in drop_cols if c in df_merge.columns]
-    feature_cols = [c for c in df_merge.columns if c not in non_feature_cols]
+    # Récupérer les features utilisées à l'entraînement
+    feat_cols = bundle["features"]
+    missing = [c for c in feat_cols if c not in df.columns]
+    if missing:
+        raise KeyError(
+            f"Colonnes de features manquantes dans dataset_final : {missing}"
+        )
 
-    # Garder uniquement les colonnes numériques pour X
-    df_feat_only = df_merge[feature_cols].select_dtypes(include=[np.number])
+    # On ne garde que les colonnes numériques de ces features
+    df_feat_only = df[feat_cols].select_dtypes(include=[np.number])
     feature_names = list(df_feat_only.columns)
 
     X = df_feat_only.to_numpy(dtype=float)
-    y = df_merge["y"].to_numpy(dtype=int)
-
     log.info(f"Shape X: {X.shape}, y: {y.shape}, nb_features: {len(feature_names)}")
 
-    return X, y, feature_names, df_merge
+    return X, y, feature_names, df
 
 
 def compute_permutation_importance(model, X, y, feature_names, cfg, log, out_dir: Path):
@@ -168,10 +165,9 @@ def compute_shap_global(model, X, feature_names, cfg, log, out_dir: Path):
 
     n_samples = X.shape[0]
     if n_samples > max_samples:
-        log.info(f"Sous-échantillonnage SHAP: {n_samples} → {max_samples} epochs")
-        idx = np.random.RandomState(cfg.get("random_state", 42)).choice(
-            n_samples, size=max_samples, replace=False
-        )
+        log.info(f"Sous-échantillonnage SHAP: {n_samples} → {max_samples} échantillons")
+        rng = np.random.RandomState(cfg.get("random_state", 42))
+        idx = rng.choice(n_samples, size=max_samples, replace=False)
         X_use = X[idx]
     else:
         X_use = X
@@ -243,15 +239,17 @@ def main(cfg):
     out_dir = Path(cfg.get("out_dir", "outputs/xai/attributions"))
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # 1) Dataset
-    X, y, feature_names, df_merge = load_dataset_from_cfg(cfg, log)
-
-    # 2) Modèle
+    # 1) Chargement checkpoint RF (bundle)
     model_path = Path(cfg["model_path"])
     if not model_path.exists():
         raise FileNotFoundError(f"model_path introuvable: {model_path}")
-    log.info(f"Chargement modèle: {model_path}")
-    model = joblib.load(model_path)
+    log.info(f"Chargement checkpoint RF : {model_path}")
+    bundle = joblib.load(model_path)
+
+    model = bundle["model"]
+
+    # 2) Dataset (dataset_final + features du bundle)
+    X, y, feature_names, df_merge = load_dataset_from_cfg(cfg, bundle, log)
 
     # 3) Permutation importance
     compute_permutation_importance(model, X, y, feature_names, cfg, log, out_dir)

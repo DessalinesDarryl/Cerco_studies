@@ -28,6 +28,7 @@ rbd_emg: | $(LOG_DIR)
 		--emg_channels Menton JAMBG JAMBD EMG1 EMG2 \
 		2>&1 | tee $(LOG_DIR)/logs_rbd_emg.txt
 
+# Add features : cohérence / corrélation mvt oculaires+EMG / 
 features: | $(LOG_DIR)
 	$(PY) scripts/extract_features.py \
 		--config configs/preproc/features.yaml \
@@ -41,6 +42,7 @@ dataset: | $(LOG_DIR)
 		--out-csv data/processed/features/dataset_final.csv \
 		2>&1 | tee $(LOG_DIR)/logs_dataset.txt
 
+# Utiliser plutot le modele KNN puis tester avec d'autres modèles : XGBoost, CNN, RNN
 train: | $(LOG_DIR)
 	$(PY) scripts/train.py \
 		--config configs/eval/train_rf.yaml \
@@ -80,4 +82,7 @@ report: | $(LOG_DIR)
 		2>&1 | tee $(LOG_DIR)/logs_report.txt
 
 # Pipeline principal
-all: preprocess segment_rem rbd_emg features train xai_attr stats report
+all: preprocess segment_rem rbd_emg features dataset train plot_metrics xai_attr xai_plots stats report
+
+# Pipeline sans preprocessing
+all_no_preproc: segment_rem rbd_emg features dataset train plot_metrics xai_attr xai_plots stats report

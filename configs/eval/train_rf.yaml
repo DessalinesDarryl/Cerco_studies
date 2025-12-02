@@ -1,21 +1,17 @@
 # configs/eval/train_rf.yaml
 
 # ---------- Données ----------
-features_csv: data/processed/features/features.csv
+features_csv: data/processed/features/dataset_final.csv
 
-# Excel avec labels patients
-labels_excel: data/BDD_RBD_patients_updated.xlsx
-labels_sheet: "classification"   # ou l’index numérique
-labels_header_row: 3             # si l'entête est sur la 4e ligne
-label_id_col: "identifiant"
-label_col: "groupe_diag"
 
-# Mapping explicite des groupes vers des entiers
+label_col: "label_id"      
+
+# Mapping explicite des groupes vers des entiers (4 classes macros)
 label_map:
-  "CTRL": 0
-  "RBD_idiopathique": 1
-  "RBD_synucléinopathie": 2
-  "Autre": 3
+  "SYN": 0
+  "Narco": 1
+  "TCSPi": 2
+  "EAI": 3
 
 # ---------- Sorties ----------
 out_dir: models

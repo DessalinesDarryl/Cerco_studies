@@ -46,7 +46,6 @@ def compute_time_eeg_features(epochs: mne.Epochs):
     rms = np.sqrt((data ** 2).mean(axis=-1))
     zc = ((np.diff(np.sign(data), axis=-1) != 0) & (np.abs(np.diff(data, axis=-1)) > 0)).sum(axis=-1)
 
-    # ICI : empiler sur un nouvel axe (feature)
     feats = np.stack([mean, var, rms, zc], axis=2)  # (n_epochs, n_ch, 4)
 
     n_epochs, n_ch, n_f = feats.shape
@@ -82,12 +81,12 @@ def load_rbd_emg_features_patient_level(rbd_csv: Path, log):
 
     df = pd.read_csv(rbd_csv)
     if "type" not in df.columns:
-        log.warning("CSV RBD EMG sans colonne 'type' → ignoré.")
+        log.warning("CSV RBD EMG sans colonne 'type' >>> ignoré.")
         return None
 
     df_ep = df[df["type"] == "REM_EPOCH_4S"].copy()
     if df_ep.empty:
-        log.warning("CSV RBD EMG sans lignes REM_EPOCH_4S → ignoré.")
+        log.warning("CSV RBD EMG sans lignes REM_EPOCH_4S >>> ignoré.")
         return None
 
     agg = df_ep.groupby(["patient_id", "channel"]).agg(
@@ -137,7 +136,7 @@ def _process_one_feature_file(fpath: Path):
         feat_names.extend(names_spec)
 
     if not feat_parts:
-        log.warning(f"[{patient_id}] aucune feature EEG calculée → skip")
+        log.warning(f"[{patient_id}] aucune feature EEG calculée >>> skip")
         return None
 
     X_all = np.concatenate(feat_parts, axis=1)  # (n_epochs, n_features)

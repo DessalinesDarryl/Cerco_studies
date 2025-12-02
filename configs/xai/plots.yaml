@@ -1,24 +1,13 @@
-# configs/xai/plots.yaml
+# ============================
+# XAI PLOTS CONFIG
+# ============================
 
-ckpt_path: models/checkpoint_rf.joblib
-features_csv: data/processed/features/features.csv
+# CSV produits par xai_attributions.py
+perm_csv: outputs/xai/attributions/permutation_importance.csv
+shap_csv: outputs/xai/attributions/shap_global_meanabs.csv
 
-# Excel avec labels patients
-labels_excel: data/BDD_RBD_patients_updated.xlsx
-labels_sheet: "classification"
-labels_header_row: 3
-label_id_col: "identifiant"
-label_col: "groupe_diag"
+# Dossier où sauvegarder les plots
+out_dir: outputs/figures/xai
 
-# Dossier des figures XAI
-fig_dir: outputs/figures/xai
-
-plots:
-  top_k_global: 25
-  top_k_group: 25
-  top_k_patient: 20
-
-  # Liste optionnelle de patients pour lesquels on veut un barplot local
-  # Laisse [] pour ne rien faire, ou mets par exemple :
-  # patients_for_local: ["AN166", "CC175"]
-  patients_for_local: []
+# Nombre de features affichées dans les barplots
+top_k: 20
