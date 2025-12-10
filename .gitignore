@@ -2,7 +2,6 @@
 .venv*
 .env*
 *.edf
-*.txt
 *.fif
 data/features_monopolaire.csv
 data/features_bipolaire.csv

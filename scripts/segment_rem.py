@@ -140,7 +140,7 @@ def _process_one_fif(fif_path: Path, out_root: Path, epoch_len: float):
     # --- 1) Récupération REM ---
     rem_int = get_intervals_from_annotations(raw, "REM")
     if not rem_int:
-        log.warning(f"[{base}] Aucun segment REM trouvé → skip")
+        log.warning(f"[{base}] Aucun segment REM trouvé >>> skip")
         return
 
     # --- 2) Récupération ARTEFACT ---
@@ -149,20 +149,20 @@ def _process_one_fif(fif_path: Path, out_root: Path, epoch_len: float):
     # --- 3) REM sans artefacts ---
     rem_clean = subtract_intervals(rem_int, art_int)
     if not rem_clean:
-        log.warning(f"[{base}] Tous les REM sont artefactués → skip")
+        log.warning(f"[{base}] Tous les REM sont artefactués >>> skip")
         return
 
     # --- 4) Époquage 4 s ---
     epochs = make_4s_epochs(raw, rem_clean, epoch_len=epoch_len)
     if epochs is None:
-        log.warning(f"[{base}] Aucun epoch extrait → skip")
+        log.warning(f"[{base}] Aucun epoch extrait >>> skip")
         return
 
     # --- 5) Sauvegarde ---
     out_path = out_root / f"{base}_REM-epo.fif"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     epochs.save(out_path, overwrite=True)
-    log.info(f"[{base}] OK → {out_path}")
+    log.info(f"[{base}] OK >>> {out_path}")
 
 
 def main(cfg):

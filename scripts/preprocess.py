@@ -33,7 +33,7 @@ def _process_one_edf(
     """Traitement d’un patient (un fichier EDF) dans un worker."""
     log = get_logger("preprocess")  # logger côté worker
     p = Path(p)
-    base_name = p.stem.split("_")[0]  # ex: AN166 à partir de AN166_H0_raw.edf
+    base_name = p.stem.split("_")[0]  # ex: =AN166 à partir de AN166_H0_raw.edf
 
     log.info(f"=== Prétraitement {base_name} ({p.name}) ===")
 
@@ -54,7 +54,7 @@ def _process_one_edf(
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     raw_prep.save(out_path, overwrite=True)
-    log.info(f"[{base_name}] Sauvegardé → {out_path}")
+    log.info(f"[{base_name}] Sauvegardé >>> {out_path}")
 
 
 def main(cfg):
@@ -70,10 +70,11 @@ def main(cfg):
 
     n_workers = int(cfg.get("n_workers", 15))
 
-    # Tous les EDF sous raw_root
+    # Tous les EDF sous raw_root (minuscules et majuscules)
     edfs = glob.glob(str(raw_root / "**" / "*.edf"), recursive=True)
+    edfs += glob.glob(str(raw_root / "**" / "*.EDF"), recursive=True)
     if not edfs:
-        log.warning(f"Aucun fichier .edf trouvé sous {raw_root}")
+        log.warning(f"Aucun fichier .edf/.EDF trouvé sous {raw_root}")
         return
 
     log.info(f"{len(edfs)} fichiers EDF trouvés. Lancement avec n_workers={n_workers}.")
