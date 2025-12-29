@@ -28,6 +28,7 @@ def _process_one_edf(
     hypno_root: Path,
     eeg_params: dict,
     emg_params: dict,
+    eog_params: dict,
     yasa_params: dict,
 ):
     """Traitement d’un patient (un fichier EDF) dans un worker."""
@@ -45,6 +46,7 @@ def _process_one_edf(
         hypno_root=hypno_root,
         eeg_params=eeg_params,
         emg_params=emg_params,
+        eog_params=eog_params,
         yasa_params=yasa_params,
     )
 
@@ -66,6 +68,7 @@ def main(cfg):
 
     eeg_params  = cfg.get("eeg",  {"l_freq": 0.5, "h_freq": 80.0, "notch": 50.0})
     emg_params  = cfg.get("emg",  {"hp": 30.0, "lp": 100.0, "notch": 50.0})
+    eog_params  = cfg.get("eog",  {"hp": 0.3, "lp": 10.0, "notch": None})
     yasa_params = cfg.get("yasa", {"win_sec": 4.0, "method": "covar", "threshold": 3.0, "include": "sleep"})
 
     n_workers = int(cfg.get("n_workers", 15))
@@ -91,6 +94,7 @@ def main(cfg):
                 hypno_root,
                 eeg_params,
                 emg_params,
+                eog_params,
                 yasa_params,
             ): p
             for p in edfs

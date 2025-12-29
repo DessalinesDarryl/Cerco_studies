@@ -6,11 +6,13 @@ PROC_ROOT ?= ../documents/EEG/preprocessed/XAI/data
 LOG_DIR = logs
 NWORKERS ?= 10
 
+.DEFAULT_GOAL := all_rf
+
 # Assure que le dossier logs existe pour chaque règle
 $(LOG_DIR):
 	mkdir -p $(LOG_DIR)
 
-
+# ======================== Préparation des données ========================
 preprocess: | $(LOG_DIR)
 	$(PY) scripts/preprocess.py \
 		--config configs/preproc/default.yaml \
@@ -42,18 +44,47 @@ dataset: | $(LOG_DIR)
 		--out-csv data/processed/features/dataset_final.csv \
 		2>&1 | tee $(LOG_DIR)/logs_dataset.txt
 
-# Utiliser plutot le modele KNN puis tester avec d'autres modèles : XGBoost, CNN, RNN
-train: | $(LOG_DIR)
-	$(PY) scripts/train.py \
+# Commande à lancer pour préparer les données
+prepa_data: preprocess segment_rem rbd_emg features dataset
+
+# ======================== Entrainement des modèles ========================
+
+### Modèles tabulaires
+train_rf: | $(LOG_DIR)
+	$(PY) scripts/train_tabular_models.py \
 		--config configs/eval/train_rf.yaml \
-		2>&1 | tee $(LOG_DIR)/logs_train.txt
+		2>&1 | tee $(LOG_DIR)/logs_train_rf.txt
 
-infer: | $(LOG_DIR)
-	$(PY) scripts/infer.py \
-		--config configs/eval/infer.yaml \
-		2>&1 | tee $(LOG_DIR)/logs_infer.txt
+train_knn: | $(LOG_DIR)
+	$(PY) scripts/train_tabular_models.py \
+		--config configs/eval/train_knn.yaml \
+		2>&1 | tee $(LOG_DIR)/logs_train_knn.txt
 
-xai_attr: | $(LOG_DIR)
+train_xgb: | $(LOG_DIR)
+	$(PY) scripts/train_tabular_models.py \
+		--config configs/eval/train_xgb.yaml \
+		2>&1 | tee $(LOG_DIR)/logs_train_xgb.txt
+
+### Modèles Deep
+train_cnn: | $(LOG_DIR)
+	$(PY) scripts/train_deep_models.py \
+		--config configs/eval/train_cnn.yaml \
+		2>&1 | tee $(LOG_DIR)/logs_train_cnn.txt
+
+train_rnn: | $(LOG_DIR)
+	$(PY) scripts/train_deep_models.py \
+		--config configs/eval/train_rnn.yaml \
+		2>&1 | tee $(LOG_DIR)/logs_train_rnn.txt
+
+
+# Evaluation et XAI
+
+plot_metrics: | $(LOG_DIR)
+	$(PY) scripts/plot_roc_cm.py \
+		--config configs/eval/plots_metrics.yaml \
+		2>&1 | tee $(LOG_DIR)/logs_plot_metrics.txt
+
+xai_attr: | $(LOG_DIR) # prévu pour RF / XGB (TreeExplainer)
 	$(PY) scripts/xai_attributions.py \
 		--config configs/xai/attributions.yaml \
 		2>&1 | tee $(LOG_DIR)/logs_xai_attr.txt
@@ -62,11 +93,6 @@ xai_plots: | $(LOG_DIR)
 	$(PY) scripts/xai_plots.py \
 		--config configs/xai/plots.yaml \
 		2>&1 | tee $(LOG_DIR)/logs_xai_plots.txt
-
-plot_metrics: | $(LOG_DIR)
-	$(PY) scripts/plot_roc_cm.py \
-		--config configs/eval/plots_metrics.yaml \
-		2>&1 | tee $(LOG_DIR)/logs_plot_metrics.txt
 
 stats: | $(LOG_DIR)
 	$(PY) scripts/group_stats.py \
@@ -81,8 +107,19 @@ report: | $(LOG_DIR)
 		--out outputs/reports \
 		2>&1 | tee $(LOG_DIR)/logs_report.txt
 
-# Pipeline principal
-all: preprocess segment_rem rbd_emg features dataset train plot_metrics xai_attr xai_plots stats report
 
-# Pipeline sans preprocessing
-all_no_preproc: segment_rem rbd_emg features dataset train plot_metrics xai_attr xai_plots stats report
+
+## Commande à lancer pour entrainer et évaluer les modèles
+step_rf: train_rf plot_metrics xai_attr xai_plots stats report
+step_knn: train_knn plot_metrics xai_attr xai_plots stats report
+step_xgb: train_xgb plot_metrics xai_attr xai_plots stats report
+
+step_cnn: train_cnn plot_metrics report
+step_rnn: train_rnn plot_metrics report
+
+## Pipeline complet 
+all_rf: prepa_data step_rf
+all_knn: prepa_data step_knn
+all_xgb: prepa_data step_xgb
+all_cnn: prepa_data step_cnn
+all_rnn: prepa_data step_rnn

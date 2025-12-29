@@ -7,11 +7,12 @@ build_reports.py
 Construit un rapport Markdown en intégrant automatiquement :
   - les figures de performances globales (confusion matrix + ROC),
   - les figures XAI (globales + par groupe + par patient),
-  - éventuellement quelques infos de stats si disponibles.
+  - un résumé chiffré des métriques de classification,
+  - un résumé des statistiques disponibles (CSV).
 
-Entrée (via arguments CLI, cohérent avec le Makefile) :
-  --xai-root   : dossier avec les sorties XAI (si besoin plus tard)
-  --stats-root : dossier avec les résultats statistiques (CSV, etc.)
+Entrée :
+  --xai-root   : dossier avec les sorties XAI
+  --stats-root : dossier avec les résultats statistiques (CSV)
   --fig-root   : dossier racine des figures (metrics/, xai/, ...)
   --out        : dossier de sortie des rapports (ex: outputs/reports)
 
@@ -21,42 +22,63 @@ Sortie :
 
 from __future__ import annotations
 
-import argparse
+import sys
 from pathlib import Path
+import argparse
 import glob
 
+import numpy as np
 import pandas as pd
+
+# ---------------------------------------------------------------------
+# Allow "import src.*"
+# ---------------------------------------------------------------------
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.append(str(ROOT))
 
 from src.utils.logging import get_logger
 
 
+# =====================================================================
+# FIGURES DISCOVERY
+# =====================================================================
 def find_metrics_figures(fig_root: Path):
-    """Retourne les chemins vers confusion_matrix.png et roc_multiclass.png si présents."""
-    metrics_dir = fig_root / "metrics"
-    cm = metrics_dir / "confusion_matrix.png"
-    roc = metrics_dir / "roc_multiclass.png"
+    metrics_dir = fig_root 
+    if not metrics_dir.exists():
+        return None, None
 
-    cm = cm if cm.exists() else None
-    roc = roc if roc.exists() else None
+    cm_candidates = list(metrics_dir.glob("*confusion*.png"))
+    roc_candidates = list(metrics_dir.glob("*roc*.png"))
+
+    cm = cm_candidates[0] if cm_candidates else None
+    roc = roc_candidates[0] if roc_candidates else None
     return cm, roc
+
 
 
 def find_xai_figures(fig_root: Path):
     """
     Cherche les figures XAI dans fig_root/xai :
-      - global_feature_importance
-      - group_feature_heatmap
-      - xai_patient_*_contrib
+      - importance globale (SHAP / permutation)
+      - heatmap par groupe
+      - attributions locales par patient
     """
     xai_dir = fig_root / "xai"
     if not xai_dir.exists():
         return None, None, []
 
-    global_fig = xai_dir / "xai_global_feature_importance.png"
-    group_fig = xai_dir / "xai_group_feature_heatmap.png"
+    global_candidates = (
+        list(xai_dir.glob("*global*importance*.png"))
+        + list(xai_dir.glob("shap_global*.png"))
+        + list(xai_dir.glob("permutation_importance*.png"))
+    )
+    global_fig = global_candidates[0] if global_candidates else None
 
-    global_fig = global_fig if global_fig.exists() else None
-    group_fig = group_fig if group_fig.exists() else None
+    group_candidates = (
+        list(xai_dir.glob("*group*heatmap*.png"))
+        + list(xai_dir.glob("*group*.png"))
+    )
+    group_fig = group_candidates[0] if group_candidates else None
 
     patient_figs = sorted(
         Path(p) for p in glob.glob(str(xai_dir / "xai_patient_*_contrib.png"))
@@ -65,11 +87,11 @@ def find_xai_figures(fig_root: Path):
     return global_fig, group_fig, patient_figs
 
 
-def summarize_stats(stats_root: Path):
-    """
-    Optionnel : résume quelques CSV de stats s'ils existent.
-    Retourne une petite section texte.
-    """
+# =====================================================================
+# STATS SUMMARY
+# =====================================================================
+def summarize_stats(stats_root: Path) -> str:
+    """Résumé simple des CSV de statistiques disponibles."""
     if not stats_root.exists():
         return "Aucun fichier de statistiques trouvé.\n"
 
@@ -81,13 +103,38 @@ def summarize_stats(stats_root: Path):
     for csv_path in csv_files:
         try:
             df = pd.read_csv(csv_path)
-            lines.append(f"- **{csv_path.name}** : {df.shape[0]} lignes, {df.shape[1]} colonnes")
+            lines.append(
+                f"- **{csv_path.name}** : {df.shape[0]} lignes, {df.shape[1]} colonnes"
+            )
         except Exception:
-            lines.append(f"- **{csv_path.name}** (lecture impossible, format non standard)")
+            lines.append(
+                f"- **{csv_path.name}** (lecture impossible)"
+            )
 
     return "\n".join(lines) + "\n"
 
 
+def summarize_metrics(stats_root: Path) -> str:
+    """Résumé numérique des performances moyennes (cross-validation)."""
+    metrics_file = stats_root / "train_metrics_rf.csv"
+    if not metrics_file.exists():
+        return ""
+
+    df = pd.read_csv(metrics_file)
+    mean_metrics = df.mean(numeric_only=True)
+
+    return (
+        "### Performances moyennes (cross-validation)\n\n"
+        f"- Accuracy moyenne : **{mean_metrics.get('accuracy', np.nan):.3f}**\n"
+        f"- Balanced accuracy : **{mean_metrics.get('balanced_accuracy', np.nan):.3f}**\n"
+        f"- F1-score macro : **{mean_metrics.get('f1_macro', np.nan):.3f}**\n"
+        f"- Recall macro : **{mean_metrics.get('recall_macro', np.nan):.3f}**\n\n"
+    )
+
+
+# =====================================================================
+# REPORT BUILDING
+# =====================================================================
 def build_markdown_report(
     out_dir: Path,
     fig_root: Path,
@@ -95,19 +142,14 @@ def build_markdown_report(
     stats_root: Path,
 ):
     """
-    Construit le contenu Markdown du rapport et l'écrit dans out_dir/report.md.
-    Les chemins d'images sont exprimés en relatif par rapport au rapport.
+    Construit le rapport Markdown et l’écrit dans out_dir/report.md.
+    Les chemins d’images sont relatifs au rapport.
     """
-    # Pour les chemins relatifs, le rapport est dans out_dir,
-    # les figures sont dans fig_root (ex: outputs/figures).
-    rel_fig_base = Path("..") / fig_root.relative_to(fig_root.parent)
-
-    # 1) Figures metrics
     cm_path, roc_path = find_metrics_figures(fig_root)
-    # 2) Figures XAI
     xai_global, xai_group, xai_patient_figs = find_xai_figures(fig_root)
-    # 3) Stats
+
     stats_summary = summarize_stats(stats_root)
+    metrics_summary = summarize_metrics(stats_root)
 
     md_lines = []
 
@@ -119,106 +161,75 @@ def build_markdown_report(
     md_lines.append("## 1. Performances globales du modèle\n")
     md_lines.append(
         "Cette section résume les performances du modèle (RandomForest) sur les features "
-        "extraits des segments REM (EEG/EMG/ECG).\n"
+        "extraits des segments REM (EEG / EMG).\n"
     )
+
+    if metrics_summary:
+        md_lines.append(metrics_summary)
 
     if cm_path is not None:
         rel_cm = Path("..") / cm_path.relative_to(out_dir.parent)
         md_lines.append("### 1.1 Matrice de confusion\n")
-        md_lines.append(
-            "La matrice de confusion (normalisée par classe réelle) permet de visualiser "
-            "les erreurs de classification entre les différentes catégories de patients.\n"
-        )
         md_lines.append(f"![Matrice de confusion]({rel_cm.as_posix()})\n")
     else:
-        md_lines.append("- Matrice de confusion non trouvée (confusion_matrix.png).\n")
+        md_lines.append("- Matrice de confusion non trouvée.\n")
 
     if roc_path is not None:
         rel_roc = Path("..") / roc_path.relative_to(out_dir.parent)
         md_lines.append("### 1.2 Courbes ROC multiclasses\n")
-        md_lines.append(
-            "Les courbes ROC (one-vs-rest) et les AUC associées quantifient la capacité "
-            "du modèle à discriminer chaque catégorie par rapport aux autres.\n"
-        )
         md_lines.append(f"![ROC multiclasses]({rel_roc.as_posix()})\n")
     else:
-        md_lines.append("- Courbes ROC non trouvées (roc_multiclass.png).\n")
-
-    md_lines.append("\n")
+        md_lines.append("- Courbes ROC non trouvées.\n")
 
     # ------------------------------------------------------------------
-    # Section 2 : Importances globales des features (XAI)
+    # Section 2 : Explicabilité globale
     # ------------------------------------------------------------------
-    md_lines.append("## 2. Explicabilité globale (XAI)\n")
-    md_lines.append(
-        "Cette section résume les features les plus importantes pour le modèle, "
-        "ainsi que leurs différences selon les groupes de patients.\n"
-    )
+    md_lines.append("\n## 2. Explicabilité globale (XAI)\n")
 
     if xai_global is not None:
         rel_xai_global = Path("..") / xai_global.relative_to(out_dir.parent)
         md_lines.append("### 2.1 Importances globales des features\n")
-        md_lines.append(
-            "Les barres représentent l’importance moyenne de chaque feature dans le RandomForest.\n"
-        )
-        md_lines.append(f"![Importances globales]({rel_xai_global.as_posix()})\n")
+        md_lines.append(f"![XAI global]({rel_xai_global.as_posix()})\n")
     else:
-        md_lines.append("- Figure d’importances globales (xai_global_feature_importance.png) non trouvée.\n")
+        md_lines.append("- Aucune figure XAI globale trouvée.\n")
 
     if xai_group is not None:
         rel_xai_group = Path("..") / xai_group.relative_to(out_dir.parent)
         md_lines.append("### 2.2 Importances par groupe de patients\n")
-        md_lines.append(
-            "La heatmap montre, pour chaque groupe de patients, quelles features contribuent le plus "
-            "aux différences par rapport à la moyenne globale.\n"
-        )
-        md_lines.append(f"![Importances par groupe]({rel_xai_group.as_posix()})\n")
+        md_lines.append(f"![XAI groupes]({rel_xai_group.as_posix()})\n")
     else:
-        md_lines.append("- Heatmap XAI par groupe (xai_group_feature_heatmap.png) non trouvée.\n")
-
-    md_lines.append("\n")
+        md_lines.append("- Heatmap XAI par groupe non trouvée.\n")
 
     # ------------------------------------------------------------------
-    # Section 3 : Attributions locales par patient
+    # Section 3 : Attributions locales
     # ------------------------------------------------------------------
-    md_lines.append("## 3. Attributions locales par patient\n")
-    md_lines.append(
-        "Pour certains patients sélectionnés, on visualise les contributions (signées) des features "
-        "qui tirent la prédiction vers une catégorie ou une autre.\n"
-    )
+    md_lines.append("\n## 3. Attributions locales par patient\n")
 
     if xai_patient_figs:
         for fig_path in xai_patient_figs:
-            # extraire l'ID patient du nom de fichier : xai_patient_{ID}_contrib.png
-            name = fig_path.name
-            patient_id = name.replace("xai_patient_", "").replace("_contrib.png", "")
+            pid = fig_path.stem.replace("xai_patient_", "").replace("_contrib", "")
             rel_fig = Path("..") / fig_path.relative_to(out_dir.parent)
-
-            md_lines.append(f"### 3.x Patient {patient_id}\n")
-            md_lines.append(
-                "Barres positives : features qui augmentent la probabilité de la classe prédite ; "
-                "barres négatives : features qui la diminuent.\n"
-            )
-            md_lines.append(f"![Attributions patient {patient_id}]({rel_fig.as_posix()})\n")
+            md_lines.append(f"### Patient {pid}\n")
+            md_lines.append(f"![XAI patient {pid}]({rel_fig.as_posix()})\n")
     else:
-        md_lines.append(
-            "- Aucune figure d’attribution locale trouvée (xai_patient_*_contrib.png). "
-            "Tu peux en générer via `scripts/xai_plots.py`.\n"
-        )
-
-    md_lines.append("\n")
+        md_lines.append("- Aucune attribution locale trouvée.\n")
 
     # ------------------------------------------------------------------
-    # Section 4 : Statistiques de groupe
+    # Section 4 : Statistiques
     # ------------------------------------------------------------------
-    md_lines.append("## 4. Statistiques de groupe\n")
-    md_lines.append(
-        "Résumé des fichiers de statistiques produits (tests de groupe, comparaisons inter-catégories, etc.).\n\n"
-    )
+    md_lines.append("\n## 4. Statistiques de groupe\n")
     md_lines.append(stats_summary)
 
+    top_feats = stats_root / "shap_top_features.csv"
+    if top_feats.exists():
+        df = pd.read_csv(top_feats)
+        top_names = ", ".join(df["feature"].head(3))
+        md_lines.append(
+            f"\nLes features les plus contributives sont principalement : **{top_names}**.\n"
+        )
+
     # ------------------------------------------------------------------
-    # Écriture du rapport
+    # Write report
     # ------------------------------------------------------------------
     out_dir.mkdir(parents=True, exist_ok=True)
     out_md = out_dir / "report.md"
@@ -226,16 +237,15 @@ def build_markdown_report(
     return out_md
 
 
+# =====================================================================
+# CLI
+# =====================================================================
 def parse_args():
-    ap = argparse.ArgumentParser(description="Construire un rapport Markdown avec les figures XAI + métriques.")
-    ap.add_argument("--xai-root", type=str, required=False, default="outputs/xai",
-                    help="Dossier des sorties XAI (non strictement nécessaire pour les figures).")
-    ap.add_argument("--stats-root", type=str, required=False, default="outputs/stats",
-                    help="Dossier contenant les CSV de stats.")
-    ap.add_argument("--fig-root", type=str, required=False, default="outputs/figures",
-                    help="Dossier racine des figures (metrics/, xai/, ...).")
-    ap.add_argument("--out", type=str, required=False, default="outputs/reports",
-                    help="Dossier de sortie des rapports.")
+    ap = argparse.ArgumentParser(description="Construire un rapport Markdown XAI + métriques.")
+    ap.add_argument("--xai-root", default="outputs/xai")
+    ap.add_argument("--stats-root", default="outputs/stats")
+    ap.add_argument("--fig-root", default="outputs/figures")
+    ap.add_argument("--out", default="outputs/reports")
     return ap.parse_args()
 
 
@@ -243,21 +253,11 @@ def main():
     log = get_logger("build_reports")
 
     args = parse_args()
-    xai_root = Path(args.xai_root)
-    stats_root = Path(args.stats_root)
-    fig_root = Path(args.fig_root)
-    out_dir = Path(args.out)
-
-    log.info(f"xai_root   = {xai_root}")
-    log.info(f"stats_root = {stats_root}")
-    log.info(f"fig_root   = {fig_root}")
-    log.info(f"out_dir    = {out_dir}")
-
     out_md = build_markdown_report(
-        out_dir=out_dir,
-        fig_root=fig_root,
-        xai_root=xai_root,
-        stats_root=stats_root,
+        out_dir=Path(args.out),
+        fig_root=Path(args.fig_root),
+        xai_root=Path(args.xai_root),
+        stats_root=Path(args.stats_root),
     )
 
     log.info(f"Rapport écrit : {out_md}")

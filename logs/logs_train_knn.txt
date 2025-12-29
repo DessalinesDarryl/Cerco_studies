@@ -1,0 +1,29 @@
+2025-12-19 12:53:44,659 | INFO | Features : 75 lignes, 1068 colonnes (incluant patient_id).
+2025-12-19 12:53:44,661 | INFO | Filtrage lignes sans label (label_id) : 75 -> 75 lignes.
+2025-12-19 12:53:44,661 | INFO | Patients avec features : 75, patients avec label (label_id) : 75.
+2025-12-19 12:53:44,663 | INFO | label_map_effective construit depuis dataset_final : {'SYN': 0, 'TCSPi': 2, 'EAI': 3, 'Narco': 1}
+2025-12-19 12:53:44,683 | INFO | CV : GroupKFold par patient (n_splits=5)
+2025-12-19 12:53:44,684 | INFO | Fold 1/5 : train=60 / val=15
+2025-12-19 12:53:44,684 | INFO | Modèle = KNN, params : {'n_neighbors': 7, 'weights': 'distance', 'metric': 'minkowski'}
+/home/darryld/conda/miniconda3/envs/EEGs/lib/python3.10/site-packages/sklearn/metrics/_classification.py:2801: UserWarning: y_pred contains classes not in y_true
+  warnings.warn("y_pred contains classes not in y_true")
+/home/darryld/conda/miniconda3/envs/EEGs/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Recall is ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+2025-12-19 12:53:44,770 | INFO |   Fold 1 : BAC=0.600, F1_macro=0.390
+2025-12-19 12:53:44,770 | INFO | Fold 2/5 : train=60 / val=15
+2025-12-19 12:53:44,771 | INFO | Modèle = KNN, params : {'n_neighbors': 7, 'weights': 'distance', 'metric': 'minkowski'}
+2025-12-19 12:53:44,781 | INFO |   Fold 2 : BAC=0.417, F1_macro=0.292
+2025-12-19 12:53:44,781 | INFO | Fold 3/5 : train=60 / val=15
+2025-12-19 12:53:44,781 | INFO | Modèle = KNN, params : {'n_neighbors': 7, 'weights': 'distance', 'metric': 'minkowski'}
+2025-12-19 12:53:44,790 | INFO |   Fold 3 : BAC=0.562, F1_macro=0.550
+2025-12-19 12:53:44,790 | INFO | Fold 4/5 : train=60 / val=15
+2025-12-19 12:53:44,790 | INFO | Modèle = KNN, params : {'n_neighbors': 7, 'weights': 'distance', 'metric': 'minkowski'}
+2025-12-19 12:53:44,802 | INFO |   Fold 4 : BAC=0.194, F1_macro=0.159
+2025-12-19 12:53:44,802 | INFO | Fold 5/5 : train=60 / val=15
+2025-12-19 12:53:44,802 | INFO | Modèle = KNN, params : {'n_neighbors': 7, 'weights': 'distance', 'metric': 'minkowski'}
+2025-12-19 12:53:44,811 | INFO |   Fold 5 : BAC=0.375, F1_macro=0.350
+2025-12-19 12:53:44,813 | INFO | CV global : BAC=0.430, F1_macro=0.348, Recall_macro=0.400
+2025-12-19 12:53:44,814 | INFO | Métriques CV sauvegardées dans outputs/stats/train_metrics_knn.csv
+2025-12-19 12:53:44,816 | INFO | Modèle = KNN, params : {'n_neighbors': 7, 'weights': 'distance', 'metric': 'minkowski'}
+2025-12-19 12:53:44,822 | INFO | Modèle final entraîné sur 75 échantillons.
+2025-12-19 12:53:44,827 | INFO | Checkpoint modèle sauvegardé dans models/checkpoint_knn.joblib

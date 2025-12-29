@@ -1,0 +1,5 @@
+2025-12-19 12:55:47,349 | INFO | Lecture permutation_importance: outputs/xai/attributions/permutation_importance.csv
+2025-12-19 12:55:47,353 | INFO | Plot → outputs/figures/xai/permutation_importance_topk.png
+2025-12-19 12:55:47,680 | INFO | Lecture SHAP global: outputs/xai/attributions/shap_global_meanabs.csv
+2025-12-19 12:55:47,682 | INFO | Plot → outputs/figures/xai/shap_global_topk.png
+2025-12-19 12:55:47,993 | INFO | Figures XAI générées.

@@ -1,0 +1,25 @@
+2025-12-19 12:00:38,307 | INFO | Features : 75 lignes, 1068 colonnes (incluant patient_id).
+2025-12-19 12:00:38,309 | INFO | Filtrage lignes sans label (label_id) : 75 -> 75 lignes.
+2025-12-19 12:00:38,309 | INFO | Patients avec features : 75, patients avec label (label_id) : 75.
+2025-12-19 12:00:38,311 | INFO | label_map_effective construit depuis dataset_final : {'SYN': 0, 'TCSPi': 2, 'EAI': 3, 'Narco': 1}
+2025-12-19 12:00:38,331 | INFO | CV : GroupKFold par patient (n_splits=5)
+2025-12-19 12:00:38,332 | INFO | Fold 1/5 : train=60 / val=15
+2025-12-19 12:00:38,332 | INFO | Modèle = RandomForest, params : {'n_estimators': 300, 'max_depth': None, 'n_jobs': -1, 'random_state': 42, 'class_weight': 'balanced'}
+2025-12-19 12:00:39,398 | INFO |   Fold 1 : BAC=0.678, F1_macro=0.593
+2025-12-19 12:00:39,398 | INFO | Fold 2/5 : train=60 / val=15
+2025-12-19 12:00:39,398 | INFO | Modèle = RandomForest, params : {'n_estimators': 300, 'max_depth': None, 'n_jobs': -1, 'random_state': 42, 'class_weight': 'balanced'}
+2025-12-19 12:00:40,477 | INFO |   Fold 2 : BAC=0.250, F1_macro=0.105
+2025-12-19 12:00:40,478 | INFO | Fold 3/5 : train=60 / val=15
+2025-12-19 12:00:40,478 | INFO | Modèle = RandomForest, params : {'n_estimators': 300, 'max_depth': None, 'n_jobs': -1, 'random_state': 42, 'class_weight': 'balanced'}
+2025-12-19 12:00:41,596 | INFO |   Fold 3 : BAC=0.375, F1_macro=0.366
+2025-12-19 12:00:41,597 | INFO | Fold 4/5 : train=60 / val=15
+2025-12-19 12:00:41,597 | INFO | Modèle = RandomForest, params : {'n_estimators': 300, 'max_depth': None, 'n_jobs': -1, 'random_state': 42, 'class_weight': 'balanced'}
+2025-12-19 12:00:42,666 | INFO |   Fold 4 : BAC=0.375, F1_macro=0.371
+2025-12-19 12:00:42,666 | INFO | Fold 5/5 : train=60 / val=15
+2025-12-19 12:00:42,666 | INFO | Modèle = RandomForest, params : {'n_estimators': 300, 'max_depth': None, 'n_jobs': -1, 'random_state': 42, 'class_weight': 'balanced'}
+2025-12-19 12:00:43,728 | INFO |   Fold 5 : BAC=0.438, F1_macro=0.457
+2025-12-19 12:00:43,731 | INFO | CV global : BAC=0.423, F1_macro=0.378, Recall_macro=0.423
+2025-12-19 12:00:43,734 | INFO | Métriques CV sauvegardées dans outputs/stats/train_metrics_rf.csv
+2025-12-19 12:00:43,736 | INFO | Modèle = RandomForest, params : {'n_estimators': 300, 'max_depth': None, 'n_jobs': -1, 'random_state': 42, 'class_weight': 'balanced'}
+2025-12-19 12:00:44,714 | INFO | Modèle final entraîné sur 75 échantillons.
+2025-12-19 12:00:44,827 | INFO | Checkpoint modèle sauvegardé dans models/checkpoint_rf.joblib

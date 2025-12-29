@@ -1,0 +1,5 @@
+2025-12-19 12:55:48,655 | INFO | Lecture SHAP global : outputs/xai/attributions/shap_global_meanabs.csv
+2025-12-19 12:55:48,658 | INFO | Lecture permutation importance : outputs/xai/attributions/permutation_importance.csv
+2025-12-19 12:55:48,661 | WARNING | Colonne 'band' absente, reconstruction des bandes à partir des noms de features.
+2025-12-19 12:55:48,669 | INFO | Stats SHAP par bande écrites dans outputs/stats/shap_band_stats.csv
+2025-12-19 12:55:48,670 | INFO | Top-20 features SHAP écrit dans outputs/stats/shap_top_features.csv

@@ -1,0 +1,21 @@
+Top 20 features (SHAP mean |value|):
+- eeg_T4-A1_gamma_haut_bp_abs_std: 0.004599
+- eeg_Fp2-A1_beta_bp_abs_mean: 0.003642
+- eeg_Fp1-C3_alpha_bp_abs_mean: 0.003492
+- eeg_Fp2-T4_beta_bp_abs_mean: 0.003383
+- eeg_Fp1-C3_delta_bp_rel_mean: 0.003368
+- eeg_T4-O2_delta_bp_abs_std: 0.00271
+- eeg_JAMBG_rms_std: 0.002676
+- eeg_JAMBD_mean_std: 0.002575
+- eeg_C3-A1_beta_bp_rel_std: 0.002485
+- eeg_EMG1_theta_bp_abs_mean: 0.002469
+- eeg_Fp2-T4_peak_freq_mean: 0.002448
+- eeg_Fp1-C3_alpha_bp_abs_std: 0.00238
+- eeg_JAMBG_var_std: 0.00232
+- eeg_T4-A1_theta_bp_rel_mean: 0.002268
+- eeg_T4-A1_delta_bp_rel_mean: 0.002263
+- eeg_Fp1-A1_beta_bp_rel_std: 0.002102
+- eeg_Fp1-C3_delta_bp_rel_std: 0.002076
+- eeg_RONF_gamma_bas_bp_rel_mean: 0.001998
+- eeg_T4-A1_theta_bp_rel_std: 0.001993
+- eeg_Fp1-C3_theta_bp_rel_mean: 0.001983

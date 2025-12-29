@@ -1,35 +1,21 @@
-# configs/eval/train_rf.yaml
-
-# ---------- Données ----------
 features_csv: data/processed/features/dataset_final.csv
+label_col: label_id
 
+model_type: rf
 
-label_col: "label_id"      
-
-# Mapping explicite des groupes vers des entiers (4 classes macros)
-label_map:
-  "SYN": 0
-  "Narco": 1
-  "TCSPi": 2
-  "EAI": 3
-
-# ---------- Sorties ----------
 out_dir: models
 ckpt_name: checkpoint_rf.joblib
-
 metrics_out: outputs/stats/train_metrics_rf.csv
 
-# ---------- Cross-validation ----------
 cv:
   n_splits: 5
   group_by_patient: true
   shuffle: false
   random_state: 42
 
-# ---------- Modèle RandomForest ----------
 rf_params:
   n_estimators: 300
-  max_depth: null       # pas de limite
+  max_depth: null
   n_jobs: -1
   random_state: 42
-  class_weight: "balanced"
+  class_weight: balanced

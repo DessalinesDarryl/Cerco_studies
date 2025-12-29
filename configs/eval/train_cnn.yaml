@@ -1,0 +1,27 @@
+features_csv: data/processed/features/dataset_final.csv
+label_col: label_id
+
+model_type: cnn
+
+out_dir: models
+ckpt_name: checkpoint_cnn.pt
+metrics_out: outputs/stats/train_metrics_cnn.csv
+
+cv:
+  n_splits: 5
+  group_by_patient: true
+  shuffle: false
+  random_state: 42
+
+training:
+  n_epochs: 40
+  batch_size: 32
+  lr: 0.001
+  weight_decay: 0.0
+  device: "cuda"   # ou "cpu"
+
+cnn_params:
+  n_filters: 64
+  kernel_size: 5
+  hidden_dim: 128
+  dropout: 0.3

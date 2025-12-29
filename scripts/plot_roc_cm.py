@@ -21,12 +21,16 @@ Config YAML : configs/eval/plots_metrics.yaml
 
 from __future__ import annotations
 
+import sys
 import argparse
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import joblib
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.append(str(ROOT))
 
 from src.utils.config import load_yaml, add_common_args
 from src.viz.metrics_plots import (

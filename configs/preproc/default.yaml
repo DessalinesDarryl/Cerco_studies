@@ -12,6 +12,11 @@ emg:
   lp: 100.0
   notch: 50.0
 
+eog:
+  hp: 0.3
+  lp: 10.0
+  notch: Null
+
 yasa:
   win_sec: 4.0
   method: covar      # ou "std"

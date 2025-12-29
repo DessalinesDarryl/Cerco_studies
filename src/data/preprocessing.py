@@ -6,15 +6,15 @@ preprocessing.py
 Fonctions de prétraitement pour tes enregistrements :
 - Application du montage bipolaire gp2 (avec conservation EMG/ECG/EOG bruts)
 - Filtres :
-    * EEG : 0.5–80 Hz + notch 50 Hz
-    * EMG : 30–100 Hz + notch 50 Hz
+    * EEG : 0.5-80 Hz + notch 50 Hz
+    * EMG : 30-100 Hz + notch 50 Hz
 - Lecture et parsing des hypnogrammes (txt "EXP" ou csv)
 - Upsampling de l'hypnogramme vers la longueur des données
 - Détection d'artéfacts avec YASA (art_detect) sur les EEG
 - Annotation des artéfacts ("ARTEFACT") dans raw.annotations
 - Annotation des segments REM dans raw.annotations à partir de l'hypnogramme
 
-À utiliser depuis ton script `preprocess.py`, par exemple :
+À utiliser depuis le script "preprocess.py", par exemple :
 
     raw = mne.io.read_raw_edf(path, preload=True)
     raw = preprocess_record(

@@ -1,0 +1,15 @@
+2025-12-16 15:54:20,413 | INFO | EEG features : data/processed/features/features.csv
+2025-12-16 15:54:20,413 | INFO | EMG-RBD      : data/processed/rbd/rbd_emg_events_and_summary_4s_per_channel.csv
+2025-12-16 15:54:20,413 | INFO | Labels TXT   : data/patients_label.txt
+2025-12-16 15:54:20,413 | INFO | Sortie       : data/processed/features/dataset_final.csv
+2025-12-16 15:54:20,413 | INFO | Tolérance temps (s) : 0.25
+2025-12-16 15:54:20,413 | INFO | Lecture EEG features : data/processed/features/features.csv
+2025-12-16 15:54:20,445 | INFO | EEG features : 75 lignes, 1067 colonnes.
+2025-12-16 15:54:20,445 | INFO | Lecture EMG-RBD : data/processed/rbd/rbd_emg_events_and_summary_4s_per_channel.csv
+2025-12-16 15:54:20,564 | INFO | EMG-RBD agrégé : 8968 lignes.
+2025-12-16 15:54:20,564 | INFO | Lecture labels TXT : data/patients_label.txt
+2025-12-16 15:54:20,569 | INFO | Labels : 111 patients, 4 classes.
+2025-12-16 15:54:20,569 | WARNING | Pas de epoch_start_sec dans EEG features ou pas de epoch_index dans EEG/EMG-RBD. Impossible d'aligner correctement EEG et EMG par époque. EMG sera ignoré.
+2025-12-16 15:54:20,571 | INFO | Tous les patients du dataset ont un label.
+2025-12-16 15:54:20,783 | INFO | Dataset final écrit : data/processed/features/dataset_final.csv (shape = (75, 1069))
+2025-12-16 15:54:20,795 | INFO | Rapport d’alignement écrit : data/processed/features/dataset_final_alignment_report.csv

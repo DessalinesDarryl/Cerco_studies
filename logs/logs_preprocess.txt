@@ -1,1114 +1,349 @@
-2025-12-09 12:03:45,387 | INFO | 88 fichiers EDF trouvés. Lancement avec n_workers=10.
-2025-12-09 12:03:45,419 | INFO | === Prétraitement CC175 (CC175_raw.edf) ===
-2025-12-09 12:03:45,419 | INFO | === Prétraitement GS105 (GS105_raw.edf) ===
-2025-12-09 12:03:45,420 | INFO | === Prétraitement MA27 (MA27_raw.edf) ===
-2025-12-09 12:03:45,420 | INFO | === Prétraitement TM151 (TM151_raw.edf) ===
-2025-12-09 12:03:45,421 | INFO | === Prétraitement CA169 (CA169_raw.edf) ===
-2025-12-09 12:03:45,421 | INFO | === Prétraitement MC154 (MC154_raw.edf) ===
-2025-12-09 12:03:45,422 | INFO | === Prétraitement TJ127 (TJ127_raw.edf) ===
-2025-12-09 12:03:45,422 | INFO | === Prétraitement FP144 (FP144_raw.edf) ===
-2025-12-09 12:03:45,422 | INFO | === Prétraitement FP52 (FP52_raw.edf) ===
-2025-12-09 12:03:45,422 | INFO | === Prétraitement DI136 (DI136_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Number of records from the header does not match the file size (perhaps the recording was not stopped before exiting). Inferring from the file size.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Number of records from the header does not match the file size (perhaps the recording was not stopped before exiting). Inferring from the file size.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-2025-12-09 12:03:46,779 | INFO | === Prétraitement CJL159 (CJL159_raw.edf) ===
-2025-12-09 12:03:46,780 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/GS105/GS105_raw.edf: index -1 is out of bounds for axis 0 with size 0
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-2025-12-09 12:03:46,830 | INFO | === Prétraitement BA152 (BA152_raw.edf) ===
-2025-12-09 12:03:46,831 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/FP52/FP52_raw.edf: MISSING_CHANNELS:FP52:A1
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:06:32 | WARNING | Hypnogram is SHORTER than data by 5.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:06:32 | WARNING | Hypnogram is SHORTER than data by 13.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:06:32 | WARNING | Hypnogram is SHORTER than data by 11.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:06:39 | WARNING | Hypnogram is SHORTER than data by 27.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:07:05 | WARNING | Hypnogram is SHORTER than data by 2.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:07:05 | WARNING | Hypnogram is SHORTER than data by 17.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:07:18 | WARNING | Hypnogram is SHORTER than data by 26.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:07:39 | WARNING | Hypnogram is LONGER than data by 265.00 seconds. Cropping hypnogram to match data.size.
-09-Dec-25 12:07:46 | WARNING | Hypnogram is SHORTER than data by 20.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:07:56 | WARNING | Hypnogram is SHORTER than data by 6.00 seconds. Padding hypnogram with last value to match data.size.
-[FP144] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/FP144/FP144_raw.fif
-Overwriting existing file.
-[FP52] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG F7': 'F7', 'EEG F3': 'F3', 'EEG T3': 'T3', 'EEG C3': 'C3', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG O1': 'O1', 'EEG F9': 'F9', 'EEG T9': 'T9', 'EEG P9': 'P9', 'EEG Fpz': 'Fpz', 'EEG Cz': 'Cz', 'EEG Oz': 'Oz', 'EEG Fp2': 'Fp2', 'EEG F8': 'F8', 'EEG F4': 'F4', 'EEG T4': 'T4', 'EEG C4': 'C4', 'EEG T6': 'T6', 'EEG P4': 'P4', 'EEG O2': 'O2', 'EEG F10': 'F10', 'EEG T10': 'T10', 'EEG P10': 'P10', 'EEG Fz': 'Fz', 'EEG Pz': 'Pz'}
-[BA152] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/BA152/BA152_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/FP144/FP144_raw.fif
-[done]
-2025-12-09 12:08:06,781 | INFO | [FP144] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/FP144/FP144_raw.fif
-09-Dec-25 12:08:06 | INFO | [FP144] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/FP144/FP144_raw.fif
-2025-12-09 12:08:07,098 | INFO | === Prétraitement SD134 (SD134_raw.edf) ===
-09-Dec-25 12:08:07 | INFO | === Prétraitement SD134 (SD134_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/BA152/BA152_raw.fif
-[done]
-2025-12-09 12:08:18,136 | INFO | [BA152] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/BA152/BA152_raw.fif
-09-Dec-25 12:08:18 | INFO | [BA152] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/BA152/BA152_raw.fif
-2025-12-09 12:08:18,429 | INFO | === Prétraitement NAL43 (NAL43_raw.edf) ===
-09-Dec-25 12:08:18 | INFO | === Prétraitement NAL43 (NAL43_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[MA27] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/MA27/MA27_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/MA27/MA27_raw.fif
-[CC175] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/CC175/CC175_raw.fif
-Overwriting existing file.
-[MC154] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/MC154/MC154_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/CC175/CC175_raw.fif
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/MC154/MC154_raw.fif
-[done]
-2025-12-09 12:08:44,521 | INFO | [MA27] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MA27/MA27_raw.fif
-09-Dec-25 12:08:44 | INFO | [MA27] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MA27/MA27_raw.fif
-2025-12-09 12:08:44,812 | INFO | === Prétraitement BA171 (BA171_raw.edf) ===
-09-Dec-25 12:08:44 | INFO | === Prétraitement BA171 (BA171_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[DI136] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/DI136/DI136_raw.fif
-Overwriting existing file.
-[done]
-2025-12-09 12:08:50,766 | INFO | [CC175] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CC175/CC175_raw.fif
-09-Dec-25 12:08:50 | INFO | [CC175] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CC175/CC175_raw.fif
-2025-12-09 12:08:51,201 | INFO | === Prétraitement CP155 (CP155_raw.edf) ===
-09-Dec-25 12:08:51 | INFO | === Prétraitement CP155 (CP155_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[done]
-2025-12-09 12:08:51,959 | INFO | [MC154] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MC154/MC154_raw.fif
-09-Dec-25 12:08:51 | INFO | [MC154] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MC154/MC154_raw.fif
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/DI136/DI136_raw.fif
-2025-12-09 12:08:52,285 | INFO | === Prétraitement CM161 (CM161_raw.edf) ===
-09-Dec-25 12:08:52 | INFO | === Prétraitement CM161 (CM161_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[done]
-2025-12-09 12:08:56,541 | INFO | [DI136] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/DI136/DI136_raw.fif
-09-Dec-25 12:08:56 | INFO | [DI136] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/DI136/DI136_raw.fif
-2025-12-09 12:08:56,881 | INFO | === Prétraitement VA182 (VA182_raw.edf) ===
-09-Dec-25 12:08:56 | INFO | === Prétraitement VA182 (VA182_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[TJ127] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG F3': 'F3', 'EEG F4': 'F4', 'EEG Cz': 'Cz', 'EEG F7': 'F7', 'EEG F8': 'F8', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG Pz': 'Pz', 'EEG P4': 'P4', 'EEG T6': 'T6'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/TJ127/TJ127_raw.fif
-Overwriting existing file.
-[TM151] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/TM151/TM151_raw.fif
-Overwriting existing file.
-[CJL159] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG F3': 'F3', 'EEG F4': 'F4', 'EEG Cz': 'Cz', 'EEG F7': 'F7', 'EEG F8': 'F8', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG Pz': 'Pz', 'EEG P4': 'P4', 'EEG T6': 'T6'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/CJL159/CJL159_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/TJ127/TJ127_raw.fif
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/CJL159/CJL159_raw.fif
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/TM151/TM151_raw.fif
-[done]
-2025-12-09 12:10:02,656 | INFO | [TJ127] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/TJ127/TJ127_raw.fif
-09-Dec-25 12:10:02 | INFO | [TJ127] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/TJ127/TJ127_raw.fif
-2025-12-09 12:10:03,175 | INFO | === Prétraitement RG156 (RG156_raw.edf) ===
-09-Dec-25 12:10:03 | INFO | === Prétraitement RG156 (RG156_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[CA169] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG F3': 'F3', 'EEG F4': 'F4', 'EEG Cz': 'Cz', 'EEG F7': 'F7', 'EEG F8': 'F8', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG Pz': 'Pz', 'EEG P4': 'P4', 'EEG T6': 'T6'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/CA169/CA169_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/CA169/CA169_raw.fif
-[done]
-2025-12-09 12:10:12,854 | INFO | [CJL159] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CJL159/CJL159_raw.fif
-09-Dec-25 12:10:12 | INFO | [CJL159] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CJL159/CJL159_raw.fif
-2025-12-09 12:10:13,356 | INFO | === Prétraitement BDRE44 (BDRE44_raw.edf) ===
-09-Dec-25 12:10:13 | INFO | === Prétraitement BDRE44 (BDRE44_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[done]
-2025-12-09 12:10:15,335 | INFO | [TM151] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/TM151/TM151_raw.fif
-09-Dec-25 12:10:15 | INFO | [TM151] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/TM151/TM151_raw.fif
-2025-12-09 12:10:15,781 | INFO | === Prétraitement RH146 (RH146_raw.edf) ===
-09-Dec-25 12:10:15 | INFO | === Prétraitement RH146 (RH146_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[done]
-2025-12-09 12:10:17,855 | INFO | [CA169] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CA169/CA169_raw.fif
-09-Dec-25 12:10:17 | INFO | [CA169] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CA169/CA169_raw.fif
-2025-12-09 12:10:18,467 | INFO | === Prétraitement RJ42 (RJ42_raw.edf) ===
-09-Dec-25 12:10:18 | INFO | === Prétraitement RJ42 (RJ42_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:11:49 | WARNING | Hypnogram is SHORTER than data by 18.00 seconds. Padding hypnogram with last value to match data.size.
-/home/darryld/Cerco_studies/src/data/preprocessing.py:413: RuntimeWarning: Limited 1 annotation(s) that were expanding outside the data range.
-  raw.set_annotations(existing_new + ann)
-09-Dec-25 12:11:53 | WARNING | Hypnogram is LONGER than data by 194.00 seconds. Cropping hypnogram to match data.size.
-09-Dec-25 12:11:56 | WARNING | Hypnogram is SHORTER than data by 12.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:12:09 | WARNING | Hypnogram is SHORTER than data by 7.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:12:28 | WARNING | Hypnogram is SHORTER than data by 149.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:12:56 | WARNING | Hypnogram is SHORTER than data by 7.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:13:10 | WARNING | Hypnogram is SHORTER than data by 11.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:13:26 | WARNING | Hypnogram is SHORTER than data by 23.00 seconds. Padding hypnogram with last value to match data.size.
-[NAL43] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/NAL43/NAL43_raw.fif
-Overwriting existing file.
-[SD134] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG F3': 'F3', 'EEG F4': 'F4', 'EEG Cz': 'Cz', 'EEG F7': 'F7', 'EEG F8': 'F8', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG Pz': 'Pz', 'EEG P4': 'P4', 'EEG T6': 'T6'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/SD134/SD134_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/NAL43/NAL43_raw.fif
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/SD134/SD134_raw.fif
-[CP155] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/CP155/CP155_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/CP155/CP155_raw.fif
-[done]
-2025-12-09 12:13:44,855 | INFO | [NAL43] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/NAL43/NAL43_raw.fif
-09-Dec-25 12:13:44 | INFO | [NAL43] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/NAL43/NAL43_raw.fif
-2025-12-09 12:13:45,193 | INFO | === Prétraitement AE129 (AE129_raw.edf) ===
-09-Dec-25 12:13:45 | INFO | === Prétraitement AE129 (AE129_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[done]
-2025-12-09 12:13:47,435 | INFO | [SD134] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/SD134/SD134_raw.fif
-09-Dec-25 12:13:47 | INFO | [SD134] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/SD134/SD134_raw.fif
-2025-12-09 12:13:47,823 | INFO | === Prétraitement PJC140 (PJC140_raw.edf) ===
-09-Dec-25 12:13:47 | INFO | === Prétraitement PJC140 (PJC140_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[done]
-2025-12-09 12:13:49,874 | INFO | [CP155] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CP155/CP155_raw.fif
-09-Dec-25 12:13:49 | INFO | [CP155] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CP155/CP155_raw.fif
-2025-12-09 12:13:50,228 | INFO | === Prétraitement JB173 (JB173_raw.edf) ===
-09-Dec-25 12:13:50 | INFO | === Prétraitement JB173 (JB173_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[BA171] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/BA171/BA171_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/BA171/BA171_raw.fif
-[done]
-2025-12-09 12:13:59,451 | INFO | [BA171] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/BA171/BA171_raw.fif
-09-Dec-25 12:13:59 | INFO | [BA171] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/BA171/BA171_raw.fif
-2025-12-09 12:13:59,790 | INFO | === Prétraitement CS131 (CS131_raw.edf) ===
-09-Dec-25 12:13:59 | INFO | === Prétraitement CS131 (CS131_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-/home/darryld/Cerco_studies/src/data/preprocessing.py:413: RuntimeWarning: Limited 1 annotation(s) that were expanding outside the data range.
-  raw.set_annotations(existing_new + ann)
-09-Dec-25 12:14:22 | WARNING | Hypnogram is LONGER than data by 213.00 seconds. Cropping hypnogram to match data.size.
-09-Dec-25 12:14:24 | WARNING | Hypnogram is LONGER than data by 294.00 seconds. Cropping hypnogram to match data.size.
-[RH146] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/RH146/RH146_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/RH146/RH146_raw.fif
-[done]
-2025-12-09 12:14:43,709 | INFO | [RH146] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/RH146/RH146_raw.fif
-09-Dec-25 12:14:43 | INFO | [RH146] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/RH146/RH146_raw.fif
-2025-12-09 12:14:44,013 | INFO | === Prétraitement HG167 (HG167_raw.edf) ===
-09-Dec-25 12:14:44 | INFO | === Prétraitement HG167 (HG167_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[VA182] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/VA182/VA182_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/VA182/VA182_raw.fif
-[done]
-2025-12-09 12:15:12,482 | INFO | [VA182] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/VA182/VA182_raw.fif
-09-Dec-25 12:15:12 | INFO | [VA182] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/VA182/VA182_raw.fif
-2025-12-09 12:15:12,847 | INFO | === Prétraitement MP150 (MP150_raw.edf) ===
-09-Dec-25 12:15:12 | INFO | === Prétraitement MP150 (MP150_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[CM161] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG F3': 'F3', 'EEG F4': 'F4', 'EEG Cz': 'Cz', 'EEG F7': 'F7', 'EEG F8': 'F8', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG Pz': 'Pz', 'EEG P4': 'P4', 'EEG T6': 'T6'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/CM161/CM161_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/CM161/CM161_raw.fif
-[done]
-2025-12-09 12:15:23,362 | INFO | [CM161] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CM161/CM161_raw.fif
-09-Dec-25 12:15:23 | INFO | [CM161] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CM161/CM161_raw.fif
-2025-12-09 12:15:23,840 | INFO | === Prétraitement GD170 (GD170_raw.edf) ===
-09-Dec-25 12:15:23 | INFO | === Prétraitement GD170 (GD170_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[RG156] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/RG156/RG156_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/RG156/RG156_raw.fif
-[done]
-2025-12-09 12:15:51,533 | INFO | [RG156] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/RG156/RG156_raw.fif
-09-Dec-25 12:15:51 | INFO | [RG156] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/RG156/RG156_raw.fif
-2025-12-09 12:15:51,863 | INFO | === Prétraitement SJP172 (SJP172_raw.edf) ===
-09-Dec-25 12:15:51 | INFO | === Prétraitement SJP172 (SJP172_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[BDRE44] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/BDRE44/BDRE44_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/BDRE44/BDRE44_raw.fif
-[done]
-2025-12-09 12:16:40,873 | INFO | [BDRE44] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/BDRE44/BDRE44_raw.fif
-09-Dec-25 12:16:40 | INFO | [BDRE44] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/BDRE44/BDRE44_raw.fif
-2025-12-09 12:16:41,309 | INFO | === Prétraitement CB165 (CB165_raw.edf) ===
-09-Dec-25 12:16:41 | INFO | === Prétraitement CB165 (CB165_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[RJ42] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/RJ42/RJ42_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/RJ42/RJ42_raw.fif
-[done]
-2025-12-09 12:16:55,553 | INFO | [RJ42] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/RJ42/RJ42_raw.fif
-09-Dec-25 12:16:55 | INFO | [RJ42] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/RJ42/RJ42_raw.fif
-2025-12-09 12:16:55,915 | INFO | === Prétraitement MN143 (MN143_raw.edf) ===
-09-Dec-25 12:16:55 | INFO | === Prétraitement MN143 (MN143_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:16:56 | WARNING | Hypnogram is SHORTER than data by 36.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:17:09 | WARNING | Hypnogram is SHORTER than data by 5.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:17:32 | WARNING | Hypnogram is SHORTER than data by 22.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:17:50 | WARNING | Hypnogram is SHORTER than data by 52.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:18:12 | WARNING | Hypnogram is SHORTER than data by 27.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:18:35 | WARNING | Hypnogram is SHORTER than data by 17.00 seconds. Padding hypnogram with last value to match data.size.
-[PJC140] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/PJC140/PJC140_raw.fif
-Overwriting existing file.
-[CS131] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/CS131/CS131_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/PJC140/PJC140_raw.fif
-[done]
-2025-12-09 12:18:53,742 | INFO | [PJC140] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/PJC140/PJC140_raw.fif
-09-Dec-25 12:18:53 | INFO | [PJC140] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/PJC140/PJC140_raw.fif
-2025-12-09 12:18:54,089 | INFO | === Prétraitement JP141 (JP141_raw.edf) ===
-09-Dec-25 12:18:54 | INFO | === Prétraitement JP141 (JP141_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/CS131/CS131_raw.fif
-09-Dec-25 12:18:58 | WARNING | Hypnogram is SHORTER than data by 12.00 seconds. Padding hypnogram with last value to match data.size.
-[done]
-2025-12-09 12:18:59,381 | INFO | [CS131] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CS131/CS131_raw.fif
-09-Dec-25 12:18:59 | INFO | [CS131] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CS131/CS131_raw.fif
-2025-12-09 12:18:59,754 | INFO | === Prétraitement BJ138 (BJ138_raw.edf) ===
-09-Dec-25 12:18:59 | INFO | === Prétraitement BJ138 (BJ138_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:19:08 | WARNING | Hypnogram is SHORTER than data by 38.00 seconds. Padding hypnogram with last value to match data.size.
-[HG167] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/HG167/HG167_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/HG167/HG167_raw.fif
-[done]
-2025-12-09 12:19:33,412 | INFO | [HG167] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/HG167/HG167_raw.fif
-09-Dec-25 12:19:33 | INFO | [HG167] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/HG167/HG167_raw.fif
-2025-12-09 12:19:33,761 | INFO | === Prétraitement RB103 (RB103_raw.edf) ===
-09-Dec-25 12:19:33 | INFO | === Prétraitement RB103 (RB103_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[AE129] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/AE129/AE129_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/AE129/AE129_raw.fif
-09-Dec-25 12:20:01 | WARNING | Hypnogram is SHORTER than data by 20.00 seconds. Padding hypnogram with last value to match data.size.
-[done]
-2025-12-09 12:20:05,484 | INFO | [AE129] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/AE129/AE129_raw.fif
-09-Dec-25 12:20:05 | INFO | [AE129] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/AE129/AE129_raw.fif
-2025-12-09 12:20:05,926 | INFO | === Prétraitement NGA157 (NGA157_raw.edf) ===
-09-Dec-25 12:20:05 | INFO | === Prétraitement NGA157 (NGA157_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[GD170] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/GD170/GD170_raw.fif
-Overwriting existing file.
-[JB173] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG F3': 'F3', 'EEG F4': 'F4', 'EEG Cz': 'Cz', 'EEG F7': 'F7', 'EEG F8': 'F8', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG Pz': 'Pz', 'EEG P4': 'P4', 'EEG T6': 'T6'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/JB173/JB173_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/GD170/GD170_raw.fif
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/JB173/JB173_raw.fif
-[done]
-2025-12-09 12:20:34,260 | INFO | [GD170] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/GD170/GD170_raw.fif
-09-Dec-25 12:20:34 | INFO | [GD170] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/GD170/GD170_raw.fif
-2025-12-09 12:20:34,564 | INFO | === Prétraitement RD158 (RD158_raw.edf) ===
-09-Dec-25 12:20:34 | INFO | === Prétraitement RD158 (RD158_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[done]
-2025-12-09 12:20:37,946 | INFO | [JB173] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/JB173/JB173_raw.fif
-09-Dec-25 12:20:37 | INFO | [JB173] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/JB173/JB173_raw.fif
-2025-12-09 12:20:38,362 | INFO | === Prétraitement KH113 (KH113_raw.edf) ===
-09-Dec-25 12:20:38 | INFO | === Prétraitement KH113 (KH113_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:20:39 | WARNING | Hypnogram is SHORTER than data by 22.00 seconds. Padding hypnogram with last value to match data.size.
-[MP150] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/MP150/MP150_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/MP150/MP150_raw.fif
-[SJP172] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/SJP172/SJP172_raw.fif
-Overwriting existing file.
-[done]
-2025-12-09 12:21:09,772 | INFO | [MP150] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MP150/MP150_raw.fif
-09-Dec-25 12:21:09 | INFO | [MP150] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MP150/MP150_raw.fif
-2025-12-09 12:21:10,132 | INFO | === Prétraitement LF126 (LF126_raw.edf) ===
-09-Dec-25 12:21:10 | INFO | === Prétraitement LF126 (LF126_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/SJP172/SJP172_raw.fif
-[done]
-2025-12-09 12:21:15,318 | INFO | [SJP172] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/SJP172/SJP172_raw.fif
-09-Dec-25 12:21:15 | INFO | [SJP172] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/SJP172/SJP172_raw.fif
-2025-12-09 12:21:15,644 | INFO | === Prétraitement TO145 (TO145_raw.edf) ===
-09-Dec-25 12:21:15 | INFO | === Prétraitement TO145 (TO145_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[MN143] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/MN143/MN143_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/MN143/MN143_raw.fif
-[done]
-2025-12-09 12:21:47,898 | INFO | [MN143] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MN143/MN143_raw.fif
-09-Dec-25 12:21:47 | INFO | [MN143] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MN143/MN143_raw.fif
-2025-12-09 12:21:48,246 | INFO | === Prétraitement EF130 (EF130_raw.edf) ===
-09-Dec-25 12:21:48 | INFO | === Prétraitement EF130 (EF130_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:22:12 | WARNING | Hypnogram is SHORTER than data by 9.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:22:19 | WARNING | Hypnogram is SHORTER than data by 32.00 seconds. Padding hypnogram with last value to match data.size.
-[CB165] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG F3': 'F3', 'EEG F4': 'F4', 'EEG Cz': 'Cz', 'EEG F7': 'F7', 'EEG F8': 'F8', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG Pz': 'Pz', 'EEG P4': 'P4', 'EEG T6': 'T6'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/CB165/CB165_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/CB165/CB165_raw.fif
-[done]
-2025-12-09 12:22:53,935 | INFO | [CB165] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CB165/CB165_raw.fif
-09-Dec-25 12:22:53 | INFO | [CB165] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CB165/CB165_raw.fif
-2025-12-09 12:22:54,431 | INFO | === Prétraitement BF181 (BF181_raw.edf) ===
-09-Dec-25 12:22:54 | INFO | === Prétraitement BF181 (BF181_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:23:12 | WARNING | Hypnogram is SHORTER than data by 11.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:23:23 | WARNING | Hypnogram is SHORTER than data by 26.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:23:41 | WARNING | Hypnogram is SHORTER than data by 28.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:23:53 | WARNING | Hypnogram is LONGER than data by 167.00 seconds. Cropping hypnogram to match data.size.
-[JP141] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/JP141/JP141_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/JP141/JP141_raw.fif
-[done]
-2025-12-09 12:24:11,727 | INFO | [JP141] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/JP141/JP141_raw.fif
-09-Dec-25 12:24:11 | INFO | [JP141] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/JP141/JP141_raw.fif
-2025-12-09 12:24:12,107 | INFO | === Prétraitement MHTK39 (MHTK39_raw.edf) ===
-09-Dec-25 12:24:12 | INFO | === Prétraitement MHTK39 (MHTK39_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[BJ138] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/BJ138/BJ138_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/BJ138/BJ138_raw.fif
-[done]
-2025-12-09 12:24:32,121 | INFO | [BJ138] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/BJ138/BJ138_raw.fif
-09-Dec-25 12:24:32 | INFO | [BJ138] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/BJ138/BJ138_raw.fif
-2025-12-09 12:24:32,471 | INFO | === Prétraitement MM109 (MM109_raw.edf) ===
-09-Dec-25 12:24:32 | INFO | === Prétraitement MM109 (MM109_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:24:40 | WARNING | Hypnogram is SHORTER than data by 25.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:24:45 | WARNING | Hypnogram is SHORTER than data by 11.00 seconds. Padding hypnogram with last value to match data.size.
-[NGA157] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/NGA157/NGA157_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/NGA157/NGA157_raw.fif
-[done]
-2025-12-09 12:25:14,606 | INFO | [NGA157] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/NGA157/NGA157_raw.fif
-09-Dec-25 12:25:14 | INFO | [NGA157] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/NGA157/NGA157_raw.fif
-2025-12-09 12:25:14,912 | INFO | === Prétraitement DSJ112 (DSJ112_raw.edf) ===
-09-Dec-25 12:25:14 | INFO | === Prétraitement DSJ112 (DSJ112_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[LF126] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/LF126/LF126_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/LF126/LF126_raw.fif
-[RD158] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/RD158/RD158_raw.fif
-Overwriting existing file.
-[done]
-2025-12-09 12:25:22,759 | INFO | [LF126] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/LF126/LF126_raw.fif
-09-Dec-25 12:25:22 | INFO | [LF126] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/LF126/LF126_raw.fif
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/RD158/RD158_raw.fif
-2025-12-09 12:25:23,030 | INFO | === Prétraitement TM142 (TM142_raw.edf) ===
-09-Dec-25 12:25:23 | INFO | === Prétraitement TM142 (TM142_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[RB103] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/RB103/RB103_raw.fif
-Overwriting existing file.
-[done]
-2025-12-09 12:25:26,256 | INFO | [RD158] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/RD158/RD158_raw.fif
-09-Dec-25 12:25:26 | INFO | [RD158] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/RD158/RD158_raw.fif
-2025-12-09 12:25:26,547 | INFO | === Prétraitement MFJ160 (MFJ160_raw.edf) ===
-09-Dec-25 12:25:26 | INFO | === Prétraitement MFJ160 (MFJ160_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/RB103/RB103_raw.fif
-[done]
-2025-12-09 12:25:32,023 | INFO | [RB103] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/RB103/RB103_raw.fif
-09-Dec-25 12:25:32 | INFO | [RB103] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/RB103/RB103_raw.fif
-2025-12-09 12:25:32,412 | INFO | === Prétraitement DA174 (DA174_raw.edf) ===
-09-Dec-25 12:25:32 | INFO | === Prétraitement DA174 (DA174_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:25:40 | WARNING | Hypnogram is SHORTER than data by 36.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:26:06 | WARNING | Hypnogram is SHORTER than data by 133.00 seconds. Padding hypnogram with last value to match data.size.
-[EF130] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/EF130/EF130_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/EF130/EF130_raw.fif
-[done]
-2025-12-09 12:26:24,893 | INFO | [EF130] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/EF130/EF130_raw.fif
-09-Dec-25 12:26:24 | INFO | [EF130] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/EF130/EF130_raw.fif
-2025-12-09 12:26:25,193 | INFO | === Prétraitement LJ41 (LJ41_raw.edf) ===
-09-Dec-25 12:26:25 | INFO | === Prétraitement LJ41 (LJ41_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[TO145] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/TO145/TO145_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/TO145/TO145_raw.fif
-[done]
-2025-12-09 12:26:59,850 | INFO | [TO145] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/TO145/TO145_raw.fif
-09-Dec-25 12:26:59 | INFO | [TO145] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/TO145/TO145_raw.fif
-2025-12-09 12:27:00,188 | INFO | === Prétraitement CJP53 (CJP53_raw.edf) ===
-09-Dec-25 12:27:00 | INFO | === Prétraitement CJP53 (CJP53_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:27:48 | WARNING | Hypnogram is SHORTER than data by 29.00 seconds. Padding hypnogram with last value to match data.size.
-[BF181] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/BF181/BF181_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/BF181/BF181_raw.fif
-[done]
-2025-12-09 12:27:58,334 | INFO | [BF181] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/BF181/BF181_raw.fif
-09-Dec-25 12:27:58 | INFO | [BF181] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/BF181/BF181_raw.fif
-2025-12-09 12:27:58,659 | INFO | === Prétraitement SB176 (SB176_raw.edf) ===
-09-Dec-25 12:27:58 | INFO | === Prétraitement SB176 (SB176_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:28:02 | WARNING | Hypnogram is SHORTER than data by 12.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:28:05 | WARNING | Hypnogram is LONGER than data by 1866.00 seconds. Cropping hypnogram to match data.size.
-[KH113] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG F3': 'F3', 'EEG F4': 'F4', 'EEG Cz': 'Cz', 'EEG F7': 'F7', 'EEG F8': 'F8', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG Pz': 'Pz', 'EEG P4': 'P4', 'EEG T6': 'T6'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/KH113/KH113_raw.fif
-Overwriting existing file.
-09-Dec-25 12:28:10 | WARNING | Hypnogram is SHORTER than data by 18.00 seconds. Padding hypnogram with last value to match data.size.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/KH113/KH113_raw.fif
-[done]
-2025-12-09 12:28:18,611 | INFO | [KH113] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/KH113/KH113_raw.fif
-09-Dec-25 12:28:18 | INFO | [KH113] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/KH113/KH113_raw.fif
-2025-12-09 12:28:19,148 | INFO | === Prétraitement VJ149 (VJ149_raw.edf) ===
-09-Dec-25 12:28:19 | INFO | === Prétraitement VJ149 (VJ149_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:28:41 | WARNING | Hypnogram is SHORTER than data by 3.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:28:47 | WARNING | Hypnogram is SHORTER than data by 26.00 seconds. Padding hypnogram with last value to match data.size.
-[MM109] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/MM109/MM109_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/MM109/MM109_raw.fif
-[done]
-2025-12-09 12:29:34,032 | INFO | [MM109] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MM109/MM109_raw.fif
-09-Dec-25 12:29:34 | INFO | [MM109] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MM109/MM109_raw.fif
-2025-12-09 12:29:34,364 | INFO | === Prétraitement BO60 (BO60_raw.edf) ===
-09-Dec-25 12:29:34 | INFO | === Prétraitement BO60 (BO60_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[DA174] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/DA174/DA174_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/DA174/DA174_raw.fif
-[done]
-2025-12-09 12:29:48,781 | INFO | [DA174] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/DA174/DA174_raw.fif
-09-Dec-25 12:29:48 | INFO | [DA174] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/DA174/DA174_raw.fif
-2025-12-09 12:29:49,105 | INFO | === Prétraitement DA110 (DA110_raw.edf) ===
-09-Dec-25 12:29:49 | INFO | === Prétraitement DA110 (DA110_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-/home/darryld/Cerco_studies/src/data/preprocessing.py:413: RuntimeWarning: Limited 1 annotation(s) that were expanding outside the data range.
-  raw.set_annotations(existing_new + ann)
-09-Dec-25 12:29:53 | WARNING | Hypnogram is LONGER than data by 200.00 seconds. Cropping hypnogram to match data.size.
-[DSJ112] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/DSJ112/DSJ112_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/DSJ112/DSJ112_raw.fif
-[done]
-2025-12-09 12:30:05,220 | INFO | [DSJ112] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/DSJ112/DSJ112_raw.fif
-09-Dec-25 12:30:05 | INFO | [DSJ112] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/DSJ112/DSJ112_raw.fif
-2025-12-09 12:30:05,547 | INFO | === Prétraitement DJ137 (DJ137_raw.edf) ===
-09-Dec-25 12:30:05 | INFO | === Prétraitement DJ137 (DJ137_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[MFJ160] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG F3': 'F3', 'EEG F4': 'F4', 'EEG Cz': 'Cz', 'EEG F7': 'F7', 'EEG F8': 'F8', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG Pz': 'Pz', 'EEG P4': 'P4', 'EEG T6': 'T6'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/MFJ160/MFJ160_raw.fif
-Overwriting existing file.
-[MHTK39] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/MHTK39/MHTK39_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/MFJ160/MFJ160_raw.fif
-09-Dec-25 12:30:21 | WARNING | Hypnogram is SHORTER than data by 15.00 seconds. Padding hypnogram with last value to match data.size.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/MHTK39/MHTK39_raw.fif
-[done]
-2025-12-09 12:30:25,194 | INFO | [MFJ160] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MFJ160/MFJ160_raw.fif
-09-Dec-25 12:30:25 | INFO | [MFJ160] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MFJ160/MFJ160_raw.fif
-2025-12-09 12:30:25,591 | INFO | === Prétraitement GS191 (GS191_raw.edf) ===
-09-Dec-25 12:30:25 | INFO | === Prétraitement GS191 (GS191_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[done]
-2025-12-09 12:30:29,194 | INFO | [MHTK39] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MHTK39/MHTK39_raw.fif
-09-Dec-25 12:30:29 | INFO | [MHTK39] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MHTK39/MHTK39_raw.fif
-2025-12-09 12:30:29,611 | INFO | === Prétraitement CD164 (CD164_raw.edf) ===
-09-Dec-25 12:30:29 | INFO | === Prétraitement CD164 (CD164_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:30:40 | WARNING | Hypnogram is SHORTER than data by 16.00 seconds. Padding hypnogram with last value to match data.size.
-[TM142] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/TM142/TM142_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/TM142/TM142_raw.fif
-[done]
-2025-12-09 12:30:55,503 | INFO | [TM142] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/TM142/TM142_raw.fif
-09-Dec-25 12:30:55 | INFO | [TM142] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/TM142/TM142_raw.fif
-2025-12-09 12:30:55,852 | INFO | === Prétraitement GX111 (GX111_raw.edf) ===
-09-Dec-25 12:30:55 | INFO | === Prétraitement GX111 (GX111_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:31:31 | WARNING | Hypnogram is SHORTER than data by 21.00 seconds. Padding hypnogram with last value to match data.size.
-[LJ41] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/LJ41/LJ41_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/LJ41/LJ41_raw.fif
-[done]
-2025-12-09 12:31:50,935 | INFO | [LJ41] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/LJ41/LJ41_raw.fif
-09-Dec-25 12:31:50 | INFO | [LJ41] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/LJ41/LJ41_raw.fif
-2025-12-09 12:31:51,250 | INFO | === Prétraitement BB114 (BB114_raw.edf) ===
-09-Dec-25 12:31:51 | INFO | === Prétraitement BB114 (BB114_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[CJP53] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/CJP53/CJP53_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/CJP53/CJP53_raw.fif
-[done]
-2025-12-09 12:32:19,196 | INFO | [CJP53] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CJP53/CJP53_raw.fif
-09-Dec-25 12:32:19 | INFO | [CJP53] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CJP53/CJP53_raw.fif
-2025-12-09 12:32:19,524 | INFO | === Prétraitement RJP148 (RJP148_raw.edf) ===
-09-Dec-25 12:32:19 | INFO | === Prétraitement RJP148 (RJP148_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[SB176] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/SB176/SB176_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/SB176/SB176_raw.fif
-[done]
-2025-12-09 12:32:46,700 | INFO | [SB176] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/SB176/SB176_raw.fif
-09-Dec-25 12:32:46 | INFO | [SB176] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/SB176/SB176_raw.fif
-2025-12-09 12:32:47,026 | INFO | === Prétraitement AN166 (AN166_raw.edf) ===
-09-Dec-25 12:32:47 | INFO | === Prétraitement AN166 (AN166_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:32:49 | WARNING | Hypnogram is LONGER than data by 146.00 seconds. Cropping hypnogram to match data.size.
-09-Dec-25 12:33:13 | WARNING | Hypnogram is SHORTER than data by 7.00 seconds. Padding hypnogram with last value to match data.size.
-[VJ149] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/VJ149/VJ149_raw.fif
-Overwriting existing file.
-09-Dec-25 12:33:29 | WARNING | Hypnogram is SHORTER than data by 26.00 seconds. Padding hypnogram with last value to match data.size.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/VJ149/VJ149_raw.fif
-[done]
-2025-12-09 12:33:33,161 | INFO | [VJ149] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/VJ149/VJ149_raw.fif
-09-Dec-25 12:33:33 | INFO | [VJ149] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/VJ149/VJ149_raw.fif
-2025-12-09 12:33:33,492 | INFO | === Prétraitement PA139 (PA139_raw.edf) ===
-09-Dec-25 12:33:33 | INFO | === Prétraitement PA139 (PA139_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:33:57 | WARNING | Hypnogram is LONGER than data by 196.00 seconds. Cropping hypnogram to match data.size.
-09-Dec-25 12:34:15 | WARNING | Hypnogram is SHORTER than data by 19.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:34:26 | WARNING | Hypnogram is SHORTER than data by 20.00 seconds. Padding hypnogram with last value to match data.size.
-[BO60] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/BO60/BO60_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/BO60/BO60_raw.fif
-[done]
-2025-12-09 12:34:49,381 | INFO | [BO60] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/BO60/BO60_raw.fif
-09-Dec-25 12:34:49 | INFO | [BO60] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/BO60/BO60_raw.fif
-2025-12-09 12:34:49,686 | INFO | === Prétraitement MRM132 (MRM132_raw.edf) ===
-09-Dec-25 12:34:49 | INFO | === Prétraitement MRM132 (MRM132_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[DA110] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/DA110/DA110_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/DA110/DA110_raw.fif
-[done]
-2025-12-09 12:35:01,884 | INFO | [DA110] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/DA110/DA110_raw.fif
-09-Dec-25 12:35:01 | INFO | [DA110] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/DA110/DA110_raw.fif
-2025-12-09 12:35:02,193 | INFO | === Prétraitement GR108 (GR108_raw.edf) ===
-09-Dec-25 12:35:02 | INFO | === Prétraitement GR108 (GR108_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[GS191] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/GS191/GS191_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/GS191/GS191_raw.fif
-[done]
-2025-12-09 12:35:14,297 | INFO | [GS191] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/GS191/GS191_raw.fif
-09-Dec-25 12:35:14 | INFO | [GS191] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/GS191/GS191_raw.fif
-2025-12-09 12:35:14,669 | INFO | === Prétraitement CS147 (CS147_raw.edf) ===
-09-Dec-25 12:35:14 | INFO | === Prétraitement CS147 (CS147_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[GX111] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/GX111/GX111_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/GX111/GX111_raw.fif
-09-Dec-25 12:35:33 | WARNING | Hypnogram is SHORTER than data by 13.00 seconds. Padding hypnogram with last value to match data.size.
-[done]
-2025-12-09 12:35:34,267 | INFO | [GX111] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/GX111/GX111_raw.fif
-09-Dec-25 12:35:34 | INFO | [GX111] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/GX111/GX111_raw.fif
-2025-12-09 12:35:34,596 | INFO | === Prétraitement ML135 (ML135_raw.edf) ===
-09-Dec-25 12:35:34 | INFO | === Prétraitement ML135 (ML135_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:35:50 | WARNING | Hypnogram is SHORTER than data by 10.00 seconds. Padding hypnogram with last value to match data.size.
-[DJ137] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/DJ137/DJ137_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/DJ137/DJ137_raw.fif
-[done]
-2025-12-09 12:36:25,415 | INFO | [DJ137] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/DJ137/DJ137_raw.fif
-09-Dec-25 12:36:25 | INFO | [DJ137] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/DJ137/DJ137_raw.fif
-2025-12-09 12:36:25,821 | INFO | === Prétraitement TLM168 (TLM168_raw.edf) ===
-09-Dec-25 12:36:25 | INFO | === Prétraitement TLM168 (TLM168_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[CD164] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG F3': 'F3', 'EEG F4': 'F4', 'EEG Cz': 'Cz', 'EEG F7': 'F7', 'EEG F8': 'F8', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG Pz': 'Pz', 'EEG P4': 'P4', 'EEG T6': 'T6'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/CD164/CD164_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/CD164/CD164_raw.fif
-[done]
-2025-12-09 12:36:37,099 | INFO | [CD164] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CD164/CD164_raw.fif
-09-Dec-25 12:36:37 | INFO | [CD164] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CD164/CD164_raw.fif
-2025-12-09 12:36:37,497 | INFO | === Prétraitement PF133 (PF133_raw.edf) ===
-09-Dec-25 12:36:37 | INFO | === Prétraitement PF133 (PF133_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:36:45 | WARNING | Hypnogram is SHORTER than data by 6.00 seconds. Padding hypnogram with last value to match data.size.
-[RJP148] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/RJP148/RJP148_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/RJP148/RJP148_raw.fif
-[done]
-2025-12-09 12:37:21,147 | INFO | [RJP148] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/RJP148/RJP148_raw.fif
-09-Dec-25 12:37:21 | INFO | [RJP148] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/RJP148/RJP148_raw.fif
-2025-12-09 12:37:21,496 | INFO | === Prétraitement MN26 (MN26_raw.edf) ===
-09-Dec-25 12:37:21 | INFO | === Prétraitement MN26 (MN26_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[AN166] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/AN166/AN166_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/AN166/AN166_raw.fif
-[done]
-2025-12-09 12:37:29,762 | INFO | [AN166] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/AN166/AN166_raw.fif
-09-Dec-25 12:37:29 | INFO | [AN166] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/AN166/AN166_raw.fif
-2025-12-09 12:37:30,127 | INFO | === Prétraitement GH163 (GH163_raw.edf) ===
-09-Dec-25 12:37:30 | INFO | === Prétraitement GH163 (GH163_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[BB114] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/BB114/BB114_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/BB114/BB114_raw.fif
-[done]
-2025-12-09 12:37:42,472 | INFO | [BB114] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/BB114/BB114_raw.fif
-09-Dec-25 12:37:42 | INFO | [BB114] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/BB114/BB114_raw.fif
-2025-12-09 12:37:42,814 | INFO | === Prétraitement SB178 (SB178_raw.edf) ===
-09-Dec-25 12:37:42 | INFO | === Prétraitement SB178 (SB178_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:38:06 | WARNING | Hypnogram is SHORTER than data by 10.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:38:23 | WARNING | Hypnogram is SHORTER than data by 25.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:38:39 | WARNING | Hypnogram is SHORTER than data by 7.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:38:51 | WARNING | Hypnogram is SHORTER than data by 16.00 seconds. Padding hypnogram with last value to match data.size.
-[PA139] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/PA139/PA139_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/PA139/PA139_raw.fif
-[done]
-2025-12-09 12:38:58,227 | INFO | [PA139] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/PA139/PA139_raw.fif
-09-Dec-25 12:38:58 | INFO | [PA139] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/PA139/PA139_raw.fif
-2025-12-09 12:38:58,575 | INFO | === Prétraitement PJL153 (PJL153_raw.edf) ===
-09-Dec-25 12:38:58 | INFO | === Prétraitement PJL153 (PJL153_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:39:40 | WARNING | Hypnogram is SHORTER than data by 28.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:39:54 | WARNING | Hypnogram is SHORTER than data by 23.00 seconds. Padding hypnogram with last value to match data.size.
-[MRM132] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/MRM132/MRM132_raw.fif
-Overwriting existing file.
-[CS147] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/CS147/CS147_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/MRM132/MRM132_raw.fif
-[done]
-2025-12-09 12:40:05,647 | INFO | [MRM132] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MRM132/MRM132_raw.fif
-09-Dec-25 12:40:05 | INFO | [MRM132] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MRM132/MRM132_raw.fif
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/CS147/CS147_raw.fif
-2025-12-09 12:40:05,998 | INFO | === Prétraitement MG16 (MG16_raw.edf) ===
-09-Dec-25 12:40:05 | INFO | === Prétraitement MG16 (MG16_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[done]
-2025-12-09 12:40:09,518 | INFO | [CS147] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CS147/CS147_raw.fif
-09-Dec-25 12:40:09 | INFO | [CS147] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CS147/CS147_raw.fif
-2025-12-09 12:40:09,889 | INFO | === Prétraitement LS162 (LS162_raw.edf) ===
-09-Dec-25 12:40:09 | INFO | === Prétraitement LS162 (LS162_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[GR108] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG F3': 'F3', 'EEG F4': 'F4', 'EEG Cz': 'Cz', 'EEG F7': 'F7', 'EEG F8': 'F8', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG Pz': 'Pz', 'EEG P4': 'P4', 'EEG T6': 'T6'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/GR108/GR108_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/GR108/GR108_raw.fif
-09-Dec-25 12:40:18 | WARNING | Hypnogram is SHORTER than data by 30.00 seconds. Padding hypnogram with last value to match data.size.
-[done]
-2025-12-09 12:40:20,673 | INFO | [GR108] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/GR108/GR108_raw.fif
-09-Dec-25 12:40:20 | INFO | [GR108] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/GR108/GR108_raw.fif
-2025-12-09 12:40:21,071 | INFO | === Prétraitement IS179 (IS179_raw.edf) ===
-09-Dec-25 12:40:21 | INFO | === Prétraitement IS179 (IS179_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:40:26 | WARNING | Hypnogram is LONGER than data by 235.00 seconds. Cropping hypnogram to match data.size.
-[ML135] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/ML135/ML135_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/ML135/ML135_raw.fif
-[done]
-2025-12-09 12:41:03,828 | INFO | [ML135] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/ML135/ML135_raw.fif
-09-Dec-25 12:41:03 | INFO | [ML135] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/ML135/ML135_raw.fif
-2025-12-09 12:41:04,093 | INFO | === Prétraitement CD28 (CD28_raw.edf) ===
-09-Dec-25 12:41:04 | INFO | === Prétraitement CD28 (CD28_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-[PF133] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/PF133/PF133_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/PF133/PF133_raw.fif
-[done]
-2025-12-09 12:41:21,696 | INFO | [PF133] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/PF133/PF133_raw.fif
-09-Dec-25 12:41:21 | INFO | [PF133] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/PF133/PF133_raw.fif
-2025-12-09 12:41:22,033 | INFO | === Prétraitement MS128 (MS128_raw.edf) ===
-09-Dec-25 12:41:22 | INFO | === Prétraitement MS128 (MS128_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:41:24 | WARNING | Hypnogram is SHORTER than data by 20.00 seconds. Padding hypnogram with last value to match data.size.
-[GH163] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/GH163/GH163_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/GH163/GH163_raw.fif
-[done]
-2025-12-09 12:41:39,391 | INFO | [GH163] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/GH163/GH163_raw.fif
-09-Dec-25 12:41:39 | INFO | [GH163] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/GH163/GH163_raw.fif
-2025-12-09 12:41:39,722 | INFO | === Prétraitement JLJ177 (JLJ177_raw.edf) ===
-09-Dec-25 12:41:39 | INFO | === Prétraitement JLJ177 (JLJ177_raw.edf) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-09-Dec-25 12:41:55 | WARNING | Hypnogram is LONGER than data by 152.00 seconds. Cropping hypnogram to match data.size.
-[MN26] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/MN26/MN26_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/MN26/MN26_raw.fif
-[done]
-2025-12-09 12:42:06,623 | INFO | [MN26] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MN26/MN26_raw.fif
-09-Dec-25 12:42:06 | INFO | [MN26] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MN26/MN26_raw.fif
-2025-12-09 12:42:06,939 | INFO | === Prétraitement MP187 (MP187_raw.EDF) ===
-09-Dec-25 12:42:06 | INFO | === Prétraitement MP187 (MP187_raw.EDF) ===
-[TLM168] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/TLM168/TLM168_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/TLM168/TLM168_raw.fif
-[done]
-2025-12-09 12:42:23,557 | INFO | [TLM168] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/TLM168/TLM168_raw.fif
-09-Dec-25 12:42:23 | INFO | [TLM168] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/TLM168/TLM168_raw.fif
-2025-12-09 12:42:23,963 | INFO | === Prétraitement DBJ184 (DBJ184_raw.EDF) ===
-09-Dec-25 12:42:23 | INFO | === Prétraitement DBJ184 (DBJ184_raw.EDF) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Limited 2 annotation(s) that were expanding outside the data range.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-2025-12-09 12:43:16,256 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/MP187/MP187_raw.EDF: MISSING_CHANNELS:MP187:A1,Fp1,Fp2,T3,T4
-2025-12-09 12:43:16,500 | INFO | === Prétraitement NCJM193 (NCJM193_raw.EDF) ===
-09-Dec-25 12:43:16 | INFO | === Prétraitement NCJM193 (NCJM193_raw.EDF) ===
-09-Dec-25 12:43:19 | WARNING | Hypnogram is SHORTER than data by 477.00 seconds. Padding hypnogram with last value to match data.size.
-[SB178] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG F3': 'F3', 'EEG F4': 'F4', 'EEG Cz': 'Cz', 'EEG F7': 'F7', 'EEG F8': 'F8', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG Pz': 'Pz', 'EEG P4': 'P4', 'EEG T6': 'T6'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/SB178/SB178_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/SB178/SB178_raw.fif
-[done]
-2025-12-09 12:43:28,403 | INFO | [SB178] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/SB178/SB178_raw.fif
-09-Dec-25 12:43:28 | INFO | [SB178] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/SB178/SB178_raw.fif
-2025-12-09 12:43:28,771 | INFO | === Prétraitement LM183 (LM183_raw.EDF) ===
-09-Dec-25 12:43:28 | INFO | === Prétraitement LM183 (LM183_raw.EDF) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Limited 2 annotation(s) that were expanding outside the data range.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-2025-12-09 12:43:32,493 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/DBJ184/DBJ184_raw.EDF: MISSING_CHANNELS:DBJ184:A1,Fp1,Fp2,T3,T4
-2025-12-09 12:43:32,729 | INFO | === Prétraitement LJ192 (LJ192_raw.EDF) ===
-09-Dec-25 12:43:32 | INFO | === Prétraitement LJ192 (LJ192_raw.EDF) ===
-[PJL153] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/PJL153/PJL153_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/PJL153/PJL153_raw.fif
-2025-12-09 12:43:59,079 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/LJ192/LJ192_raw.EDF: MISSING_CHANNELS:LJ192:A1,C3,C4,Fp1,Fp2,O1,O2,T3,T4
-2025-12-09 12:43:59,173 | INFO | === Prétraitement EP194 (EP194_raw.EDF) ===
-09-Dec-25 12:43:59 | INFO | === Prétraitement EP194 (EP194_raw.EDF) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Number of records from the header does not match the file size (perhaps the recording was not stopped before exiting). Inferring from the file size.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-2025-12-09 12:43:59,604 | INFO | === Prétraitement BJM190 (BJM190_raw.EDF) ===
-2025-12-09 12:43:59,604 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/EP194/EP194_raw.EDF: index -1 is out of bounds for axis 0 with size 0
-09-Dec-25 12:43:59 | INFO | === Prétraitement BJM190 (BJM190_raw.EDF) ===
-[done]
-2025-12-09 12:43:59,732 | INFO | [PJL153] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/PJL153/PJL153_raw.fif
-09-Dec-25 12:43:59 | INFO | [PJL153] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/PJL153/PJL153_raw.fif
-2025-12-09 12:44:00,032 | INFO | === Prétraitement BP185 (BP185_raw.EDF) ===
-09-Dec-25 12:44:00 | INFO | === Prétraitement BP185 (BP185_raw.EDF) ===
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Number of records from the header does not match the file size (perhaps the recording was not stopped before exiting). Inferring from the file size.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-2025-12-09 12:44:00,067 | INFO | === Prétraitement TG189 (TG189_raw.EDF) ===
-09-Dec-25 12:44:00 | INFO | === Prétraitement TG189 (TG189_raw.EDF) ===
-2025-12-09 12:44:00,068 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/BP185/BP185_raw.EDF: index -1 is out of bounds for axis 0 with size 0
-2025-12-09 12:44:06,580 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/NCJM193/NCJM193_raw.EDF: MISSING_CHANNELS:NCJM193:A1,Fp1,Fp2,T3,T4
-2025-12-09 12:44:06,788 | INFO | === Prétraitement PB186 (PB186_raw.EDF) ===
-09-Dec-25 12:44:06 | INFO | === Prétraitement PB186 (PB186_raw.EDF) ===
-09-Dec-25 12:44:12 | WARNING | Hypnogram is SHORTER than data by 26.00 seconds. Padding hypnogram with last value to match data.size.
-09-Dec-25 12:44:19 | WARNING | Hypnogram is SHORTER than data by 6.00 seconds. Padding hypnogram with last value to match data.size.
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Omitted 59 annotation(s) that were outside data range.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-/home/darryld/Cerco_studies/scripts/preprocess.py:40: RuntimeWarning: Limited 2 annotation(s) that were expanding outside the data range.
-  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
-2025-12-09 12:44:26,644 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/TG189/TG189_raw.EDF: MISSING_CHANNELS:TG189:A1,C3,C4,Fp1,Fp2,O1,O2,T3,T4
-2025-12-09 12:44:26,954 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/BJM190/BJM190_raw.EDF: MISSING_CHANNELS:BJM190:A1,C3,C4,Fp1,Fp2,O1,O2,T3,T4
-09-Dec-25 12:44:28 | WARNING | Hypnogram is SHORTER than data by 30.00 seconds. Padding hypnogram with last value to match data.size.
-2025-12-09 12:44:28,589 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/LM183/LM183_raw.EDF: MISSING_CHANNELS:LM183:A1,Fp1,Fp2,T3,T4
-09-Dec-25 12:44:30 | WARNING | Hypnogram is SHORTER than data by 10.00 seconds. Padding hypnogram with last value to match data.size.
-[MG16] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG F3': 'F3', 'EEG F4': 'F4', 'EEG Cz': 'Cz', 'EEG F7': 'F7', 'EEG F8': 'F8', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG Pz': 'Pz', 'EEG P4': 'P4', 'EEG T6': 'T6'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/MG16/MG16_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/MG16/MG16_raw.fif
-09-Dec-25 12:44:54 | WARNING | Hypnogram is SHORTER than data by 23.00 seconds. Padding hypnogram with last value to match data.size.
-[done]
-2025-12-09 12:44:55,241 | INFO | [MG16] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MG16/MG16_raw.fif
-09-Dec-25 12:44:55 | INFO | [MG16] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MG16/MG16_raw.fif
-2025-12-09 12:44:59,698 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/PB186/PB186_raw.EDF: MISSING_CHANNELS:PB186:A1,Fp1,Fp2,T3,T4
-[MS128] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/MS128/MS128_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/MS128/MS128_raw.fif
-[IS179] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG F3': 'F3', 'EEG F4': 'F4', 'EEG Cz': 'Cz', 'EEG F7': 'F7', 'EEG F8': 'F8', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG Pz': 'Pz', 'EEG P4': 'P4', 'EEG T6': 'T6'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/IS179/IS179_raw.fif
-Overwriting existing file.
-[done]
-2025-12-09 12:45:50,676 | INFO | [MS128] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MS128/MS128_raw.fif
-09-Dec-25 12:45:50 | INFO | [MS128] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/MS128/MS128_raw.fif
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/IS179/IS179_raw.fif
-[done]
-2025-12-09 12:45:56,086 | INFO | [IS179] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/IS179/IS179_raw.fif
-09-Dec-25 12:45:56 | INFO | [IS179] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/IS179/IS179_raw.fif
-[CD28] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/CD28/CD28_raw.fif
-Overwriting existing file.
-[JLJ177] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG Cz': 'Cz', 'EEG Pz': 'Pz'}
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/JLJ177/JLJ177_raw.fif
-Overwriting existing file.
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/CD28/CD28_raw.fif
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/JLJ177/JLJ177_raw.fif
-[LS162] Canaux renommés : {'EEG Fp1': 'Fp1', 'EEG Fp2': 'Fp2', 'EEG C3': 'C3', 'EEG C4': 'C4', 'EEG T3': 'T3', 'EEG T4': 'T4', 'EEG O1': 'O1', 'EEG O2': 'O2', 'EEG A1': 'A1', 'EEG F3': 'F3', 'EEG F4': 'F4', 'EEG Cz': 'Cz', 'EEG F7': 'F7', 'EEG F8': 'F8', 'EEG T5': 'T5', 'EEG P3': 'P3', 'EEG Pz': 'Pz', 'EEG P4': 'P4', 'EEG T6': 'T6'}
-Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.
-Overwriting existing file.
-Writing /home/darryld/documents/EEG/preprocessed/XAI/data/LS162/LS162_raw.fif
-Overwriting existing file.
-[done]
-2025-12-09 12:46:06,189 | INFO | [CD28] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CD28/CD28_raw.fif
-09-Dec-25 12:46:06 | INFO | [CD28] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/CD28/CD28_raw.fif
-[done]
-2025-12-09 12:46:08,396 | INFO | [JLJ177] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/JLJ177/JLJ177_raw.fif
-09-Dec-25 12:46:08 | INFO | [JLJ177] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/JLJ177/JLJ177_raw.fif
-Closing /home/darryld/documents/EEG/preprocessed/XAI/data/LS162/LS162_raw.fif
-[done]
-2025-12-09 12:46:13,136 | INFO | [LS162] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/LS162/LS162_raw.fif
-09-Dec-25 12:46:13 | INFO | [LS162] Sauvegardé >>> /home/darryld/documents/EEG/preprocessed/XAI/data/LS162/LS162_raw.fif
-[TG189] Canaux renommés : {'EEG F3-M2': 'F3-M2', 'EEG F4-M1': 'F4-M1', 'EEG C3-M2': 'C3-M2', 'EEG C4-M1': 'C4-M1', 'EEG O1-M2': 'O1-M2', 'EEG O2-M1': 'O2-M1'}
-[LJ192] Canaux renommés : {'EEG F3-M2': 'F3-M2', 'EEG F4-M1': 'F4-M1', 'EEG C3-M2': 'C3-M2', 'EEG C4-M1': 'C4-M1', 'EEG O1-M2': 'O1-M2', 'EEG O2-M1': 'O2-M1'}
-[BJM190] Canaux renommés : {'EEG F3-M2': 'F3-M2', 'EEG F4-M1': 'F4-M1', 'EEG C3-M2': 'C3-M2', 'EEG C4-M1': 'C4-M1', 'EEG O1-M2': 'O1-M2', 'EEG O2-M1': 'O2-M1'}
-2025-12-09 12:46:13,597 | WARNING | Patients SKIP pour canaux manquants (montage gp2 impossible) :
-2025-12-09 12:46:13,597 | WARNING |   - FP52 : manquants = A1
-2025-12-09 12:46:13,598 | WARNING |   - MP187 : manquants = A1,Fp1,Fp2,T3,T4
-2025-12-09 12:46:13,598 | WARNING |   - DBJ184 : manquants = A1,Fp1,Fp2,T3,T4
-2025-12-09 12:46:13,598 | WARNING |   - LJ192 : manquants = A1,C3,C4,Fp1,Fp2,O1,O2,T3,T4
-2025-12-09 12:46:13,598 | WARNING |   - NCJM193 : manquants = A1,Fp1,Fp2,T3,T4
-2025-12-09 12:46:13,598 | WARNING |   - TG189 : manquants = A1,C3,C4,Fp1,Fp2,O1,O2,T3,T4
-2025-12-09 12:46:13,598 | WARNING |   - BJM190 : manquants = A1,C3,C4,Fp1,Fp2,O1,O2,T3,T4
-2025-12-09 12:46:13,598 | WARNING |   - LM183 : manquants = A1,Fp1,Fp2,T3,T4
-2025-12-09 12:46:13,598 | WARNING |   - PB186 : manquants = A1,Fp1,Fp2,T3,T4
+2025-12-16 09:07:31,678 | INFO | 88 fichiers EDF trouvés. Lancement avec n_workers=10.
+2025-12-16 09:07:31,719 | INFO | === Prétraitement CC175 (CC175_raw.edf) ===
+2025-12-16 09:07:31,720 | INFO | === Prétraitement GS105 (GS105_raw.edf) ===
+2025-12-16 09:07:31,720 | INFO | === Prétraitement MA27 (MA27_raw.edf) ===
+2025-12-16 09:07:31,720 | INFO | === Prétraitement TM151 (TM151_raw.edf) ===
+2025-12-16 09:07:31,721 | INFO | === Prétraitement CA169 (CA169_raw.edf) ===
+2025-12-16 09:07:31,721 | INFO | === Prétraitement MC154 (MC154_raw.edf) ===
+2025-12-16 09:07:31,721 | INFO | === Prétraitement TJ127 (TJ127_raw.edf) ===
+2025-12-16 09:07:31,721 | INFO | === Prétraitement FP144 (FP144_raw.edf) ===
+2025-12-16 09:07:31,722 | INFO | === Prétraitement FP52 (FP52_raw.edf) ===
+2025-12-16 09:07:31,722 | INFO | === Prétraitement DI136 (DI136_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Number of records from the header does not match the file size (perhaps the recording was not stopped before exiting). Inferring from the file size.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Number of records from the header does not match the file size (perhaps the recording was not stopped before exiting). Inferring from the file size.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:07:36,593 | INFO | === Prétraitement CJL159 (CJL159_raw.edf) ===
+2025-12-16 09:07:36,593 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/GS105/GS105_raw.edf: index -1 is out of bounds for axis 0 with size 0
+2025-12-16 09:07:36,597 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/FP52/FP52_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:07:36,597 | INFO | === Prétraitement BA152 (BA152_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:08:10,759 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/FP144/FP144_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:08:10,904 | INFO | === Prétraitement SD134 (SD134_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:08:17,023 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/DI136/DI136_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:08:17,164 | INFO | === Prétraitement NAL43 (NAL43_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:08:22,810 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/MA27/MA27_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:08:22,869 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/MC154/MC154_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:08:22,940 | INFO | === Prétraitement BA171 (BA171_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:08:22,997 | INFO | === Prétraitement CP155 (CP155_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:08:23,971 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/TJ127/TJ127_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:08:23,991 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/TM151/TM151_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:08:24,089 | INFO | === Prétraitement CM161 (CM161_raw.edf) ===
+2025-12-16 09:08:24,142 | INFO | === Prétraitement VA182 (VA182_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:08:29,699 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/BA152/BA152_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:08:29,825 | INFO | === Prétraitement RG156 (RG156_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:08:30,587 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/CC175/CC175_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:08:30,696 | INFO | === Prétraitement BDRE44 (BDRE44_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:08:37,319 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/CA169/CA169_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:08:37,355 | INFO | === Prétraitement RH146 (RH146_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:08:44,214 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/SD134/SD134_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:08:44,330 | INFO | === Prétraitement RJ42 (RJ42_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:08:55,572 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/VA182/VA182_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:08:55,700 | INFO | === Prétraitement AE129 (AE129_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:09:00,558 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/CJL159/CJL159_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:00,681 | INFO | === Prétraitement PJC140 (PJC140_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:09:01,030 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/RG156/RG156_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:01,034 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/CP155/CP155_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:01,139 | INFO | === Prétraitement JB173 (JB173_raw.edf) ===
+2025-12-16 09:09:01,149 | INFO | === Prétraitement CS131 (CS131_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:09:06,590 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/RH146/RH146_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:06,638 | INFO | === Prétraitement HG167 (HG167_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:09:12,894 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/NAL43/NAL43_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:12,925 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/BA171/BA171_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:12,977 | INFO | === Prétraitement MP150 (MP150_raw.edf) ===
+2025-12-16 09:09:13,006 | INFO | === Prétraitement GD170 (GD170_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:09:17,430 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/CM161/CM161_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:17,498 | INFO | === Prétraitement SJP172 (SJP172_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:09:17,921 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/BDRE44/BDRE44_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:17,996 | INFO | === Prétraitement CB165 (CB165_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:09:33,828 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/AE129/AE129_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:33,932 | INFO | === Prétraitement MN143 (MN143_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:09:34,123 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/PJC140/PJC140_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:34,202 | INFO | === Prétraitement JP141 (JP141_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:09:37,303 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/HG167/HG167_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:37,378 | INFO | === Prétraitement BJ138 (BJ138_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:09:37,478 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/RJ42/RJ42_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:37,612 | INFO | === Prétraitement RB103 (RB103_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:09:43,996 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/CS131/CS131_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:44,061 | INFO | === Prétraitement NGA157 (NGA157_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:09:44,404 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/JB173/JB173_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:44,499 | INFO | === Prétraitement RD158 (RD158_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:09:46,253 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/GD170/GD170_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:46,306 | INFO | === Prétraitement KH113 (KH113_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:09:52,349 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/SJP172/SJP172_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:52,428 | INFO | === Prétraitement LF126 (LF126_raw.edf) ===
+2025-12-16 09:09:52,430 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/MP150/MP150_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:09:52,512 | INFO | === Prétraitement TO145 (TO145_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:10:01,097 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/MN143/MN143_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:10:01,170 | INFO | === Prétraitement EF130 (EF130_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:10:01,431 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/BJ138/BJ138_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:10:01,523 | INFO | === Prétraitement BF181 (BF181_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:10:08,413 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/CB165/CB165_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:10:08,539 | INFO | === Prétraitement MHTK39 (MHTK39_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:10:13,357 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/JP141/JP141_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:10:13,472 | INFO | === Prétraitement MM109 (MM109_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:10:13,690 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/RB103/RB103_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:10:13,790 | INFO | === Prétraitement DSJ112 (DSJ112_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:10:13,921 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/NGA157/NGA157_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:10:13,933 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/RD158/RD158_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:10:13,982 | INFO | === Prétraitement TM142 (TM142_raw.edf) ===
+2025-12-16 09:10:13,988 | INFO | === Prétraitement MFJ160 (MFJ160_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:10:18,250 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/LF126/LF126_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:10:18,288 | INFO | === Prétraitement DA174 (DA174_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:10:18,748 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/TO145/TO145_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:10:18,784 | INFO | === Prétraitement LJ41 (LJ41_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:10:23,378 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/EF130/EF130_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:10:23,411 | INFO | === Prétraitement CJP53 (CJP53_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:10:23,550 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/BF181/BF181_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:10:23,580 | INFO | === Prétraitement SB176 (SB176_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:10:55,396 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/TM142/TM142_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:10:55,558 | INFO | === Prétraitement VJ149 (VJ149_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:10:59,924 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/SB176/SB176_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:00,006 | INFO | === Prétraitement BO60 (BO60_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:00,191 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/DA174/DA174_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:00,314 | INFO | === Prétraitement DA110 (DA110_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:01,549 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/CJP53/CJP53_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:01,625 | INFO | === Prétraitement DJ137 (DJ137_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:02,692 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/MFJ160/MFJ160_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:02,829 | INFO | === Prétraitement GS191 (GS191_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:04,657 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/BO60/BO60_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:04,661 | INFO | === Prétraitement CD164 (CD164_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:04,792 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/MM109/MM109_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:04,926 | INFO | === Prétraitement GX111 (GX111_raw.edf) ===
+2025-12-16 09:11:05,063 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/MHTK39/MHTK39_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:05,240 | INFO | === Prétraitement BB114 (BB114_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:06,934 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/DSJ112/DSJ112_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:07,085 | INFO | === Prétraitement RJP148 (RJP148_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:07,735 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/VJ149/VJ149_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:07,739 | INFO | === Prétraitement AN166 (AN166_raw.edf) ===
+2025-12-16 09:11:07,789 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/LJ41/LJ41_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:07,927 | INFO | === Prétraitement PA139 (PA139_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:08,134 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/KH113/KH113_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:08,303 | INFO | === Prétraitement MRM132 (MRM132_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:40,032 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/GX111/GX111_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:40,203 | INFO | === Prétraitement GR108 (GR108_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:40,234 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/DA110/DA110_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:40,323 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/GS191/GS191_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:40,429 | INFO | === Prétraitement CS147 (CS147_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:40,525 | INFO | === Prétraitement ML135 (ML135_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:44,565 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/PA139/PA139_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:44,667 | INFO | === Prétraitement TLM168 (TLM168_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:51,832 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/MRM132/MRM132_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:51,893 | INFO | === Prétraitement PF133 (PF133_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:52,105 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/RJP148/RJP148_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:52,157 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/DJ137/DJ137_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:11:52,211 | INFO | === Prétraitement MN26 (MN26_raw.edf) ===
+2025-12-16 09:11:52,241 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/CD164/CD164_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:52,274 | INFO | === Prétraitement GH163 (GH163_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:11:52,334 | INFO | === Prétraitement SB178 (SB178_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:12:01,381 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/BB114/BB114_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:12:01,459 | INFO | === Prétraitement PJL153 (PJL153_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:12:01,641 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/AN166/AN166_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:12:01,714 | INFO | === Prétraitement MG16 (MG16_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:12:13,994 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/CS147/CS147_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:12:14,080 | INFO | === Prétraitement LS162 (LS162_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:12:17,354 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/MN26/MN26_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:12:17,464 | INFO | === Prétraitement IS179 (IS179_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:12:23,643 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/GH163/GH163_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:12:23,787 | INFO | === Prétraitement CD28 (CD28_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:12:23,913 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/ML135/ML135_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:12:23,978 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/GR108/GR108_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:12:24,037 | INFO | === Prétraitement MS128 (MS128_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:12:24,116 | INFO | === Prétraitement JLJ177 (JLJ177_raw.edf) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:12:24,527 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/TLM168/TLM168_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:12:24,654 | INFO | === Prétraitement MP187 (MP187_raw.EDF) ===
+2025-12-16 09:12:24,927 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/PF133/PF133_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:12:24,995 | INFO | === Prétraitement DBJ184 (DBJ184_raw.EDF) ===
+2025-12-16 09:12:29,858 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/PJL153/PJL153_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:12:29,887 | INFO | === Prétraitement NCJM193 (NCJM193_raw.EDF) ===
+2025-12-16 09:12:30,168 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/SB178/SB178_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:12:30,224 | INFO | === Prétraitement LM183 (LM183_raw.EDF) ===
+2025-12-16 09:12:35,594 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/MG16/MG16_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:12:35,626 | INFO | === Prétraitement LJ192 (LJ192_raw.EDF) ===
+2025-12-16 09:12:58,287 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/LJ192/LJ192_raw.EDF: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:12:58,368 | INFO | === Prétraitement EP194 (EP194_raw.EDF) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Number of records from the header does not match the file size (perhaps the recording was not stopped before exiting). Inferring from the file size.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:12:58,499 | INFO | === Prétraitement BJM190 (BJM190_raw.EDF) ===
+2025-12-16 09:12:58,499 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/EP194/EP194_raw.EDF: index -1 is out of bounds for axis 0 with size 0
+2025-12-16 09:13:01,400 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/CD28/CD28_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:13:01,597 | INFO | === Prétraitement BP185 (BP185_raw.EDF) ===
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Number of records from the header does not match the file size (perhaps the recording was not stopped before exiting). Inferring from the file size.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:13:01,629 | INFO | === Prétraitement TG189 (TG189_raw.EDF) ===
+2025-12-16 09:13:01,629 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/BP185/BP185_raw.EDF: index -1 is out of bounds for axis 0 with size 0
+2025-12-16 09:13:02,399 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/JLJ177/JLJ177_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:13:02,581 | INFO | === Prétraitement PB186 (PB186_raw.EDF) ===
+2025-12-16 09:13:02,988 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/NCJM193/NCJM193_raw.EDF: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:13:06,278 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/MS128/MS128_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:13:06,650 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/LM183/LM183_raw.EDF: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:13:07,027 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/LS162/LS162_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:13:08,555 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/IS179/IS179_raw.edf: preprocess_record() got an unexpected keyword argument 'eog_params'
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Omitted 59 annotation(s) that were outside data range.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Limited 2 annotation(s) that were expanding outside the data range.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:13:09,092 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/TG189/TG189_raw.EDF: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:13:09,273 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/BJM190/BJM190_raw.EDF: preprocess_record() got an unexpected keyword argument 'eog_params'
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Limited 2 annotation(s) that were expanding outside the data range.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:13:10,077 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/MP187/MP187_raw.EDF: preprocess_record() got an unexpected keyword argument 'eog_params'
+/home/darryld/Cerco_studies/scripts/preprocess.py:41: RuntimeWarning: Limited 2 annotation(s) that were expanding outside the data range.
+  raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
+2025-12-16 09:13:10,962 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/DBJ184/DBJ184_raw.EDF: preprocess_record() got an unexpected keyword argument 'eog_params'
+2025-12-16 09:13:11,734 | ERROR | [ERREUR] lors du prétraitement de /home/darryld/documents/EEG/raw/PB186/PB186_raw.EDF: preprocess_record() got an unexpected keyword argument 'eog_params'

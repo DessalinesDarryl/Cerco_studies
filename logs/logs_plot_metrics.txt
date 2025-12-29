@@ -1,0 +1,9 @@
+2025-12-19 12:53:46,353 | INFO | Loading model checkpoint : models/checkpoint_rf.joblib
+2025-12-19 12:53:46,529 | INFO | Lecture dataset_final : data/processed/features/dataset_final.csv
+2025-12-19 12:53:46,563 | INFO | Lignes avec label (label_id) : 75 -> 75
+2025-12-19 12:53:46,565 | INFO | Shape X: (75, 1066), y: (75,), nb_features: 1066
+2025-12-19 12:53:46,565 | INFO | Classes (model.classes_) et noms : [(np.int64(0), 'SYN'), (np.int64(1), 'Narco'), (np.int64(2), 'TCSPi'), (np.int64(3), 'EAI')]
+2025-12-19 12:53:46,565 | INFO | Calcul des prédictions et probabilités...
+2025-12-19 12:53:46,799 | INFO | Saving confusion matrix → outputs/figures/metrics/confusion_matrix.png
+2025-12-19 12:53:47,092 | INFO | Saving ROC curves → outputs/figures/metrics/roc_multiclass.png
+2025-12-19 12:53:47,418 | INFO | Métriques (CM + ROC) générées.

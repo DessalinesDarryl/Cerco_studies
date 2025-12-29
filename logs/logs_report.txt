@@ -1,0 +1,1 @@
+2025-12-19 12:55:49,136 | INFO | Rapport écrit : outputs/reports/report.md

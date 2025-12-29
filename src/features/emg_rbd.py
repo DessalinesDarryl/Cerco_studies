@@ -2,8 +2,16 @@
 # -*- coding: utf-8 -*-
 """
 Detect RBD markers (PHASIC & TONIC RSWA) from EMG during REM sleep
-- CALCULS PAR CANAL, sur ÉPOQUES REM non chevauchantes de 4 s (par défaut).
+- Calculs par canal
+- Epochs REM non chevauchantes de 4 s
+- TONIC basé sur EOG (0.3-10 Hz, <25 µV, 2×2 s) après masquage phasique
 """
+
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.append(str(ROOT))
 
 import argparse, os, sys, glob
 from dataclasses import dataclass
@@ -261,6 +269,91 @@ def build_emg_envelopes(raw: mne.io.BaseRaw, emg_chs: List[str]):
         envs[i, :] = moving_average(np.abs(data[i, :]), win)
     return envs, emg.ch_names, sfreq
 
+def load_eog_signal(raw: mne.io.BaseRaw):
+    """
+    Charge les signaux EOG.
+    - Force le type 'eog' pour les canaux contenant 'EOGD' ou 'EOGG'
+    - Retourne (data en µV, sfreq)
+    """
+
+    # --- 1) Forcer le type EOG si nécessaire ---
+    eog_chs = [
+        ch for ch in raw.ch_names
+        if ("EOGD" in ch.upper()) or ("EOGG" in ch.upper())
+    ]
+
+    if eog_chs:
+        raw.set_channel_types({ch: "eog" for ch in eog_chs})
+
+    # --- 2) Sélection des canaux EOG ---
+    picks = mne.pick_types(
+        raw.info,
+        eog=True,
+        eeg=False,
+        emg=False,
+        meg=False,
+        stim=False,
+        misc=False,
+    )
+
+    if len(picks) == 0:
+        return None, None
+
+    eog = raw.copy().pick(picks)
+    data = eog.get_data() * 1e6  # µV
+    sfreq = eog.info["sfreq"]
+    return data, sfreq
+
+def detect_tonic_eog_epoch(
+    eog: np.ndarray,
+    sfreq: float,
+    w0: int,
+    w1: int,
+    phasic_in_win: List[Tuple[int, int]],
+    amp_thresh_uv: float = 25.0,
+):
+    """
+    Critère tonic EOG :
+    - signal EOG 0.3-10 Hz
+    - masquage phasique
+    - 2 fenêtres adjacentes de 2 s
+    - |EOG| < 25 µV sur chaque fenêtre
+    """
+
+    if eog is None:
+        return np.nan
+
+    # moyenne des canaux EOG si plusieurs
+    sig = np.mean(eog[:, w0:w1], axis=0)
+
+    # --- Masque phasique ---
+    mask = np.zeros(sig.shape[0], dtype=bool)
+    for s, e in phasic_in_win:
+        s_rel = max(0, s - w0)
+        e_rel = min(sig.shape[0], e - w0)
+        if s_rel < e_rel:
+            mask[s_rel:e_rel] = True
+
+    sig_clean = sig.copy()
+    sig_clean[mask] = np.nan
+
+    # --- Split 2 × 2 s ---
+    half = int(2.0 * sfreq)
+    if sig_clean.size < 2 * half:
+        return np.nan
+
+    win1 = sig_clean[:half]
+    win2 = sig_clean[half:2 * half]
+
+    if np.isnan(win1).all() or np.isnan(win2).all():
+        return np.nan
+
+    amp1 = np.nanmax(np.abs(win1))
+    amp2 = np.nanmax(np.abs(win2))
+
+    tonic_eog = (amp1 <= amp_thresh_uv) and (amp2 <= amp_thresh_uv)
+    return bool(tonic_eog)
+
 
 def detect_phasic_events_ch(envelope: np.ndarray, sfreq: float,
                             rem_start: int, rem_end: int,
@@ -391,6 +484,7 @@ def split_into_epochs(rem_start: int, rem_end: int, sfreq: float, epoch_len_s: f
 
 def process_patient(patient_dir: str, args) -> pd.DataFrame:
     patient_id = os.path.basename(patient_dir.rstrip(os.sep))
+    
     rec = None
     try:
         rec = find_recording_file(patient_dir)
@@ -398,6 +492,17 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
             raise RuntimeError("No recording file (edf/fif) found.")
         raw, emg_chs = load_raw_with_emg(rec, args.emg_channels)
 
+        eog_data, eog_sfreq = load_eog_signal(raw)
+        if eog_data is None or eog_sfreq is None:
+            raise RuntimeError("EOG manquant — eye_emg_corr requis (corrélation EOG–EMG obligatoire).")
+
+        # Si sfreq EOG != sfreq EMG, on refuse (sinon tes indices w0/w1 sont faux pour l'EOG)
+        if abs(float(eog_sfreq) - float(raw.info["sfreq"])) > 1e-6:
+            raise RuntimeError(
+                f"sfreq EOG ({eog_sfreq}) != sfreq raw/EMG ({raw.info['sfreq']}) — resampling requis."
+            )
+
+        
         envs, chs, sfreq = build_emg_envelopes(raw, emg_chs)
         n_samples = envs.shape[1]
 
@@ -441,6 +546,14 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
 
                 for ep_k, (w0, w1) in enumerate(epochs):
                     phasic_in_win = clip_events_to_window(phasic_all, w0, w1)
+                    tonic_eog_epoch = detect_tonic_eog_epoch(
+                        eog=eog_data,
+                        sfreq=eog_sfreq,
+                        w0=w0,
+                        w1=w1,
+                        phasic_in_win=phasic_in_win,
+                    )
+
                     dur_phasic, phasic_ratio_epoch = phasic_time_ratio(phasic_in_win, w0, w1, sfreq)
                     very_phasic_epoch = (phasic_ratio_epoch > 0.75)
 
@@ -448,7 +561,23 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
                         env, sfreq, w0, w1, phasic_in_win,
                         nrem_ref_start, nrem_ref_end, phasic_ratio_epoch
                     )
-                    rswa_epoch = (not np.isnan(tonic_ratio_epoch)) and (tonic_ratio_epoch > 1.3)
+                    rswa_epoch = (
+                        ((not np.isnan(tonic_ratio_epoch)) and (tonic_ratio_epoch > 1.3))
+                        or (tonic_eog_epoch is True)
+                    )
+
+                    # --- eye_emg_corr (OBLIGATOIRE) ---
+                    eog_seg = np.mean(eog_data[:, w0:w1], axis=0)   # (n_samples_epoch,)
+                    emg_seg = env[w0:w1]                            # enveloppe EMG (n_samples_epoch,)
+
+                    if eog_seg.size == 0 or emg_seg.size == 0 or eog_seg.size != emg_seg.size:
+                        raise RuntimeError("Segment EOG/EMG invalide pour eye_emg_corr.")
+
+                    # Si variance ~0 → corrélation non définie, on force une erreur (obligatoire)
+                    if np.std(eog_seg) < 1e-8 or np.std(emg_seg) < 1e-8:
+                        raise RuntimeError("Variance trop faible (EOG ou EMG) — eye_emg_corr non calculable.")
+
+                    eye_emg_corr = float(np.corrcoef(emg_seg, eog_seg)[0, 1])
 
                     rows.append({
                         "patient_id": patient_id,
@@ -460,6 +589,8 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
                         "epoch_start_sec": w0 / sfreq,
                         "epoch_end_sec": w1 / sfreq,
                         "phasic_time_sec": dur_phasic,
+                        "tonic_eog": tonic_eog_epoch,
+                        "eye_emg_corr": eye_emg_corr,
                         "phasic_ratio": phasic_ratio_epoch,
                         "very_phasic": bool(very_phasic_epoch),
                         "tonic_ratio": tonic_ratio_epoch,
@@ -472,10 +603,10 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
 
     except Exception as e:
         return pd.DataFrame([{
-            "patient_id": os.path.basename(patient_dir.rstrip(os.sep)),
+            "patient_id": patient_id,
             "type": "ERROR",
             "episode_index": -1,
-            "error": f"{e} (rec={rec})"
+            "error": f"{e} (rec={rec}, raw_loaded={raw is not None}, eog_loaded={eog_data is not None})"
         }])
 
 

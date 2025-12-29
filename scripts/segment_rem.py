@@ -91,7 +91,7 @@ def make_4s_epochs(raw, intervals, epoch_len=4.0):
     Découpe des Epochs de "epoch_len" secondes à l’intérieur des intervals.
     Exemple :
         interval = (10, 22)
-        -> epochs = [10–14], [14–18], [18–22]
+        -> epochs = [10-14], [14-18], [18-22]
     """
     events = []
     event_id = {"REM": 1}
@@ -118,7 +118,7 @@ def make_4s_epochs(raw, intervals, epoch_len=4.0):
         events=events,
         event_id=event_id,
         tmin=0.0,
-        tmax=epoch_len,  # 4 s nominales
+        tmax=epoch_len,  
         baseline=None,
         picks=picks,
         preload=True,

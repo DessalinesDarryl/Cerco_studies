@@ -379,7 +379,7 @@ def parse_args():
     p.add_argument(
         "--labels-txt",
         type=str,
-        default="data/patient_list.txt",
+        default="data/patients_label.txt",
         help="Fichier texte des labels patients (patient_id,label_str).",
     )
     p.add_argument(
