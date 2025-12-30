@@ -4,5 +4,6 @@
 *.edf
 *.txt
 *.fif
+*.pyc
 data/features_monopolaire.csv
 data/features_bipolaire.csv
