@@ -1,0 +1,303 @@
+[INFO] RSWA CSV rows: (41306, 15) | patients: 76
+[INFO] XAI patients dirs: 76
+[INFO] Patients traités: 76
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+Overwriting existing file.
+[BA152] OK: saved=BA152_RSWA-epo.fif | epochs=829 | windows_in=829 | windows_kept=829
+[BA171] OK: saved=BA171_RSWA-epo.fif | epochs=224 | windows_in=224 | windows_kept=224
+[BB114] OK: saved=BB114_RSWA-epo.fif | epochs=1112 | windows_in=1112 | windows_kept=1112
+[CB165] OK: saved=CB165_RSWA-epo.fif | epochs=531 | windows_in=531 | windows_kept=531
+[BDRE44] OK: saved=BDRE44_RSWA-epo.fif | epochs=804 | windows_in=804 | windows_kept=804
+[BF181] OK: saved=BF181_RSWA-epo.fif | epochs=1027 | windows_in=1027 | windows_kept=1027
+[AN166] OK: saved=AN166_RSWA-epo.fif | epochs=374 | windows_in=374 | windows_kept=374
+[BO60] OK: saved=BO60_RSWA-epo.fif | epochs=365 | windows_in=365 | windows_kept=365
+[BJ138] OK: saved=BJ138_RSWA-epo.fif | epochs=188 | windows_in=188 | windows_kept=188
+[CP155] OK: saved=CP155_RSWA-epo.fif | epochs=250 | windows_in=250 | windows_kept=250
+[AE129] OK: saved=AE129_RSWA-epo.fif | epochs=2003 | windows_in=2003 | windows_kept=2003
+[CD164] OK: saved=CD164_RSWA-epo.fif | epochs=352 | windows_in=352 | windows_kept=352
+[CM161] OK: saved=CM161_RSWA-epo.fif | epochs=108 | windows_in=108 | windows_kept=108
+[CJP53] OK: saved=CJP53_RSWA-epo.fif | epochs=737 | windows_in=737 | windows_kept=737
+[CS131] OK: saved=CS131_RSWA-epo.fif | epochs=446 | windows_in=446 | windows_kept=446
+[CS147] OK: saved=CS147_RSWA-epo.fif | epochs=214 | windows_in=214 | windows_kept=214
+[DI136] OK: saved=DI136_RSWA-epo.fif | epochs=828 | windows_in=828 | windows_kept=828
+[DA110] OK: saved=DA110_RSWA-epo.fif | epochs=503 | windows_in=503 | windows_kept=503
+[DA174] OK: saved=DA174_RSWA-epo.fif | epochs=401 | windows_in=401 | windows_kept=401
+[CA169] OK: saved=CA169_RSWA-epo.fif | epochs=1029 | windows_in=1029 | windows_kept=1029
+[CD28] OK: saved=CD28_RSWA-epo.fif | epochs=842 | windows_in=842 | windows_kept=842
+[CJL159] OK: saved=CJL159_RSWA-epo.fif | epochs=306 | windows_in=306 | windows_kept=306
+[DSJ112] OK: saved=DSJ112_RSWA-epo.fif | epochs=563 | windows_in=563 | windows_kept=563
+[DJ137] OK: saved=DJ137_RSWA-epo.fif | epochs=881 | windows_in=881 | windows_kept=881
+[GH163] OK: saved=GH163_RSWA-epo.fif | epochs=97 | windows_in=97 | windows_kept=97
+[GX111] OK: saved=GX111_RSWA-epo.fif | epochs=283 | windows_in=283 | windows_kept=283
+[GS191] OK: saved=GS191_RSWA-epo.fif | epochs=655 | windows_in=655 | windows_kept=655
+[GR108] OK: saved=GR108_RSWA-epo.fif | epochs=137 | windows_in=137 | windows_kept=137
+[IS179] OK: saved=IS179_RSWA-epo.fif | epochs=191 | windows_in=191 | windows_kept=191
+[HG167] OK: saved=HG167_RSWA-epo.fif | epochs=160 | windows_in=160 | windows_kept=160
+[GD170] OK: saved=GD170_RSWA-epo.fif | epochs=637 | windows_in=637 | windows_kept=637
+[JP141] OK: saved=JP141_RSWA-epo.fif | epochs=410 | windows_in=410 | windows_kept=410
+[EF130] OK: saved=EF130_RSWA-epo.fif | epochs=355 | windows_in=355 | windows_kept=355
+[JLJ177] OK: saved=JLJ177_RSWA-epo.fif | epochs=518 | windows_in=518 | windows_kept=518
+[MA27] OK: saved=MA27_RSWA-epo.fif | epochs=1008 | windows_in=1008 | windows_kept=1008
+[JB173] OK: saved=JB173_RSWA-epo.fif | epochs=298 | windows_in=298 | windows_kept=298
+[KH113] OK: saved=KH113_RSWA-epo.fif | epochs=312 | windows_in=312 | windows_kept=312
+[CC175] OK: saved=CC175_RSWA-epo.fif | epochs=452 | windows_in=452 | windows_kept=452
+[LS162] OK: saved=LS162_RSWA-epo.fif | epochs=662 | windows_in=662 | windows_kept=662
+[MFJ160] OK: saved=MFJ160_RSWA-epo.fif | epochs=96 | windows_in=96 | windows_kept=96
+[MG16] OK: saved=MG16_RSWA-epo.fif | epochs=102 | windows_in=102 | windows_kept=102
+[LJ41] OK: saved=LJ41_RSWA-epo.fif | epochs=559 | windows_in=559 | windows_kept=559
+[MM109] OK: saved=MM109_RSWA-epo.fif | epochs=575 | windows_in=575 | windows_kept=575
+[ML135] OK: saved=ML135_RSWA-epo.fif | epochs=469 | windows_in=469 | windows_kept=469
+[MN26] OK: saved=MN26_RSWA-epo.fif | epochs=321 | windows_in=321 | windows_kept=321
+[LF126] OK: saved=LF126_RSWA-epo.fif | epochs=319 | windows_in=319 | windows_kept=319
+[MRM132] OK: saved=MRM132_RSWA-epo.fif | epochs=420 | windows_in=420 | windows_kept=420
+[MHTK39] OK: saved=MHTK39_RSWA-epo.fif | epochs=588 | windows_in=588 | windows_kept=588
+[MS128] OK: saved=MS128_RSWA-epo.fif | epochs=215 | windows_in=215 | windows_kept=215
+[MN143] OK: saved=MN143_RSWA-epo.fif | epochs=269 | windows_in=269 | windows_kept=269
+[MP150] OK: saved=MP150_RSWA-epo.fif | epochs=816 | windows_in=816 | windows_kept=816
+[NGA157] OK: saved=NGA157_RSWA-epo.fif | epochs=442 | windows_in=442 | windows_kept=442
+[PA139] OK: saved=PA139_RSWA-epo.fif | epochs=1030 | windows_in=1030 | windows_kept=1030
+[PF133] OK: saved=PF133_RSWA-epo.fif | epochs=325 | windows_in=325 | windows_kept=325
+[PJC140] OK: saved=PJC140_RSWA-epo.fif | epochs=327 | windows_in=327 | windows_kept=327
+[MC154] OK: saved=MC154_RSWA-epo.fif | epochs=500 | windows_in=500 | windows_kept=500
+[NAL43] OK: saved=NAL43_RSWA-epo.fif | epochs=1869 | windows_in=1869 | windows_kept=1869
+[PJL153] OK: saved=PJL153_RSWA-epo.fif | epochs=656 | windows_in=656 | windows_kept=656
+[RH146] OK: saved=RH146_RSWA-epo.fif | epochs=451 | windows_in=451 | windows_kept=451
+[RG156] OK: saved=RG156_RSWA-epo.fif | epochs=488 | windows_in=488 | windows_kept=488
+[RD158] OK: saved=RD158_RSWA-epo.fif | epochs=374 | windows_in=374 | windows_kept=374
+[TJ127] OK: saved=TJ127_RSWA-epo.fif | epochs=334 | windows_in=334 | windows_kept=334
+[SJP172] OK: saved=SJP172_RSWA-epo.fif | epochs=939 | windows_in=939 | windows_kept=939
+[RB103] OK: saved=RB103_RSWA-epo.fif | epochs=726 | windows_in=726 | windows_kept=726
+[RJ42] OK: saved=RJ42_RSWA-epo.fif | epochs=1078 | windows_in=1078 | windows_kept=1078
+[SB176] OK: saved=SB176_RSWA-epo.fif | epochs=1256 | windows_in=1256 | windows_kept=1256
+[RJP148] OK: saved=RJP148_RSWA-epo.fif | epochs=1319 | windows_in=1319 | windows_kept=1319
+[SD134] OK: saved=SD134_RSWA-epo.fif | epochs=187 | windows_in=187 | windows_kept=187
+[SB178] OK: saved=SB178_RSWA-epo.fif | epochs=78 | windows_in=78 | windows_kept=78
+[VA182] OK: saved=VA182_RSWA-epo.fif | epochs=372 | windows_in=372 | windows_kept=372
+[TM142] OK: saved=TM142_RSWA-epo.fif | epochs=618 | windows_in=618 | windows_kept=618
+[VJ149] OK: saved=VJ149_RSWA-epo.fif | epochs=209 | windows_in=209 | windows_kept=209
+[TLM168] OK: saved=TLM168_RSWA-epo.fif | epochs=787 | windows_in=787 | windows_kept=787
+[TO145] OK: saved=TO145_RSWA-epo.fif | epochs=259 | windows_in=259 | windows_kept=259
+[TM151] OK: saved=TM151_RSWA-epo.fif | epochs=561 | windows_in=561 | windows_kept=561
+[FP144] OK: saved=FP144_RSWA-epo.fif | epochs=280 | windows_in=280 | windows_kept=280
+
+[DONE] ok=76 | skip=0 | error=0

@@ -80,11 +80,17 @@ def find_hypnogram_file(patient_dir: str) -> Optional[str]:
             return files[0]
     return None
 
+import re
 
 def _norm_stage_to_rem_nrem_w(s: str) -> str:
-    s = str(s).strip().upper()
+    s = re.sub(r"[^A-Z0-9]+", "", str(s).upper())
+    if s in ("N1", "N2", "N3", "S1", "S2", "S3", "S4", "N4", "1", "2", "3", "4"):
+        return "NREM"
+    if s in ("REM", "R", "SP"):
+        return "REM"
+    if s in ("W", "WAKE", "V"):
+        return "W"
     return STAGE_MAP.get(s, s)
-
 
 def _aggregate_epochs_to_episodes(rows: List[Tuple[float, float, str]]) -> List[Episode]:
     if not rows:
@@ -300,7 +306,7 @@ def load_eog_signal(raw: mne.io.BaseRaw):
         return None, None
 
     eog = raw.copy().pick(picks)
-    data = eog.get_data() * 1e6  # µV
+    data = eog.get_data() * 1e9  # nV
     sfreq = eog.info["sfreq"]
     return data, sfreq
 
@@ -494,12 +500,12 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
 
         eog_data, eog_sfreq = load_eog_signal(raw)
         if eog_data is None or eog_sfreq is None:
-            raise RuntimeError("EOG manquant — eye_emg_corr requis (corrélation EOG–EMG obligatoire).")
+            raise RuntimeError("EOG manquant - eye_emg_corr requis (corrélation EOG–EMG obligatoire).")
 
         # Si sfreq EOG != sfreq EMG, on refuse (sinon tes indices w0/w1 sont faux pour l'EOG)
         if abs(float(eog_sfreq) - float(raw.info["sfreq"])) > 1e-6:
             raise RuntimeError(
-                f"sfreq EOG ({eog_sfreq}) != sfreq raw/EMG ({raw.info['sfreq']}) — resampling requis."
+                f"sfreq EOG ({eog_sfreq}) != sfreq raw/EMG ({raw.info['sfreq']}) - resampling requis."
             )
 
         
@@ -510,8 +516,17 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
         episodes = parse_hypnogram_table(hyp_path) if hyp_path else parse_hypnogram_from_raw(raw)
         if not episodes:
             raise RuntimeError("No hypnogram found or parsed.")
+        
         pairs = collect_rem_nrem_pairs(episodes, min_len_sec=10.0)
-
+        if not pairs:
+            print(f"[{patient_id}] NO_PAIRS: episodes={len(episodes)} hyp={hyp_path}")
+            return pd.DataFrame([{
+                "patient_id": patient_id,
+                "type": "EMPTY_NO_PAIRS",
+                "episode_index": -1,
+                "error": f"No NREM->REM pairs (episodes={len(episodes)} hyp={hyp_path})"
+            }])
+        
         rows = []
         for idx_pair, (nrem_ep, rem_ep) in enumerate(pairs):
             rem_start = int(np.round((rem_ep.onset + 2.0) * sfreq))
@@ -524,6 +539,9 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
             nrem_ref_end = max(nrem_ref_start + 1, min(nrem_end_for_ref, n_samples))
 
             epochs = split_into_epochs(rem_start, rem_end, sfreq, args.rem_epoch_len)
+            if not epochs:
+                print(f"[{patient_id}] NO_EPOCHS: rem_dur={(rem_end-rem_start)/sfreq:.1f}s after margins")
+                continue
 
             for ch_i, ch_name in enumerate(chs):
                 env = envs[ch_i, :]
@@ -566,18 +584,21 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
                         or (tonic_eog_epoch is True)
                     )
 
-                    # --- eye_emg_corr (OBLIGATOIRE) ---
+                    # Partie à retravailler plus tard : eye_emg_corr (on le fera sur les données non lissées)
+                    # --- eye_emg_corr ---
+                    """
                     eog_seg = np.mean(eog_data[:, w0:w1], axis=0)   # (n_samples_epoch,)
                     emg_seg = env[w0:w1]                            # enveloppe EMG (n_samples_epoch,)
 
                     if eog_seg.size == 0 or emg_seg.size == 0 or eog_seg.size != emg_seg.size:
                         raise RuntimeError("Segment EOG/EMG invalide pour eye_emg_corr.")
 
-                    # Si variance ~0 → corrélation non définie, on force une erreur (obligatoire)
+                    # Si variance ~0 >>> corrélation non définie, on force une erreur 
                     if np.std(eog_seg) < 1e-8 or np.std(emg_seg) < 1e-8:
-                        raise RuntimeError("Variance trop faible (EOG ou EMG) — eye_emg_corr non calculable.")
+                        raise RuntimeError("Variance trop faible (EOG ou EMG) - eye_emg_corr non calculable.")
 
                     eye_emg_corr = float(np.corrcoef(emg_seg, eog_seg)[0, 1])
+                    """
 
                     rows.append({
                         "patient_id": patient_id,
@@ -590,7 +611,7 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
                         "epoch_end_sec": w1 / sfreq,
                         "phasic_time_sec": dur_phasic,
                         "tonic_eog": tonic_eog_epoch,
-                        "eye_emg_corr": eye_emg_corr,
+                        #"eye_emg_corr": eye_emg_corr,
                         "phasic_ratio": phasic_ratio_epoch,
                         "very_phasic": bool(very_phasic_epoch),
                         "tonic_ratio": tonic_ratio_epoch,
@@ -598,6 +619,13 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
                         "rswa": bool(rswa_epoch),
                         "phasic_count": len(phasic_in_win)
                     })
+        if len(rows) == 0:
+            return pd.DataFrame([{
+                "patient_id": patient_id,
+                "type": "EMPTY",
+                "episode_index": -1,
+                "error": "Aucun résultat: pas de paires NREM->REM ou REM trop court ou aucune epoch retenue"
+            }])
 
         return pd.DataFrame(rows)
 
@@ -664,7 +692,7 @@ def main():
 
     if not patients:
         print("[ERREUR] Aucun dossier patient trouvé.", file=sys.stderr)
-        sys.exit(1)
+        sys.exit(1) 
 
     dfs = []
     if args.n_jobs and args.n_jobs > 1:

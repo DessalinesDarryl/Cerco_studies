@@ -157,6 +157,7 @@ def main():
 
     # Keep only epoch rows (exclude PHASIC event rows)
     df_epochs = df.loc[df[args.type_col].astype(str) == args.epoch_type_value].copy()
+    
     if df_epochs.empty:
         raise RuntimeError(f"Aucune ligne trouvée avec {args.type_col} == '{args.epoch_type_value}'.")
 

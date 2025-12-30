@@ -1,0 +1,235 @@
+[INFO] mode=rswa_epo | patients=77
+[INFO] Parallèle avec 15 worker(s) (spawn, maxtasksperchild=1)
+[CM161] PID=3670494 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/CM161/CM161_RSWA-epo.fif
+[CM161] types: {'eeg': 18}
+[PSD] sf=256.000Hz | n_times=110700 | n_per_seg=1024 | n_overlap=512
+[CP155] PID=3670494 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/CP155/CP155_RSWA-epo.fif
+[CP155] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=256250 | n_per_seg=1024 | n_overlap=512
+[GH163] PID=3670483 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/GH163/GH163_RSWA-epo.fif
+[GH163] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=99425 | n_per_seg=1024 | n_overlap=512
+[GR108] PID=3670483 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/GR108/GR108_RSWA-epo.fif
+[GR108] types: {'eeg': 18}
+[PSD] sf=256.000Hz | n_times=140425 | n_per_seg=1024 | n_overlap=512
+[CB165] PID=3670496 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/CB165/CB165_RSWA-epo.fif
+[CB165] types: {'eeg': 18}
+[PSD] sf=256.000Hz | n_times=544275 | n_per_seg=1024 | n_overlap=512
+[CC175] PID=3670496 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/CC175/CC175_RSWA-epo.fif
+[CC175] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=463300 | n_per_seg=1024 | n_overlap=512
+[BO60] PID=3670488 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/BO60/BO60_RSWA-epo.fif
+[BO60] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=374125 | n_per_seg=1024 | n_overlap=512
+[CA169] PID=3670488 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/CA169/CA169_RSWA-epo.fif
+[CA169] types: {'eeg': 18}
+[PSD] sf=256.000Hz | n_times=1054725 | n_per_seg=1024 | n_overlap=512
+[CJL159] PID=3670486 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/CJL159/CJL159_RSWA-epo.fif
+[CJL159] types: {'eeg': 18}
+[PSD] sf=256.000Hz | n_times=313650 | n_per_seg=1024 | n_overlap=512
+[CJP53] PID=3670486 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/CJP53/CJP53_RSWA-epo.fif
+[CJP53] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=755425 | n_per_seg=1024 | n_overlap=512
+[CD164] PID=3670492 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/CD164/CD164_RSWA-epo.fif
+[CD164] types: {'eeg': 18}
+[PSD] sf=256.000Hz | n_times=360800 | n_per_seg=1024 | n_overlap=512
+[CD28] PID=3670492 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/CD28/CD28_RSWA-epo.fif
+[CD28] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=863050 | n_per_seg=1024 | n_overlap=512
+[CS131] PID=3670493 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/CS131/CS131_RSWA-epo.fif
+[CS131] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=457150 | n_per_seg=1024 | n_overlap=512
+[CS147] PID=3670493 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/CS147/CS147_RSWA-epo.fif
+[CS147] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=219350 | n_per_seg=1024 | n_overlap=512
+[DSJ112] PID=3670489 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/DSJ112/DSJ112_RSWA-epo.fif
+[DSJ112] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=577075 | n_per_seg=1024 | n_overlap=512
+[EF130] PID=3670489 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/EF130/EF130_RSWA-epo.fif
+[EF130] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=363875 | n_per_seg=1024 | n_overlap=512
+[FP144] PID=3670495 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/FP144/FP144_RSWA-epo.fif
+[FP144] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=287000 | n_per_seg=1024 | n_overlap=512
+[GD170] PID=3670495 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/GD170/GD170_RSWA-epo.fif
+[GD170] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=652925 | n_per_seg=1024 | n_overlap=512
+[BA152] PID=3670484 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/BA152/BA152_RSWA-epo.fif
+[BA152] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=849725 | n_per_seg=1024 | n_overlap=512
+[BA171] PID=3670484 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/BA171/BA171_RSWA-epo.fif
+[BA171] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=229600 | n_per_seg=1024 | n_overlap=512
+[DA110] PID=3670487 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/DA110/DA110_RSWA-epo.fif
+[DA110] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=515575 | n_per_seg=1024 | n_overlap=512
+[DA174] PID=3670487 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/DA174/DA174_RSWA-epo.fif
+[DA174] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=411025 | n_per_seg=1024 | n_overlap=512
+[BF181] PID=3670490 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/BF181/BF181_RSWA-epo.fif
+[BF181] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=1052675 | n_per_seg=1024 | n_overlap=512
+[BJ138] PID=3670490 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/BJ138/BJ138_RSWA-epo.fif
+[BJ138] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=192700 | n_per_seg=1024 | n_overlap=512
+[DI136] PID=3670491 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/DI136/DI136_RSWA-epo.fif
+[DI136] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=848700 | n_per_seg=1024 | n_overlap=512
+[DJ137] PID=3670491 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/DJ137/DJ137_RSWA-epo.fif
+[DJ137] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=903025 | n_per_seg=1024 | n_overlap=512
+[AE129] PID=3670482 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/AE129/AE129_RSWA-epo.fif
+[AE129] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=2053075 | n_per_seg=1024 | n_overlap=512
+[AN166] PID=3670482 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/AN166/AN166_RSWA-epo.fif
+[AN166] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=383350 | n_per_seg=1024 | n_overlap=512
+[BB114] PID=3670485 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/BB114/BB114_RSWA-epo.fif
+[BB114] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=1139800 | n_per_seg=1024 | n_overlap=512
+[BDRE44] PID=3670485 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/BDRE44/BDRE44_RSWA-epo.fif
+[BDRE44] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=824100 | n_per_seg=1024 | n_overlap=512
+[PJL153] PID=3670806 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/PJL153/PJL153_RSWA-epo.fif
+[PJL153] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=672400 | n_per_seg=1024 | n_overlap=512
+[HG167] PID=3670747 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/HG167/HG167_RSWA-epo.fif
+[HG167] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=164000 | n_per_seg=1024 | n_overlap=512
+[IS179] PID=3670747 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/IS179/IS179_RSWA-epo.fif
+[IS179] types: {'eeg': 18}
+[PSD] sf=256.000Hz | n_times=195775 | n_per_seg=1024 | n_overlap=512
+[JB173] PID=3670760 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/JB173/JB173_RSWA-epo.fif
+[JB173] types: {'eeg': 18}
+[PSD] sf=256.000Hz | n_times=305450 | n_per_seg=1024 | n_overlap=512
+[JLJ177] PID=3670760 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/JLJ177/JLJ177_RSWA-epo.fif
+[JLJ177] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=530950 | n_per_seg=1024 | n_overlap=512
+[JP141] PID=3670762 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/JP141/JP141_RSWA-epo.fif
+[JP141] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=420250 | n_per_seg=1024 | n_overlap=512
+[KH113] PID=3670762 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/KH113/KH113_RSWA-epo.fif
+[KH113] types: {'eeg': 18}
+[PSD] sf=256.000Hz | n_times=319800 | n_per_seg=1024 | n_overlap=512
+[MG16] PID=3670776 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/MG16/MG16_RSWA-epo.fif
+[MG16] types: {'eeg': 18}
+[PSD] sf=256.000Hz | n_times=104550 | n_per_seg=1024 | n_overlap=512
+[MHTK39] PID=3670776 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/MHTK39/MHTK39_RSWA-epo.fif
+[MHTK39] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=602700 | n_per_seg=1024 | n_overlap=512
+[MC154] PID=3670777 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/MC154/MC154_RSWA-epo.fif
+[MC154] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=512500 | n_per_seg=1024 | n_overlap=512
+[MFJ160] PID=3670777 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/MFJ160/MFJ160_RSWA-epo.fif
+[MFJ160] types: {'eeg': 18}
+[PSD] sf=256.000Hz | n_times=98400 | n_per_seg=1024 | n_overlap=512
+[LS162] PID=3670766 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/LS162/LS162_RSWA-epo.fif
+[LS162] types: {'eeg': 18}
+[PSD] sf=256.000Hz | n_times=678550 | n_per_seg=1024 | n_overlap=512
+[MA27] PID=3670766 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/MA27/MA27_RSWA-epo.fif
+[MA27] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=1033200 | n_per_seg=1024 | n_overlap=512
+[GS191] PID=3670745 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/GS191/GS191_RSWA-epo.fif
+[GS191] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=671375 | n_per_seg=1024 | n_overlap=512
+[GX111] PID=3670745 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/GX111/GX111_RSWA-epo.fif
+[GX111] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=290075 | n_per_seg=1024 | n_overlap=512
+[LF126] PID=3670764 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/LF126/LF126_RSWA-epo.fif
+[LF126] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=326975 | n_per_seg=1024 | n_overlap=512
+[LJ41] PID=3670764 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/LJ41/LJ41_RSWA-epo.fif
+[LJ41] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=572975 | n_per_seg=1024 | n_overlap=512
+[ML135] PID=3670783 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/ML135/ML135_RSWA-epo.fif
+[ML135] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=480725 | n_per_seg=1024 | n_overlap=512
+[MM109] PID=3670783 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/MM109/MM109_RSWA-epo.fif
+[MM109] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=589375 | n_per_seg=1024 | n_overlap=512
+[MN143] PID=3670785 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/MN143/MN143_RSWA-epo.fif
+[MN143] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=275725 | n_per_seg=1024 | n_overlap=512
+[MN26] PID=3670785 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/MN26/MN26_RSWA-epo.fif
+[MN26] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=329025 | n_per_seg=1024 | n_overlap=512
+[PF133] PID=3670805 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/PF133/PF133_RSWA-epo.fif
+[PF133] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=333125 | n_per_seg=1024 | n_overlap=512
+[PJC140] PID=3670805 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/PJC140/PJC140_RSWA-epo.fif
+[PJC140] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=335175 | n_per_seg=1024 | n_overlap=512
+[MP150] PID=3670788 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/MP150/MP150_RSWA-epo.fif
+[MP150] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=836400 | n_per_seg=1024 | n_overlap=512
+[MRM132] PID=3670788 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/MRM132/MRM132_RSWA-epo.fif
+[MRM132] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=430500 | n_per_seg=1024 | n_overlap=512
+[MS128] PID=3670792 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/MS128/MS128_RSWA-epo.fif
+[MS128] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=220375 | n_per_seg=1024 | n_overlap=512
+[NAL43] PID=3670792 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/NAL43/NAL43_RSWA-epo.fif
+[NAL43] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=1915725 | n_per_seg=1024 | n_overlap=512
+[NGA157] PID=3670803 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/NGA157/NGA157_RSWA-epo.fif
+[NGA157] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=453050 | n_per_seg=1024 | n_overlap=512
+[PA139] PID=3670803 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/PA139/PA139_RSWA-epo.fif
+[PA139] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=1055750 | n_per_seg=1024 | n_overlap=512
+[VJ149] PID=3671038 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/VJ149/VJ149_RSWA-epo.fif
+[VJ149] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=214225 | n_per_seg=1024 | n_overlap=512
+[RB103] PID=3670939 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/RB103/RB103_RSWA-epo.fif
+[RB103] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=744150 | n_per_seg=1024 | n_overlap=512
+[RD158] PID=3670939 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/RD158/RD158_RSWA-epo.fif
+[RD158] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=383350 | n_per_seg=1024 | n_overlap=512
+[RG156] PID=3670990 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/RG156/RG156_RSWA-epo.fif
+[RG156] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=500200 | n_per_seg=1024 | n_overlap=512
+[RH146] PID=3670990 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/RH146/RH146_RSWA-epo.fif
+[RH146] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=462275 | n_per_seg=1024 | n_overlap=512
+[SD134] PID=3671018 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/SD134/SD134_RSWA-epo.fif
+[SD134] types: {'eeg': 18}
+[PSD] sf=256.000Hz | n_times=191675 | n_per_seg=1024 | n_overlap=512
+[SJP172] PID=3671018 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/SJP172/SJP172_RSWA-epo.fif
+[SJP172] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=962475 | n_per_seg=1024 | n_overlap=512
+[SB176] PID=3671008 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/SB176/SB176_RSWA-epo.fif
+[SB176] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=1287400 | n_per_seg=1024 | n_overlap=512
+[SB178] PID=3671008 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/SB178/SB178_RSWA-epo.fif
+[SB178] types: {'eeg': 18}
+[PSD] sf=256.000Hz | n_times=79950 | n_per_seg=1024 | n_overlap=512
+[TJ127] PID=3671023 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/TJ127/TJ127_RSWA-epo.fif
+[TJ127] types: {'eeg': 18}
+[PSD] sf=256.000Hz | n_times=342350 | n_per_seg=1024 | n_overlap=512
+[TLM168] PID=3671023 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/TLM168/TLM168_RSWA-epo.fif
+[TLM168] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=806675 | n_per_seg=1024 | n_overlap=512
+[RJ42] PID=3671003 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/RJ42/RJ42_RSWA-epo.fif
+[RJ42] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=1104950 | n_per_seg=1024 | n_overlap=512
+[RJP148] PID=3671003 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/RJP148/RJP148_RSWA-epo.fif
+[RJP148] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=1351975 | n_per_seg=1024 | n_overlap=512
+[TO145] PID=3671032 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/TO145/TO145_RSWA-epo.fif
+[TO145] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=265475 | n_per_seg=1024 | n_overlap=512
+[VA182] PID=3671032 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/VA182/VA182_RSWA-epo.fif
+[VA182] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=381300 | n_per_seg=1024 | n_overlap=512
+[TM142] PID=3671027 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/TM142/TM142_RSWA-epo.fif
+[TM142] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=633450 | n_per_seg=1024 | n_overlap=512
+[TM151] PID=3671027 | mode=rswa_epo | file=/home/darryld/documents/EEG/results/TM151/TM151_RSWA-epo.fif
+[TM151] types: {'eeg': 21}
+[PSD] sf=256.000Hz | n_times=575025 | n_per_seg=1024 | n_overlap=512
+[PSDRSWAEPO] SKIP: rswa_epo fif not found
+>>> /home/darryld/documents/EEG/results/psd_rswa_epo/all_band_powers.csv
+>>> /home/darryld/documents/EEG/results/psd_rswa_epo/per_channel_band_powers.csv
+>>> /home/darryld/documents/EEG/results/psd_rswa_epo/group_psd_bands.png
+>>> /home/darryld/documents/EEG/results/psd_rswa_epo/group_psd_full_0p5_80.png

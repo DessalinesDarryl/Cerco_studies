@@ -3,7 +3,7 @@
 """
 preprocessing.py
 
-Fonctions de prétraitement pour tes enregistrements :
+Fonctions de prétraitement pour les enregistrements :
 - Application du montage bipolaire gp2 (avec conservation EMG/ECG/EOG bruts)
 - Filtres :
     * EEG : 0.5-80 Hz + notch 50 Hz
