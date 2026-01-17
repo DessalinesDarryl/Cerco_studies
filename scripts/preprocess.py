@@ -44,7 +44,7 @@ def _extract_base_name(edf_path: Path) -> str:
     Extrait l’identifiant patient (base_name) à partir du nom du fichier EDF.
 
     Convention attendue :
-        AN166_H0_raw.edf  →  base_name = "AN166"
+        AN166_raw.edf  →  base_name = "AN166"
 
     Paramètres
     ----------
@@ -121,6 +121,8 @@ def _process_one_edf(
     eog_params: Dict,
     yasa_params: Dict,
 ) -> None:
+    
+
     """
     Fonction exécutée dans un worker : prétraitement d’un fichier EDF unique.
 
@@ -141,6 +143,7 @@ def _process_one_edf(
         Dossier racine pour localiser les hypnogrammes / annotations.
     eeg_params, emg_params, eog_params, yasa_params : dict
         Paramètres de traitement transmis à preprocess_record.
+        Ces paramètres sont définis dans le fichier de configuration YAML > configs/preproc.
 
     Exceptions
     ----------
@@ -148,6 +151,10 @@ def _process_one_edf(
     Les erreurs commençant par "MISSING_CHANNELS:" sont interprétées
     comme des échecs contrôlés (canaux requis absents).
     """
+
+
+    # Début du code 
+
     log = get_logger("preprocess")
     p = Path(p)
 
@@ -237,7 +244,7 @@ def main(cfg: Dict) -> None:
         {"win_sec": 4.0, "method": "covar", "threshold": 3.0, "include": "sleep"},
     )
 
-    n_workers = int(cfg.get("n_workers", 15))
+    n_workers = int(cfg.get("n_workers", 15)) # 15 processus en parallèle
 
     # --- Recherche des EDF ---
     edfs = _find_edf_files(raw_root)

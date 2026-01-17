@@ -62,7 +62,7 @@ BANDS = {
     "Gamma_Bas": (30.0, 50.0),
     "Gamma_Haut": (50.0, 80.0),
 }
-FMIN, FMAX = 10.0, 100.0
+FMIN, FMAX = 0.5, 100.0
 COMMON_NFREQ = 400
 COMMON_FREQS = np.linspace(FMIN, FMAX, COMMON_NFREQ)
 

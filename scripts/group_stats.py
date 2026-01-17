@@ -40,10 +40,10 @@ def infer_band_from_feature(feat: str) -> str:
     Essaie de déduire une bande de fréquence à partir du nom de la feature.
 
     Règles :
-      - si 'delta'/'theta'/'alpha'/'beta'/'gamma_bas'/'gamma_haut' dans le nom → ces bandes
-      - si pattern numérique du type '85_95Hz' ou '85-95Hz' → '85.0–95.0Hz'
-      - si spec_entropy / spec_centroid / peak_freq / rms / zc → '0.5–80.0Hz'
-      - sinon → 'broadband'
+      - si 'delta'/'theta'/'alpha'/'beta'/'gamma_bas'/'gamma_haut' dans le nom >>> ces bandes
+      - si pattern numérique du type '85_95Hz' ou '85-95Hz' >>> '85.0–95.0Hz'
+      - si spec_entropy / spec_centroid / peak_freq / rms / zc >>> '0.5–80.0Hz'
+      - sinon >>> 'broadband'
     """
     if not isinstance(feat, str):
         return "broadband"
@@ -112,10 +112,10 @@ def main(cfg):
         if "feature" in df_perm.columns:
             df = df_shap.merge(df_perm, on="feature", how="left")
         else:
-            log.warning("permutation_importance.csv sans colonne 'feature' → ignoré.")
+            log.warning("permutation_importance.csv sans colonne 'feature' >>> ignoré.")
             df = df_shap.copy()
     else:
-        log.info("permutation_importance.csv introuvable → seules les stats SHAP seront utilisées.")
+        log.info("permutation_importance.csv introuvable >>> seules les stats SHAP seront utilisées.")
         df = df_shap.copy()
 
     # ---------- Gestion de la colonne 'band' ----------
@@ -124,10 +124,10 @@ def main(cfg):
         df["band"] = df["band"].astype(str)
         mask_other = df["band"] == "other"
         if mask_other.any():
-            log.info(f"{mask_other.sum()} features avec band='other' → remplacement par bande exacte.")
+            log.info(f"{mask_other.sum()} features avec band='other' >>> remplacement par bande exacte.")
             df.loc[mask_other, "band"] = df.loc[mask_other, "feature"].apply(infer_band_from_feature)
     else:
-        # Pas de bande du tout → on la reconstruit pour toutes les features
+        # Pas de bande du tout >>> on la reconstruit pour toutes les features
         log.warning("Colonne 'band' absente, reconstruction des bandes à partir des noms de features.")
         df["band"] = df["feature"].apply(infer_band_from_feature)
 

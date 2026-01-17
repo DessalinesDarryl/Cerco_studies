@@ -3,26 +3,69 @@
 
 """
 xai_plots.py
-Génère les figures XAI à partir des sorties de xai_attributions.py :
+============
 
-- Barplot permutation importance
-- Barplot SHAP mean |value|
-- Top-k features
+Objectif
+--------
+Générer des figures XAI (prêtes pour un rapport / papier) à partir des sorties
+produites par `xai_attributions.py`.
 
-Config (configs/xai/plots.yaml) attend :
-    perm_csv: outputs/xai/attributions/permutation_importance.csv
-    shap_csv: outputs/xai/attributions/shap_global_meanabs.csv
-    out_dir: outputs/figures/xai
-    top_k: 20
+Figures générées
+----------------
+1) Barplot des **Top-k** features selon la permutation importance
+   - Fichier attendu : permutation_importance.csv
+   - Score : importance_mean (moyenne sur n_repeats permutations)
+   - Interprétation : plus c'est grand, plus la feature est importante au sens
+     "si je casse cette feature, la performance baisse".
+
+2) Barplot des **Top-k** features selon **SHAP mean |value|**
+   - Fichier attendu : shap_global_meanabs.csv
+   - Score : mean_abs_shap (moyenne des contributions absolues)
+   - Interprétation : plus c'est grand, plus la feature contribue en moyenne à la décision,
+     toutes classes / tous échantillons confondus.
+
+Entrées
+-------
+Les chemins viennent du YAML, typiquement :
+
+- perm_csv : outputs/xai/attributions/permutation_importance.csv
+- shap_csv : outputs/xai/attributions/shap_global_meanabs.csv
+- out_dir  : outputs/figures/xai
+- top_k    : 20
+
+Sorties
+-------
+Dans out_dir :
+- permutation_importance_topk.png
+- shap_global_topk.png
+
+Dépendances
+-----------
+- pandas
+- matplotlib
+- seaborn
+
+Notes / bonnes pratiques
+------------------------
+- Le script ne plante pas si l'un des CSV est absent : il log un warning.
+- Le barplot est orienté "horizontal" (x=score, y=feature) pour lire facilement les noms.
+- La taille de figure est adaptée au nombre de features (hauteur proportionnelle à top_k).
+
+Exécution
+---------
+python scripts/xai_plots.py --config configs/xai/plots.yaml
 """
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+from typing import Optional
 
 import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-
-import sys
-from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
@@ -31,16 +74,150 @@ from src.utils.config import load_yaml, add_common_args
 from src.utils.logging import get_logger
 
 
-def plot_bar(df, x, y, title, out_path):
-    plt.figure(figsize=(8, max(4, len(df) * 0.25)))
+def plot_bar(
+    df: pd.DataFrame,
+    x: str,
+    y: str,
+    title: str,
+    out_path: Path,
+    *,
+    figsize_w: float = 8.0,
+    row_height: float = 0.25,
+    min_h: float = 4.0,
+    dpi: int = 200,
+) -> None:
+    """
+    Trace et sauvegarde un barplot horizontal (score en abscisse, features en ordonnée).
+
+    Pourquoi cette fonction ?
+    -------------------------
+    - Mutualiser la logique de plotting (permutation + SHAP).
+    - Assurer une figure lisible même quand top_k est grand (hauteur variable).
+    - Centraliser la sauvegarde (dpi, tight_layout, close).
+
+    Paramètres
+    ----------
+    df : pd.DataFrame
+        DataFrame déjà filtré / trié (souvent top_k lignes).
+    x : str
+        Nom de la colonne numérique à utiliser comme score (axe X).
+        Exemples : "importance_mean", "mean_abs_shap"
+    y : str
+        Nom de la colonne texte utilisée comme étiquette (axe Y).
+        Exemples : "feature"
+    title : str
+        Titre de la figure.
+    out_path : Path
+        Chemin du fichier image de sortie (ex: .png).
+    figsize_w : float, optionnel
+        Largeur figure en pouces.
+    row_height : float, optionnel
+        Hauteur par ligne (feature) en pouces. Utilisé pour adapter automatiquement la figure.
+    min_h : float, optionnel
+        Hauteur minimale de figure en pouces.
+    dpi : int, optionnel
+        Résolution du rendu.
+
+    Sortie
+    ------
+    None
+        Écrit un fichier image sur disque.
+
+    Remarques
+    ---------
+    - La fonction suppose que df[x] est numérique.
+    - En cas de df vide, la fonction ne trace rien.
+    """
+    if df is None or df.empty:
+        return
+
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    fig_h = max(min_h, float(len(df)) * float(row_height))
+
+    plt.figure(figsize=(figsize_w, fig_h))
     sns.barplot(data=df, x=x, y=y)
     plt.title(title)
+    plt.xlabel(x)
+    plt.ylabel(y)
     plt.tight_layout()
-    plt.savefig(out_path, dpi=200)
+    plt.savefig(out_path, dpi=dpi)
     plt.close()
 
 
-def main(cfg):
+def _load_and_prepare(
+    csv_path: Path,
+    score_col: str,
+    feature_col: str,
+    top_k: int,
+    log,
+) -> Optional[pd.DataFrame]:
+    """
+    Charge un CSV d'attributions (permutation ou SHAP), vérifie les colonnes,
+    trie décroissant sur le score et garde les top_k.
+
+    Paramètres
+    ----------
+    csv_path : Path
+        Chemin vers le CSV.
+    score_col : str
+        Colonne contenant le score d'importance.
+    feature_col : str
+        Colonne contenant le nom de la feature.
+    top_k : int
+        Nombre de features à conserver.
+    log : logger
+
+    Retour
+    ------
+    Optional[pd.DataFrame]
+        - DataFrame filtré (top_k) si OK
+        - None si fichier absent ou colonnes manquantes
+    """
+    csv_path = Path(csv_path)
+    if not csv_path.exists():
+        log.warning(f"CSV introuvable : {csv_path}")
+        return None
+
+    log.info(f"Lecture CSV : {csv_path}")
+    df = pd.read_csv(csv_path)
+
+    missing = [c for c in (score_col, feature_col) if c not in df.columns]
+    if missing:
+        log.warning(f"Colonnes manquantes dans {csv_path.name} : {missing}")
+        return None
+
+    df = df.copy()
+    df[score_col] = pd.to_numeric(df[score_col], errors="coerce")
+    df = df.dropna(subset=[score_col, feature_col])
+
+    df = df.sort_values(score_col, ascending=False)
+    df_top = df.head(int(top_k)).reset_index(drop=True)
+    return df_top
+
+
+def main(cfg: dict) -> None:
+    """
+    Point d'entrée du script.
+
+    Étapes
+    ------
+    1) Lecture des chemins (perm_csv, shap_csv) et paramètres (out_dir, top_k).
+    2) Génération du plot permutation importance (si perm_csv existe).
+    3) Génération du plot SHAP global (si shap_csv existe).
+    4) Log final.
+
+    Paramètres
+    ----------
+    cfg : dict
+        Configuration YAML, attend au minimum :
+          - perm_csv : str
+          - shap_csv : str
+          - out_dir : str
+        et optionnel :
+          - top_k : int (défaut 20)
+    """
     log = get_logger("xai_plots")
 
     perm_csv = Path(cfg["perm_csv"])
@@ -53,34 +230,48 @@ def main(cfg):
     # -------------------------------
     # 1) Permutation importance
     # -------------------------------
-    if perm_csv.exists():
-        log.info(f"Lecture permutation_importance: {perm_csv}")
-        df_perm = pd.read_csv(perm_csv).sort_values("importance_mean", ascending=False)
-        df_top = df_perm.head(top_k)
-
+    df_perm_top = _load_and_prepare(
+        csv_path=perm_csv,
+        score_col="importance_mean",
+        feature_col="feature",
+        top_k=top_k,
+        log=log,
+    )
+    if df_perm_top is not None and not df_perm_top.empty:
         out = out_dir / "permutation_importance_topk.png"
-        log.info(f"Plot → {out}")
-        plot_bar(df_top, x="importance_mean", y="feature",
-                 title=f"Top {top_k} - Permutation Importance",
-                 out_path=out)
+        log.info(f"Plot permutation importance → {out}")
+        plot_bar(
+            df_perm_top,
+            x="importance_mean",
+            y="feature",
+            title=f"Top {top_k} - Permutation Importance",
+            out_path=out,
+        )
     else:
-        log.warning("Permutation importance CSV non trouvé.")
+        log.warning("Permutation importance non tracée (CSV absent ou invalide).")
 
     # -------------------------------
     # 2) SHAP global
     # -------------------------------
-    if shap_csv.exists():
-        log.info(f"Lecture SHAP global: {shap_csv}")
-        df_shap = pd.read_csv(shap_csv).sort_values("mean_abs_shap", ascending=False)
-        df_top = df_shap.head(top_k)
-
+    df_shap_top = _load_and_prepare(
+        csv_path=shap_csv,
+        score_col="mean_abs_shap",
+        feature_col="feature",
+        top_k=top_k,
+        log=log,
+    )
+    if df_shap_top is not None and not df_shap_top.empty:
         out = out_dir / "shap_global_topk.png"
-        log.info(f"Plot → {out}")
-        plot_bar(df_top, x="mean_abs_shap", y="feature",
-                 title=f"Top {top_k} - SHAP mean |value|",
-                 out_path=out)
+        log.info(f"Plot SHAP global → {out}")
+        plot_bar(
+            df_shap_top,
+            x="mean_abs_shap",
+            y="feature",
+            title=f"Top {top_k} - SHAP mean |value|",
+            out_path=out,
+        )
     else:
-        log.warning("SHAP global CSV non trouvé.")
+        log.warning("SHAP global non tracé (CSV absent ou invalide).")
 
     log.info("Figures XAI générées.")
 
