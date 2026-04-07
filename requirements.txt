@@ -1,3 +1,2 @@
 mne
 scikit-learn
-tree

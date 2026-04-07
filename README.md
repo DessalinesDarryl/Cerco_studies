@@ -30,3 +30,13 @@ CERCO_STUDIES/
 │
 ├── README.md
 └── requirements.txt
+
+## Vérification rapide de l'environnement
+
+Après activation de `.venv`, lancez :
+
+```bash
+python -c "import mne, sklearn; print('env_ok')"
+```
+
+Si tout est correct, la commande affiche `env_ok`.
