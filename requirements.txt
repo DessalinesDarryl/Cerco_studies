@@ -16,7 +16,7 @@ matplotlib
 pyriemann
 torch
 torchaudio
-pythorch-lightning
+pytorch-lightning
 captum
 tqdm
 jinja2
