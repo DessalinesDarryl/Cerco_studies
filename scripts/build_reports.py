@@ -31,7 +31,7 @@ import numpy as np
 import pandas as pd
 
 # ---------------------------------------------------------------------
-# Allow "import src.*"
+# Initialisation du chemin projet pour les imports internes
 # ---------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
@@ -40,7 +40,7 @@ from src.utils.logging import get_logger
 
 
 # =====================================================================
-# FIGURES DISCOVERY
+# Recherche des figures disponibles
 # =====================================================================
 def find_metrics_figures(fig_root: Path):
     metrics_dir = fig_root 
@@ -88,7 +88,7 @@ def find_xai_figures(fig_root: Path):
 
 
 # =====================================================================
-# STATS SUMMARY
+# Résumés automatiques des statistiques et métriques
 # =====================================================================
 def summarize_stats(stats_root: Path) -> str:
     """Résumé simple des CSV de statistiques disponibles."""
@@ -133,7 +133,7 @@ def summarize_metrics(stats_root: Path) -> str:
 
 
 # =====================================================================
-# REPORT BUILDING
+# Construction du rapport Markdown final
 # =====================================================================
 def build_markdown_report(
     out_dir: Path,
@@ -156,7 +156,7 @@ def build_markdown_report(
     md_lines.append("# Rapport d’analyse – Classification RBD / EEG–EMG\n")
 
     # ------------------------------------------------------------------
-    # Section 1 : Performances globales
+    # Section 1 — Performances globales du modèle
     # ------------------------------------------------------------------
     md_lines.append("## 1. Performances globales du modèle\n")
     md_lines.append(
@@ -182,7 +182,7 @@ def build_markdown_report(
         md_lines.append("- Courbes ROC non trouvées.\n")
 
     # ------------------------------------------------------------------
-    # Section 2 : Explicabilité globale
+    # Section 2 — Explicabilité globale
     # ------------------------------------------------------------------
     md_lines.append("\n## 2. Explicabilité globale (XAI)\n")
 
@@ -201,7 +201,7 @@ def build_markdown_report(
         md_lines.append("- Heatmap XAI par groupe non trouvée.\n")
 
     # ------------------------------------------------------------------
-    # Section 3 : Attributions locales
+    # Section 3 — Attributions locales par patient
     # ------------------------------------------------------------------
     md_lines.append("\n## 3. Attributions locales par patient\n")
 
@@ -215,7 +215,7 @@ def build_markdown_report(
         md_lines.append("- Aucune attribution locale trouvée.\n")
 
     # ------------------------------------------------------------------
-    # Section 4 : Statistiques
+    # Section 4 — Statistiques de groupe
     # ------------------------------------------------------------------
     md_lines.append("\n## 4. Statistiques de groupe\n")
     md_lines.append(stats_summary)
@@ -229,7 +229,7 @@ def build_markdown_report(
         )
 
     # ------------------------------------------------------------------
-    # Write report
+    # Écriture du rapport sur disque
     # ------------------------------------------------------------------
     out_dir.mkdir(parents=True, exist_ok=True)
     out_md = out_dir / "report.md"
@@ -238,7 +238,7 @@ def build_markdown_report(
 
 
 # =====================================================================
-# CLI
+# Interface en ligne de commande
 # =====================================================================
 def parse_args():
     ap = argparse.ArgumentParser(description="Construire un rapport Markdown XAI + métriques.")

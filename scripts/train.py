@@ -73,7 +73,7 @@ from src.utils.logging import get_logger
 
 
 # ======================================================================
-#  Utils chargement features / labels
+# Chargement des features et préparation des labels
 # ======================================================================
 
 def load_features(features_csv: Path, log) -> pd.DataFrame:
@@ -117,7 +117,7 @@ def prepare_train_dataframe(
     df = df_feat.copy()
     n_pat_total = df["patient_id"].nunique()
 
-    # On enlève les patients sans label
+    # 1) Suppression des lignes sans label exploitable
     before_rows = df.shape[0]
     df = df.dropna(subset=[label_col])
     after_rows = df.shape[0]
@@ -126,8 +126,7 @@ def prepare_train_dataframe(
         f"Filtrage lignes sans label ({label_col}) : {before_rows} -> {after_rows} lignes."
     )
 
-    # Si on utilise un label numérique (recommandé : label_id)
-    # on force le cast en int.
+    # 2) Construction d’un label numérique utilisable pour l’entraînement
     if np.issubdtype(df[label_col].dtype, np.number):
         df[label_col] = df[label_col].astype(int)
     else:
@@ -142,10 +141,10 @@ def prepare_train_dataframe(
         f"patients avec label ({label_col}) : {n_pat_labeled}."
     )
 
-    # Construire un label_map_effective pour le checkpoint XAI :
+    # 3) Construction d’un label_map utile pour l’inférence/XAI
     label_map_effective = None
 
-    # Cas idéal : on a 'label_str' ET 'label_id' dans le CSV
+    # Cas idéal : le dataset contient déjà label_str et label_id
     if "label_str" in df_feat.columns and "label_id" in df_feat.columns:
         pairs = (
             df_feat[["label_str", "label_id"]]
@@ -159,7 +158,7 @@ def prepare_train_dataframe(
         label_map_effective = dict(zip(pairs["label_str"], pairs["label_id"]))
         log.info(f"label_map_effective construit depuis dataset_final : {label_map_effective}")
     else:
-        # Sinon, on regarde si un label_map est fourni dans la config
+        # Sinon, on essaie de récupérer un mapping dans la config YAML
         label_map_cfg = cfg.get("label_map", None)
         if label_map_cfg is not None:
             label_map_effective = {str(k): int(v) for k, v in label_map_cfg.items()}
@@ -171,7 +170,7 @@ def prepare_train_dataframe(
 
 
 # ======================================================================
-#  Modèle & CV
+# Construction du modèle et validation croisée
 # ======================================================================
 
 def build_model(cfg, log) -> RandomForestClassifier:
@@ -184,7 +183,7 @@ def train_with_cv(df, label_col, cfg, log):
     """
     df : DataFrame avec 'patient_id', features, et 'label_col'
     """
-    # On retire les colonnes non-features, et on ne garde que les colonnes numériques
+    # 1) Sélection des colonnes de features numériques
     all_cols = [c for c in df.columns if c not in ("patient_id", label_col, "label_str")]
     feat_cols = [c for c in all_cols if np.issubdtype(df[c].dtype, np.number)]
 

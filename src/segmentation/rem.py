@@ -1,4 +1,9 @@
-# src/segmentation/rem.py
+"""Segmentation des périodes REM en epochs exploitables.
+
+Ce module lit un enregistrement prétraité et ses annotations, extrait les
+intervalles REM, puis construit/sauvegarde des epochs prêtes pour les features.
+"""
+
 import os, mne, numpy as np
 def segment_rem(raw_fif: str, annot_txt: str, epoch_len_s: float, out_epochs_fif: str):
     raw = mne.io.read_raw_fif(raw_fif, preload=True, verbose=False)

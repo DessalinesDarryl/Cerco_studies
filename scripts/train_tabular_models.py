@@ -59,6 +59,9 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+# ---------------------------------------------------------------------
+# Initialisation du chemin projet pour permettre les imports internes.
+# ---------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
 
@@ -79,7 +82,7 @@ from src.utils.logging import get_logger
 
 
 # ======================================================================
-#  Utils chargement features / labels
+# Chargement des features et préparation des labels
 # ======================================================================
 
 def load_features(features_csv: Path, log) -> pd.DataFrame:
@@ -173,7 +176,7 @@ def prepare_train_dataframe(
 
 
 # ======================================================================
-#  Modèles tabulaires
+# Construction des modèles tabulaires
 # ======================================================================
 
 def build_model(cfg, log):
@@ -311,7 +314,7 @@ def train_with_cv(df, label_col, cfg, log):
 
 
 # ======================================================================
-#  Main
+# Point d’entrée principal
 # ======================================================================
 
 def main(cfg):
@@ -325,23 +328,23 @@ def main(cfg):
     out_dir.mkdir(parents=True, exist_ok=True)
     metrics_out.parent.mkdir(parents=True, exist_ok=True)
 
-    # ---- 1) Features (incluant labels) ----
+    # ---- 1) Chargement du dataset final (features + labels) ----
     df_feat = load_features(features_csv, log)
 
-    # ---- 2) Préparation df_train à partir du CSV (plus d'Excel) ----
+    # ---- 2) Construction du jeu d'entraînement à partir du CSV ----
     df_train, label_col, label_map_effective = prepare_train_dataframe(df_feat, cfg, log)
     if df_train.empty:
         raise RuntimeError("Aucune ligne avec label après filtrage des features.")
 
-    # ---- 3) CV + métriques ----
+    # ---- 3) Validation croisée et calcul des métriques ----
     feat_cols, df_metrics = train_with_cv(df_train, label_col, cfg, log)
 
-    # ---- 4) Sauvegarde métriques ----
+    # ---- 4) Sauvegarde des métriques de validation croisée ----
     metrics_out.parent.mkdir(parents=True, exist_ok=True)
     df_metrics.to_csv(metrics_out, index=False)
     log.info(f"Métriques CV sauvegardées dans {metrics_out}")
 
-    # ---- 5) Entraînement final sur tout le dataset ----
+    # ---- 5) Entraînement final sur l'ensemble des données disponibles ----
     X_full = df_train[feat_cols].values.astype(float)
     y_full = df_train[label_col].astype(int).values
 
@@ -354,7 +357,7 @@ def main(cfg):
     model.fit(X_full, y_full)
     log.info(f"Modèle final entraîné sur {len(y_full)} échantillons.")
 
-    # ---- 6) Checkpoint pour XAI / inference ----
+    # ---- 6) Sauvegarde du checkpoint pour l'inférence et la XAI ----
     ckpt_path = out_dir / ckpt_name
     bundle = {
         "model": model,

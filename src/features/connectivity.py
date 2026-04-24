@@ -1,4 +1,9 @@
-# src/features/connectivity.py
+"""Extraction de descripteurs de connectivité EEG.
+
+Le module calcule des métriques de connectivité entre paires de canaux
+à partir de signaux EEG par bandes de fréquences.
+"""
+
 import numpy as np
 import mne
 
@@ -12,20 +17,35 @@ DEFAULT_BANDS = {
 }
 
 
+# ======================================================================
+# Utilitaires pour énumération des paires de canaux
+# ======================================================================
+
 def _pair_indices(n):
+    """Retourne tous les couples (i, j) avec i < j pour n canaux."""
     pairs = []
     for i in range(n):
-        for j in range(i+1, n):
+        for j in range(i + 1, n):
             pairs.append((i, j))
     return pairs
 
 
+# ======================================================================
+# Calcul des features de connectivité EEG
+# ======================================================================
+
 def compute_connectivity_features(epochs: mne.Epochs, bands=None):
-    """
-    Connectivité EEG (par epoch, par bande) :
-      - cohérence magnitude-squared (scipy / mne)
-      - corrélation de Pearson entre signaux
-    Attention : nombre de features peut exploser si beaucoup de canaux.
+    """Extrait des features de connectivité EEG par paire de canaux.
+
+    Mesures incluses
+    ----------------
+    - Corrélation de Pearson temporelle
+    - Cohérence magnitude-squared par bande
+
+    Attention
+    ---------
+    Le nombre de features peut croître rapidement avec le nombre de canaux.
+    Préférer une sélection ROI si besoin.
     """
     picks = mne.pick_types(epochs.info, eeg=True, exclude=[])
     if len(picks) < 2:
@@ -47,7 +67,7 @@ def compute_connectivity_features(epochs: mne.Epochs, bands=None):
     feat_list = []
     names = []
 
-    # --- Corrélation temporelle par paire ---
+    # 1) Corrélation de Pearson temporelle par paire de canaux
     corr_feats = []
     for (i, j) in pairs:
         x = data[:, i, :]  # (n_epochs, n_times)
@@ -65,8 +85,7 @@ def compute_connectivity_features(epochs: mne.Epochs, bands=None):
     corr_arr = np.stack(corr_feats, axis=1)  # (n_epochs, n_pairs)
     feat_list.append(corr_arr)
 
-    # --- Cohérence par bande, moyenne sur la bande ---
-    # On calcule la cohérence pour chaque epoch et chaque paire.
+    # 2) Cohérence par bande (moyenne intra-bande) pour chaque paire
     from scipy.signal import coherence
 
     for band_name, (fmin, fmax) in bands.items():

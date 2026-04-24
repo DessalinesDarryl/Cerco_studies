@@ -1,4 +1,9 @@
-# src/viz/metrics_plots.py
+"""Fonctions de visualisation des métriques de classification.
+
+Le module regroupe les tracés standards (matrice de confusion, courbes ROC)
+utilisés dans les rapports d'évaluation.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -12,7 +17,7 @@ from sklearn.metrics import (
 
 
 # ==========================================================
-# 1) CONFUSION MATRIX
+# 1) Matrice de confusion
 # ==========================================================
 def plot_confusion_matrix(
     y_true,
@@ -24,7 +29,9 @@ def plot_confusion_matrix(
     figsize=(6, 6),
 ):
     """
-    - normalize: None | 'true' | 'pred' | 'all'
+    Trace une matrice de confusion, éventuellement normalisée.
+
+    `normalize` peut valoir `None`, `"true"`, `"pred"` ou `"all"`.
     """
     cm = confusion_matrix(y_true, y_pred, normalize=normalize)
 
@@ -51,7 +58,7 @@ def plot_confusion_matrix(
 
 
 # ==========================================================
-# 2) ROC MULTICLASSE (one-vs-rest)
+# 2) Courbes ROC multiclasses (one-vs-rest)
 # ==========================================================
 def plot_multiclass_roc(
     y_true,
@@ -62,10 +69,12 @@ def plot_multiclass_roc(
     figsize=(8, 6),
 ):
     """
-    y_true : labels en texte ou int
-    y_proba : array (n_samples, n_classes)
+    Trace les courbes ROC one-vs-rest pour un problème multiclasses.
+
+    `y_true` peut contenir des labels texte ou entiers.
+    `y_proba` doit être de forme `(n_samples, n_classes)`.
     """
-    # On encode les classes → int
+    # Encodage local des classes en indices entiers pour le calcul ROC.
     classes = np.unique(y_true)
     name_to_int = {c: i for i, c in enumerate(classes)}
     y_int = np.array([name_to_int[v] for v in y_true])
@@ -73,7 +82,7 @@ def plot_multiclass_roc(
     fig, ax = plt.subplots(figsize=figsize)
 
     for idx, c in enumerate(classes):
-        # Binarisation 1-vs-rest
+        # Construction de la cible binaire one-vs-rest pour la classe courante.
         y_bin = (y_int == idx).astype(int)
         fpr, tpr, _ = roc_curve(y_bin, y_proba[:, idx])
         roc_auc = auc(fpr, tpr)

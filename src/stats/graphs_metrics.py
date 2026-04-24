@@ -1,4 +1,9 @@
-# src/stats/graphs_metrics.py
+"""Métriques de graphe dérivées de matrices d'attention/connectivité.
+
+Le module calcule des indicateurs simples (ex. degré) afin de résumer
+la structure d'interactions entre nœuds/canaux.
+"""
+
 import numpy as np, pandas as pd
 def degree(matrix: np.ndarray): return np.sum(matrix!=0, axis=1)
 def metrics_from_attention(attn: np.ndarray):

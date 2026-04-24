@@ -1,4 +1,9 @@
-# src/viz/plots.py
+"""Visualisations globales et par groupe des importances/features.
+
+Ce module fournit les fonctions de plotting utilisées pour l'analyse XAI
+et l'interprétation des contributions des variables.
+"""
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -26,7 +31,7 @@ def plot_global_feature_importance(
     figsize=(8, 10),
 ):
     """
-    Barplot vertical des top-k features les plus importantes.
+    Trace un barplot horizontal des `top_k` features les plus importantes.
     """
     importances = np.asarray(importances)
     order, names_top, vals_top = _topk_order(importances, feature_names, top_k)
@@ -48,7 +53,7 @@ def plot_global_feature_importance(
 
 
 # ======================================================================
-# 2) Importance par groupe de patients (heatmap)
+# 2) Importance par groupe de patients
 # ======================================================================
 
 def compute_group_feature_contributions(
@@ -58,10 +63,13 @@ def compute_group_feature_contributions(
     importances: np.ndarray,
 ):
     """
-    Approche simple :
+    Calcule une contribution moyenne par groupe selon une heuristique simple.
+
+    Principe
+    --------
       contrib_g,j = |mean(X_j | groupe=g) - mean(X_j global)| * importance_j
 
-    Retourne un DataFrame (group x feature) utilisable pour une heatmap.
+    Retourne un DataFrame (groupe x feature) exploitable dans une heatmap.
     """
     X = df[feature_cols].values.astype(float)
     y = df[label_col].values
@@ -99,10 +107,11 @@ def plot_group_feature_importance_heatmap(
     figsize=(10, 6),
 ):
     """
-    Heatmap des top-k features les plus discriminantes entre groupes.
-    df_contrib : DataFrame index = groupes, colonnes = features, valeurs = contrib.
+    Trace une heatmap des `top_k` features les plus discriminantes entre groupes.
+
+    `df_contrib` doit avoir les groupes en index et les features en colonnes.
     """
-    # On choisit les features avec plus grande importance moyenne
+    # On retient ici les features à contribution moyenne absolue la plus élevée.
     mean_contrib = df_contrib.abs().mean(axis=0)
     order, feat_top, _ = _topk_order(mean_contrib.values, df_contrib.columns.tolist(), top_k)
 
@@ -139,13 +148,16 @@ def compute_patient_contributions(
     feature_names,
 ):
     """
-    Approx local type "attribution" (très simple) :
+    Calcule une attribution locale simplifiée pour un patient donné.
+
+    Principe
+    --------
 
       contrib_j = (x_j - baseline_j) * importance_j
 
-    - baseline = moyenne globale (ou moyenne du groupe contrôle)
-    - signe : direction (valeur > baseline et importance positive => pousse la classe)
-    - magnitude : impact relatif
+    - `baseline` = moyenne globale ou moyenne d'un groupe de référence
+    - le signe indique la direction de l'effet
+    - la magnitude reflète l'impact relatif de la variable
 
     Retourne DataFrame avec colonnes [feature, contribution, abs_contribution].
     """
@@ -178,7 +190,7 @@ def plot_patient_contributions(
     figsize=(8, 6),
 ):
     """
-    Barplot des top-k contributions (signées) pour un patient.
+    Trace un barplot des contributions signées les plus fortes pour un patient.
     """
     df_top = df_contrib.head(top_k).copy()
     df_top = df_top.iloc[::-1]  # pour que la plus grande soit en haut

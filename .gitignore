@@ -1,13 +1,88 @@
-.vscode
-.venv*
-.env*
-*.edf
-*.fif
-data/features_monopolaire.csv
-data/features_bipolaire.csv
-
-################################
-# caches
+# Python
 __pycache__/
-*.pyc
-.ipynb_checkpoints/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv_clean/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.code-workspace
+.pylintrc
+.mypy.ini
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb_checkpoints
+.jupyter/
+
+# Data (large files - adjust paths as needed)
+data/raw/
+data/processed/
+*.edf
+*.EDF
+*.fif
+*.fiff
+
+# Outputs generated during pipeline execution
+outputs/figures/
+outputs/reports/*.md
+outputs/reports/*.html
+outputs/reports/*.json
+outputs/infer/
+outputs/stats/
+outputs/xai/
+
+# Large model files
+models/*.joblib
+models/*.pt
+models/*.pth
+
+# Logs
+logs/
+*.log
+
+# DVC
+.dvc/
+.dvcignore
+
+# Misc
+.pytest_cache/
+.coverage
+htmlcov/
+*.bak

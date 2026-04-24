@@ -1,4 +1,9 @@
-# src/features/spectral_eeg.py
+"""Features spectrales spécifiques aux canaux EEG.
+
+Le module calcule des indicateurs fréquentiels (puissance absolue/relative,
+entropie, etc.) par canal pour l'analyse des états de sommeil.
+"""
+
 import numpy as np
 import mne
 from scipy.stats import entropy
@@ -14,12 +19,12 @@ DEFAULT_BANDS = {
 
 
 def _spectral_base(epochs, fmin=0.5, fmax=80.0, picks=None):
-    """
-    Calcule la PSD avec l'API moderne de MNE (Epochs.compute_psd).
+    """Calcule la PSD via Welch avec l'API moderne de MNE.
 
-    Retourne :
-      - psds : (n_epochs, n_channels, n_freqs)
-      - freqs : (n_freqs,)
+    Retourne
+    -------
+    psds : ndarray, shape (n_epochs, n_channels, n_freqs)
+    freqs : ndarray, shape (n_freqs,)
     """
     psd = epochs.compute_psd(
         method="welch",
@@ -37,14 +42,20 @@ def _spectral_base(epochs, fmin=0.5, fmax=80.0, picks=None):
 
 
 
-def compute_spectral_eeg_features(epochs: mne.Epochs,
-                                  bands=None):
-    """
-    Pour chaque canal EEG et epoch :
-      - Bandpower absolue et relative par bande
-      - Ratios inter-bandes (α/β, θ/α, θ/β, gamma_bas/β, gamma_haut/β) moyennés sur les canaux
-      - Spectral centroid, spectral entropy, peak frequency, bandwidth
-        (sur [0.5,80] Hz)
+def compute_spectral_eeg_features(epochs: mne.Epochs, bands=None):
+    """Extrait des features spectrales EEG complètes dans plusieurs domaines.
+
+    Domaines inclus
+    ---------------
+    - Puissances absolues et relatives par bande et canal
+    - Ratios inter-bandes (α/β, θ/α, etc.) moyennés sur les canaux
+    - Descripteurs spectraux : centroid, entropy, peak frequency, bandwidth
+
+    Retours
+    -------
+    X : ndarray, shape (n_epochs, n_features)
+    names : list of str
+        Noms des features retournées.
     """
     picks = mne.pick_types(epochs.info, eeg=True, exclude=[])
     if len(picks) == 0:
@@ -65,7 +76,7 @@ def compute_spectral_eeg_features(epochs: mne.Epochs,
     feat_list = []
     names = []
 
-    # --- Band powers (abs + rel) par canal ---
+    # 1) Puissances par bande, absolue et relative
     band_powers_abs = []
     band_powers_rel = []
     band_names = list(bands.keys())
@@ -77,11 +88,11 @@ def compute_spectral_eeg_features(epochs: mne.Epochs,
         band_powers_abs.append(bp)
         band_powers_rel.append(bp_rel)
 
-    # concat : (n_epochs, n_ch * nb_bands)
+    # Concaténation : (n_epochs, n_ch * nb_bands)
     bp_abs_cat = np.concatenate(band_powers_abs, axis=1)
     bp_rel_cat = np.concatenate(band_powers_rel, axis=1)
 
-    # noms
+    # Noms des features de puissance
     for ch_idx in picks:
         ch_name = epochs.ch_names[ch_idx]
         for b in band_names:
@@ -91,13 +102,13 @@ def compute_spectral_eeg_features(epochs: mne.Epochs,
 
     feat_list.extend([bp_abs_cat, bp_rel_cat])
 
-    # --- Moyenne par bande sur les canaux (pour les ratios) ---
+    # 2) Moyennes par bande sur tous les canaux (pour les ratios)
     band_means = {}
     for i, b in enumerate(band_names):
         bp_b = band_powers_abs[i]          # (n_epochs, n_ch)
         band_means[b] = bp_b.mean(axis=1)  # (n_epochs,)
 
-    # --- Ratios inter-bandes (basés sur moyenne des canaux) ---
+    # 3) Ratios inter-bandes (basés sur moyennes des canaux)
     ratios = []
     ratio_names = []
 
@@ -126,7 +137,7 @@ def compute_spectral_eeg_features(epochs: mne.Epochs,
         feat_list.append(ratios_arr)
         names.extend(ratio_names)
 
-    # --- Centroid, entropy, peak freq, bandwidth (par canal) ---
+    # 4) Descripteurs spectraux (centroid, entropy, peak frequency, bandwidth)
     p_norm = psds_full / psd_sum  # normalisation
     # spectral entropy
     spec_entropy = entropy(p_norm + 1e-20, base=2, axis=-1)  # (n_epochs, n_ch)

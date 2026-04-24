@@ -204,9 +204,9 @@ def main(cfg: dict) -> None:
     Étapes
     ------
     1) Lecture des chemins (perm_csv, shap_csv) et paramètres (out_dir, top_k).
-    2) Génération du plot permutation importance (si perm_csv existe).
-    3) Génération du plot SHAP global (si shap_csv existe).
-    4) Log final.
+    2) Génération du barplot de permutation importance (si perm_csv existe).
+    3) Génération du barplot SHAP global (si shap_csv existe).
+    4) Journalisation finale des sorties générées.
 
     Paramètres
     ----------

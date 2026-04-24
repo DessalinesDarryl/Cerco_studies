@@ -58,8 +58,7 @@ import sys
 from pathlib import Path
 
 # ---------------------------------------------------------------------
-# Ajout du dossier racine du projet au PYTHONPATH pour permettre
-# l'import des modules internes (src.utils.*).
+# Initialisation du chemin projet pour permettre les imports internes.
 # ---------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
@@ -76,13 +75,13 @@ from src.utils.logging import get_logger
 
 
 # =====================================================================
-# Types utiles
+# Types utilitaires
 # =====================================================================
 Interval = Tuple[float, float]  # (start_sec, end_sec)
 
 
 # =====================================================================
-# Fonctions utilitaires
+# Fonctions utilitaires pour manipuler les intervalles REM / artefacts
 # =====================================================================
 def get_intervals_from_annotations(raw: mne.io.BaseRaw, label: str) -> List[Interval]:
     """Extrait les intervalles (start, end) d’un label d’annotation MNE.

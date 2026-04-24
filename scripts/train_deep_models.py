@@ -97,6 +97,9 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+# ---------------------------------------------------------------------
+# Initialisation du chemin projet pour permettre les imports internes.
+# ---------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
 
@@ -118,7 +121,7 @@ from src.utils.logging import get_logger
 
 
 # ======================================================================
-# Dataset & utils
+# Dataset PyTorch et fonctions utilitaires de préparation
 # ======================================================================
 
 class FeatureDataset(Dataset):
@@ -729,7 +732,7 @@ def train_with_cv_deep(df: pd.DataFrame, label_col: str, cfg: dict, log):
 
 
 # ======================================================================
-# Main
+# Point d’entrée principal
 # ======================================================================
 
 def main(cfg: dict) -> None:
@@ -760,21 +763,21 @@ def main(cfg: dict) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     metrics_out.parent.mkdir(parents=True, exist_ok=True)
 
-    # ---- 1) Features ----
+    # ---- 1) Chargement du dataset final de features ----
     df_feat = load_features_deep(features_csv, log)
 
-    # ---- 2) Préparation df_train ----
+    # ---- 2) Préparation du jeu d'entraînement et des labels ----
     df_train, label_col, id_to_name = prepare_train_dataframe_deep(df_feat, cfg, log)
     if df_train.empty:
         raise RuntimeError("Aucune ligne avec label après filtrage des features (deep).")
 
-    # ---- 3) CV ----
+    # ---- 3) Validation croisée du modèle deep ----
     feat_cols, df_metrics, input_dim, n_classes = train_with_cv_deep(df_train, label_col, cfg, log)
 
     df_metrics.to_csv(metrics_out, index=False)
     log.info(f"Métriques deep CV sauvegardées dans {metrics_out}")
 
-    # ---- 4) Entraînement final sur tout le dataset ----
+    # ---- 4) Entraînement final sur l'ensemble des données ----
     X_full = df_train[feat_cols].values.astype(np.float32)
     y_full = df_train[label_col].astype(int).values
 
@@ -812,7 +815,7 @@ def main(cfg: dict) -> None:
 
     log.info(f"Modèle deep final entraîné sur {len(y_full)} échantillons.")
 
-    # ---- 5) Sauvegarde checkpoint ----
+    # ---- 5) Sauvegarde du checkpoint et des métadonnées utiles ----
     ckpt_path = out_dir / ckpt_name
     torch.save(
         {

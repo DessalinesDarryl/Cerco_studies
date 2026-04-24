@@ -98,7 +98,7 @@ from src.utils.logging import get_logger
 
 
 # ---------------------------------------------------------------------
-# Utilitaires labels (depuis un fichier .txt / .csv)
+# Chargement et normalisation des labels patients
 # ---------------------------------------------------------------------
 def load_labels_from_txt(txt_path: Path) -> pd.DataFrame:
     """
@@ -151,19 +151,19 @@ def load_labels_from_txt(txt_path: Path) -> pd.DataFrame:
     if not txt_path.exists():
         raise FileNotFoundError(f"Fichier labels TXT introuvable : {txt_path}")
 
-    # Tentative lecture avec header (CSV)
+    # 1) Tentative de lecture avec header explicite
     try:
         df = pd.read_csv(txt_path)
         cols_lower = {c.lower(): c for c in df.columns}
 
-        # Si aucune colonne patient_id/identifiant => on bascule en mode "sans header"
+        # Si aucune colonne patient_id/identifiant n’est trouvée, on bascule en lecture brute
         if "patient_id" not in cols_lower and "identifiant" not in cols_lower:
             raise ValueError("Pas de colonnes patient_id/identifiant détectées, on tente sans header.")
 
-        # colonne ID
+        # Détection de la colonne identifiant patient
         id_col = cols_lower.get("patient_id") or cols_lower.get("identifiant")
 
-        # colonne label
+        # Détection de la colonne label clinique
         if "label_str" in cols_lower:
             label_col = cols_lower["label_str"]
         elif "diagnostic" in cols_lower:
@@ -171,7 +171,7 @@ def load_labels_from_txt(txt_path: Path) -> pd.DataFrame:
         elif "label" in cols_lower:
             label_col = cols_lower["label"]
         else:
-            # Heuristique : s’il ne reste qu’une autre colonne, on l’utilise comme label
+            # Heuristique : s’il ne reste qu’une seule autre colonne, on l’utilise comme label
             other_cols = [c for c in df.columns if c != id_col]
             if len(other_cols) != 1:
                 raise ValueError("Impossible d'inférer la colonne de label dans le fichier TXT.")
@@ -182,16 +182,16 @@ def load_labels_from_txt(txt_path: Path) -> pd.DataFrame:
         out["label_str"] = df[label_col].astype(str).str.strip()
 
     except Exception:
-        # Lecture brute sans header : patient_id,label_str
+        # 2) Lecture brute sans header : patient_id,label_str
         df = pd.read_csv(txt_path, header=None, names=["patient_id", "label_str"])
         out = pd.DataFrame()
         out["patient_id"] = df["patient_id"].astype(str).str.strip()
         out["label_str"] = df["label_str"].astype(str).str.strip()
 
-    # 1 label par patient
+    # 3) Une seule ligne de label conservée par patient
     out = out.drop_duplicates(subset=["patient_id"], keep="first")
 
-    # Ordre fixe des macros
+    # 4) Définition de l’ordre fixe des macro-classes
     macro_order = ["SYN", "Narco", "TCSPi", "EAI"]
 
     norm = out["label_str"].astype(str).str.strip()

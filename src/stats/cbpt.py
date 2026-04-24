@@ -1,5 +1,9 @@
-# src/stats/cbpt.py
-# MVP: proxy très simplifié (pas un CBPT complet) pour illustrer l'API.
+"""Proxy simplifié de Cluster-Based Permutation Testing (CBPT).
+
+Ce module n'implémente pas un CBPT complet ; il fournit une version
+didactique/rapide pour illustrer l'API et valider le flux de traitement.
+"""
+
 import numpy as np, pandas as pd
 def dummy_cbpt(tensor_by_class, n_perm=1000, p_cluster=0.05):
     # tensor_by_class: dict{class: np.array [N, F]} → retourne “clusters” sur dimension F

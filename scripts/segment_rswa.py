@@ -80,7 +80,7 @@ import sys
 from pathlib import Path
 
 # ---------------------------------------------------------------------
-# Ajout du dossier racine du projet au PYTHONPATH pour imports internes (si besoin)
+# Initialisation du chemin projet pour permettre les imports internes.
 # ---------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
@@ -99,7 +99,7 @@ import pandas as pd
 
 
 # =====================================================================
-# Constantes / paramètres de chemin (adapter si besoin)
+# Constantes et paramètres de chemins
 # =====================================================================
 GP2_ROOT = "/home/darryld/documents/EEG/preprocessed/XAI/data"
 RAW_ROOT = "/home/darryld/documents/EEG/raw"
@@ -107,7 +107,7 @@ RAW_ROOT = "/home/darryld/documents/EEG/raw"
 FIF_GLOB_PATTERNS = ["*_art_annotated.fif", "*.fif"]
 HYPNO_CANDIDATES = ["{pid}_hypnoEXP.txt", "{pid}_hypnoEXP.csv", "{pid}_hypno.txt", "{pid}_hypnogram.txt"]
 
-# Map stades hétérogènes -> harmonisé
+# Harmonisation des libellés de stades
 STAGE_MAP = {
     "W": "W", "V": "W", "WAKE": "W",
     "N1": "NREM", "S1": "NREM", "1": "NREM",
@@ -116,13 +116,13 @@ STAGE_MAP = {
     "NREM": "NREM", "REM": "REM", "R": "REM", "SP": "REM",
 }
 
-# Types pratiques
+# Types utilitaires
 IntervalSamp = Tuple[int, int]   # (start_sample, end_sample)
 IntervalSec = Tuple[float, float]  # (start_sec, end_sec)
 
 
 # =====================================================================
-# Data structure: Episode de sommeil (REM/NREM/W)
+# Structure de données pour les épisodes de sommeil
 # =====================================================================
 @dataclass
 class Episode:
@@ -138,7 +138,7 @@ class Episode:
 
 
 # =====================================================================
-# Discovery: patients, enregistrements, hypnogrammes
+# Découverte des patients, enregistrements et hypnogrammes
 # =====================================================================
 def find_patient_dirs(input_dir: str) -> List[str]:
     """Liste les sous-dossiers patients dans un dossier racine (triés)."""

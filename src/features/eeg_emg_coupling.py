@@ -1,4 +1,9 @@
-# src/features/eeg_emg_coupling.py
+"""Extraction de features de couplage EEG-EMG.
+
+Ce module calcule des indicateurs de cohérence/corrélation entre canaux
+EEG et signaux EMG pour la caractérisation des épisodes REM.
+"""
+
 import numpy as np
 import mne
 from scipy.signal import coherence, correlate
@@ -9,11 +14,17 @@ from .temporal_emg import _get_emg_like_picks
 def compute_eeg_emg_coupling_features(epochs: mne.Epochs,
                                       do_coherence: bool = True,
                                       do_cross_corr: bool = True):
-    """
-    Couplage EEG–EMG :
-      - cohérence magnitude-squared (bêta / gamma)
-      - cross-corr max (lag) entre signaux EEG (bande) et EMG
-    (version simplifiée, mais informative)
+    """Extrait des features de couplage EEG-EMG.
+
+    Mesures incluses
+    ----------------
+    - Cohérence dans les bandes bêta (12-30 Hz) et gamma (30-80 Hz)
+    - Corrélation croisée maximale par paire EEG-EMG
+
+    Retours
+    -------
+    X : ndarray, shape (n_epochs, n_features)
+    names : list of str
     """
     eeg_picks = mne.pick_types(epochs.info, eeg=True, exclude=[])
     emg_picks = _get_emg_like_picks(epochs)
@@ -27,7 +38,7 @@ def compute_eeg_emg_coupling_features(epochs: mne.Epochs,
     feats = []
     names = []
 
-    # Cohérence bêta/gamma moyenne (EEG-EMG) par paire
+    # 1) Cohérence bêta/gamma moyenne (EEG-EMG) par paire
     if do_coherence:
         for epick in eeg_picks:
             for mpick in emg_picks:
@@ -54,7 +65,7 @@ def compute_eeg_emg_coupling_features(epochs: mne.Epochs,
                 names.append(f"cpl_coh_beta_{e_name}_{m_name}")
                 names.append(f"cpl_coh_gamma_{e_name}_{m_name}")
 
-    # Cross-corr max lag (normalisé)
+    # 2) Corrélation croisée maximale par paire (normalisée)
     if do_cross_corr:
         max_lags = []
         for epick in eeg_picks:

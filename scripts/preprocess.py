@@ -26,8 +26,7 @@ from typing import Dict, List, Tuple, Optional
 import mne
 
 # ============================================================================
-# Ajout du répertoire racine du projet au PYTHONPATH
-# Permet d’importer les modules internes via "src.*"
+# Initialisation du chemin projet pour les imports internes
 # ============================================================================
 THIS_FILE = Path(__file__).resolve()
 PROJECT_ROOT = THIS_FILE.parents[1]  # ex : .../Cerco_studies
@@ -121,8 +120,6 @@ def _process_one_edf(
     eog_params: Dict,
     yasa_params: Dict,
 ) -> None:
-    
-
     """
     Fonction exécutée dans un worker : prétraitement d’un fichier EDF unique.
 
@@ -152,8 +149,7 @@ def _process_one_edf(
     comme des échecs contrôlés (canaux requis absents).
     """
 
-
-    # Début du code 
+    # 1) Initialisation du logger et métadonnées du fichier
 
     log = get_logger("preprocess")
     p = Path(p)
@@ -161,10 +157,10 @@ def _process_one_edf(
     base_name = _extract_base_name(p)
     log.info(f"=== Prétraitement {base_name} ({p.name}) ===")
 
-    # Lecture du fichier EDF (chargement complet en mémoire)
+    # 2) Lecture du fichier EDF (chargement complet en mémoire)
     raw = mne.io.read_raw_edf(p, preload=True, verbose=False)
 
-    # Application du prétraitement EEG / EMG / EOG
+    # 3) Application du pipeline de prétraitement EEG / EMG / EOG
     raw_prep = preprocess_record(
         raw=raw,
         base_name=base_name,
@@ -175,11 +171,11 @@ def _process_one_edf(
         yasa_params=yasa_params,
     )
 
-    # Construction du chemin de sortie et création des dossiers si besoin
+    # 4) Construction du chemin de sortie et création des dossiers si besoin
     out_path = _build_output_path(p, raw_root, out_root)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Sauvegarde au format .fif
+    # 5) Sauvegarde du signal prétraité au format .fif
     raw_prep.save(out_path, overwrite=True)
     log.info(f"[{base_name}] Sauvegardé >>> {out_path}")
 

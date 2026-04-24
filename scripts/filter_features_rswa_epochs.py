@@ -1,26 +1,29 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Filter RSWA epochs (REM 4s windows) from the final RBD dataset.
+Filtre les epochs RSWA (fenêtres REM de 4 s) à partir du dataset final RBD.
 
-Input (final dataset):
+Entrée principale
+-----------------
 - data/processed/rbd/rbd_emg_events_and_summary_4s_per_channel.csv
 
-This file contains:
-- rows of type == "PHASIC" (events)
-- rows of type == "REM_EPOCH_4S" (4s REM epochs) PER EMG CHANNEL
-- RSWA flag per epoch/channel: rswa (bool)
-- various epoch metrics: tonic_ratio, phasic_ratio, eye_emg_corr, etc.
+Ce fichier contient notamment :
+- des lignes de type == "PHASIC" (événements)
+- des lignes de type == "REM_EPOCH_4S" (epochs REM de 4 s) par canal EMG
+- un drapeau `rswa` par epoch/canal
+- plusieurs métriques associées : `tonic_ratio`, `phasic_ratio`, `eye_emg_corr`, etc.
 
-Outputs:
-1) RSWA epochs only (per-channel): keeps one row per (epoch, EMG channel)
-2) RSWA epochs only (aggregated per epoch): reduces EMG channels into a single row per epoch
-3) Small QC report files
+Sorties
+-------
+1) epochs RSWA seules au niveau canal
+2) epochs RSWA agrégées au niveau de l'epoch
+3) petits exports de contrôle qualité
 
-Usage:
-  python filter_rswa_epochs.py \
-    --input_csv data/processed/rbd/rbd_emg_events_and_summary_4s_per_channel.csv \
-    --out_dir  data/processed/rbd/_rswa_only
+Usage
+-----
+    python filter_rswa_epochs.py \
+        --input_csv data/processed/rbd/rbd_emg_events_and_summary_4s_per_channel.csv \
+        --out_dir data/processed/rbd/_rswa_only
 """
 
 import argparse
@@ -30,7 +33,7 @@ import pandas as pd
 
 
 # -------------------------
-# Utilities
+# Fonctions utilitaires
 # -------------------------
 def _to_bool_series(s: pd.Series) -> pd.Series:
     """Robust conversion of rswa column to boolean."""
@@ -94,7 +97,7 @@ def _pick_epoch_key_cols(df: pd.DataFrame):
 
 
 # -------------------------
-# Main
+# Point d’entrée principal
 # -------------------------
 def main():
     ap = argparse.ArgumentParser(description="Filter RSWA-only REM 4s epochs from final RBD dataset CSV.")
@@ -155,22 +158,22 @@ def main():
     if args.rswa_col not in df.columns:
         raise RuntimeError(f"Colonne '{args.rswa_col}' absente du CSV.")
 
-    # Keep only epoch rows (exclude PHASIC event rows)
+    # 1) Conservation des lignes correspondant uniquement aux epochs REM
     df_epochs = df.loc[df[args.type_col].astype(str) == args.epoch_type_value].copy()
     
     if df_epochs.empty:
         raise RuntimeError(f"Aucune ligne trouvée avec {args.type_col} == '{args.epoch_type_value}'.")
 
-    # Normalize rswa to boolean
+    # 2) Normalisation de la colonne RSWA en booléen robuste
     df_epochs[args.rswa_col] = _to_bool_series(df_epochs[args.rswa_col])
 
-    # Optional time rounding
+    # 3) Arrondi optionnel des temps pour stabiliser les clés d'agrégation
     if args.round_sec is not None:
         for c in ["epoch_start_sec", "epoch_end_sec"]:
             if c in df_epochs.columns:
                 df_epochs[c] = pd.to_numeric(df_epochs[c], errors="coerce").round(args.round_sec)
 
-    # Split RSWA / non-RSWA
+    # 4) Séparation des epochs RSWA et non-RSWA
     df_rswa = df_epochs.loc[df_epochs[args.rswa_col] == True].copy()
     df_non  = df_epochs.loc[df_epochs[args.rswa_col] == False].copy()
 
@@ -179,7 +182,7 @@ def main():
     print("[INFO] RSWA epochs:", df_rswa.shape)
     print("[INFO] non-RSWA epochs:", df_non.shape)
 
-    # Write per-channel RSWA-only (or both)
+    # 5) Export des fichiers au niveau canal
     out_rswa_per_ch = out_dir / "rbd_emg_epochs_4s_rswa_only_per_channel.csv"
     df_rswa.to_csv(out_rswa_per_ch, index=False)
     print("[OK] Écrit:", out_rswa_per_ch)
@@ -189,7 +192,7 @@ def main():
         df_non.to_csv(out_non_per_ch, index=False)
         print("[OK] Écrit:", out_non_per_ch)
 
-    # Aggregate per epoch (recommended for group stats)
+    # 6) Agrégation au niveau epoch pour les analyses de groupe
     key_cols = _pick_epoch_key_cols(df_epochs)
 
     agg_dict = _safe_agg_dict(df_epochs)
@@ -198,7 +201,7 @@ def main():
               "Je vais agréger uniquement rswa (max) si possible.")
         agg_dict = {args.rswa_col: "max"}
 
-    # Keep some metadata columns (take first)
+    # 7) Conservation de quelques métadonnées descriptives
     meta_candidates = [
         "label", "label_id", "diagnosis", "group",
         "epoch_len_sec", "sfreq", "night", "session"
@@ -206,8 +209,7 @@ def main():
     meta_cols = [c for c in meta_candidates if c in df_epochs.columns]
     meta_aggs = {c: "first" for c in meta_cols}
 
-    # For per-channel file, channel col is usually "channel"
-    # In aggregated output, we drop channel dimension by aggregating.
+    # 8) Suppression implicite de la dimension canal par agrégation
     df_rswa_agg = (
         df_rswa
         .groupby(key_cols, as_index=False)

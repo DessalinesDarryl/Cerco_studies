@@ -1,3 +1,9 @@
+"""Constitution de la cohorte et regroupement des enregistrements EDF.
+
+Ce script charge les métadonnées patients (Excel), harmonise les labels
+cliniques, puis associe les fichiers EDF aux groupes/pathologies.
+"""
+
 import pandas as pd
 import os
 import glob

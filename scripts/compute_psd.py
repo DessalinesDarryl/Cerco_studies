@@ -50,7 +50,7 @@ from matplotlib.ticker import ScalarFormatter, FixedLocator, LogLocator
 import mne
 mne.set_config("MNE_MEMMAP_MIN_SIZE", "1M", set_env=True)
 
-# ---------- Defaults ----------
+# ---------- Paramètres par défaut ----------
 DATA_DIR_DEFAULT  = "/home/darryld/documents/EEG/preprocessed/bipolaire/1bis_RBD/method_95percentile"
 OUT_ROOT_DEFAULT  = "/home/darryld/documents/EEG/results"
 
@@ -68,7 +68,7 @@ COMMON_FREQS = np.linspace(FMIN, FMAX, COMMON_NFREQ)
 
 MIN_PATIENTS_PER_CHANNEL = 5
 
-# ---------- Utils ----------
+# ---------- Fonctions utilitaires ----------
 def normalize_id(x: str) -> str:
     return "".join(ch for ch in str(x).strip().upper() if ch.isalnum())
 
@@ -108,13 +108,13 @@ def find_concat_fif(base: str, data_dir: Path, mode: str) -> Path | None:
     ]
     return next((p for p in candidates if p.exists()), None)
 
-# --------- Chargement des catégories ---------
+# --------- Chargement des catégories patients ---------
 def load_groups_from_excel(xlsx_path: Path, sheet_index: int | None):
     from cohort import load_patient_groups as _lpg
     _df, group_map, _demo = _lpg(str(xlsx_path), sheet_index=sheet_index)
     return {str(k).strip().upper(): str(v).strip().lower() for k, v in group_map.items()}
 
-# ---------- PSD helpers ----------
+# ---------- Fonctions de calcul PSD ----------
 def _welch_psd_array(
     data: np.ndarray,
     sfreq: float,

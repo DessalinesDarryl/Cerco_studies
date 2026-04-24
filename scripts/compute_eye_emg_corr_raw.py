@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Compute EOG–EMG correlation on RAW (non-rectified, non-smoothed) signals
-per REM 4s epoch.
+Calcule la corrélation EOG–EMG sur les signaux RAW (non rectifiés, non lissés)
+pour chaque epoch REM de 4 secondes.
 
-- EOG: bandpass 0.3–10 Hz
-- EMG: bandpass 30–100 Hz
-- Correlation computed on z-scored signals (per epoch)
-- Optionally: max cross-correlation and best lag (ms)
+Principe
+--------
+- EOG : filtrage passe-bande 0.3–10 Hz
+- EMG : filtrage passe-bande 30–100 Hz
+- corrélation de Pearson sur signaux centrés-réduits à l'échelle de l'epoch
+- optionnel : corrélation maximale avec décalage temporel et estimation du lag (ms)
 
-This script reuses most of your patient scanning + hypnogram parsing logic.
+Le script réutilise la logique de parcours patient et de lecture d'hypnogrammes
+déjà présente dans le pipeline principal.
 """
 
 import os, sys, glob, argparse
@@ -23,7 +26,7 @@ import mne
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 # -------------------------
-# CONFIG (adapt if needed)
+# Configuration des chemins et constantes par défaut
 # -------------------------
 GP2_ROOT  = "/home/darryld/documents/EEG/preprocessed/XAI/data"
 RAW_ROOT  = "/home/darryld/documents/EEG/raw"
@@ -39,7 +42,7 @@ STAGE_MAP = {
 }
 
 # -------------------------
-# Data structures
+# Structures de données
 # -------------------------
 @dataclass
 class Episode:
@@ -53,7 +56,7 @@ class Episode:
 
 
 # -------------------------
-# Helpers: filesystem
+# Fonctions utilitaires de découverte des fichiers
 # -------------------------
 def find_patient_dirs(input_dir: str) -> List[str]:
     subs = [p for p in glob.glob(os.path.join(input_dir, "*")) if os.path.isdir(p)]
@@ -88,7 +91,7 @@ def find_hypnogram_file(patient_dir: str) -> Optional[str]:
 
 
 # -------------------------
-# Helpers: hypnogram parsing (same idea as yours)
+# Fonctions utilitaires de parsing des hypnogrammes
 # -------------------------
 def _norm_stage_to_rem_nrem_w(s: str) -> str:
     s = str(s).strip().upper()
@@ -206,7 +209,7 @@ def split_into_epochs(rem_start: int, rem_end: int, sfreq: float, epoch_len_s: f
 
 
 # -------------------------
-# Signal loading (RAW signals, filtered but NOT rectified/NOT smoothed)
+# Chargement des signaux RAW filtrés (sans rectification ni lissage)
 # -------------------------
 def load_raw(path: str) -> mne.io.BaseRaw:
     ext = os.path.splitext(path)[1].lower()
@@ -296,7 +299,7 @@ def corr_maxlag(x: np.ndarray, y: np.ndarray, sfreq: float, max_lag_ms: float = 
 
 
 # -------------------------
-# Main per-patient processing
+# Traitement principal patient par patient
 # -------------------------
 def process_patient(patient_dir: str, args) -> pd.DataFrame:
     patient_id = os.path.basename(patient_dir.rstrip(os.sep))
@@ -309,25 +312,25 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
 
         raw = load_raw(rec)
 
-        # picks
+        # 1) Sélection des canaux EOG et EMG utilisés pour le calcul
         emg_chs = pick_emg_channels(raw, args.emg_channels)
         eog_chs = pick_eog_channels(raw)
 
         sfreq = float(raw.info["sfreq"])
 
-        # prepare filtered copies (NO rectification, NO smoothing)
-        # EOG filtered 0.3-10
+        # 2) Préparation des copies filtrées sans rectification ni lissage
+        #    EOG filtré 0.3-10 Hz
         eog_raw = raw.copy().pick_channels(eog_chs)
         eog_raw.filter(l_freq=args.eog_hp, h_freq=args.eog_lp, picks="all", method="fir", verbose=False)
 
-        # EMG filtered 30-100 (or your values)
+        #    EMG filtré 30-100 Hz (ou bornes fournies en argument)
         emg_raw = raw.copy().pick_channels(emg_chs)
         emg_raw.filter(l_freq=args.emg_hp, h_freq=args.emg_lp, picks="all", method="fir", verbose=False)
 
         eog_data = eog_raw.get_data()  # volts
         emg_data = emg_raw.get_data()  # volts
 
-        # hypnogram
+        # 3) Lecture de l'hypnogramme puis construction des paires NREM -> REM
         hyp_path = find_hypnogram_file(patient_dir)
         episodes = parse_hypnogram_table(hyp_path) if hyp_path else parse_hypnogram_from_raw(raw)
         if not episodes:
@@ -350,10 +353,10 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
             epochs = split_into_epochs(rem_start, rem_end, sfreq, args.rem_epoch_len)
 
             for ep_k, (w0, w1) in enumerate(epochs):
-                # mean EOG (multi-channel -> average)
+                # 4) Agrégation EOG : moyenne si plusieurs canaux sont disponibles
                 eog_seg = np.mean(eog_data[:, w0:w1], axis=0)
 
-                # per EMG channel correlations + aggregate
+                # 5) Calcul des corrélations par canal EMG puis agrégation robuste
                 corr_per_ch = []
                 corrmax_per_ch = []
                 lagms_per_ch = []
@@ -379,17 +382,17 @@ def process_patient(patient_dir: str, args) -> pd.DataFrame:
                         "emg_channel": ch_name,
                         "eog_channels": ",".join(eog_chs),
 
-                        # RAW corr (non-rectified, non-smoothed)
+                        # Corrélation RAW (sans rectification, sans lissage)
                         "eye_emg_corr_raw": r,
                         "eye_emg_corrmax_raw": rmax,
                         "eye_emg_lag_ms_raw": lagms,
 
-                        # for convenience
+                        # Paramètres de filtrage rappelés pour la traçabilité
                         "emg_hp": args.emg_hp, "emg_lp": args.emg_lp,
                         "eog_hp": args.eog_hp, "eog_lp": args.eog_lp,
                     })
 
-                # also store per-epoch aggregated across EMG channels
+                # 6) Sauvegarde d'une version agrégée à l'échelle de l'epoch
                 rows.append({
                     "patient_id": patient_id,
                     "episode_index": idx_pair,
@@ -430,13 +433,13 @@ def main():
     parser.add_argument("--rem_epoch_len", type=float, default=4.0, help="REM epoch length in seconds.")
     parser.add_argument("--n_jobs", type=int, default=20, help="Parallel workers.")
 
-    # Filters (RAW, but filtered)
+    # Paramètres de filtrage appliqués aux signaux RAW avant calcul des corrélations
     parser.add_argument("--eog_hp", type=float, default=0.3)
     parser.add_argument("--eog_lp", type=float, default=10.0)
     parser.add_argument("--emg_hp", type=float, default=30.0)
     parser.add_argument("--emg_lp", type=float, default=100.0)
 
-    # lagged correlation
+    # Paramètre de recherche pour la corrélation maximale avec décalage
     parser.add_argument("--max_lag_ms", type=float, default=200.0,
                         help="Max lag (ms) for corrmax (cross-correlation).")
 
@@ -454,7 +457,7 @@ def main():
         print("[ERREUR] Aucun dossier patient trouvé.", file=sys.stderr)
         sys.exit(1)
 
-    # keep only patients with recording
+    # 1) Filtrage des dossiers patients pour ne garder que ceux avec enregistrement
     valid_patients = []
     for p in patients:
         if find_recording_file(p) is not None:
@@ -462,6 +465,7 @@ def main():
     patients = valid_patients
     print(f"[CHECK] {len(patients)} patients valides trouvés.")
 
+    # 2) Traitement parallèle ou séquentiel selon le nombre de workers demandé
     dfs = []
     if args.n_jobs and args.n_jobs > 1:
         with ProcessPoolExecutor(max_workers=args.n_jobs) as ex:
@@ -472,11 +476,13 @@ def main():
         for p in patients:
             dfs.append(process_patient(p, args))
 
+    # 3) Concaténation finale et écriture du CSV de sortie
     out_df = pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
     os.makedirs(os.path.dirname(args.output_csv), exist_ok=True)
     out_df.to_csv(args.output_csv, index=False)
     print(f"[OK] CSV écrit: {args.output_csv}")
 
+    # 4) Export optionnel d'un fichier séparé pour les patients en erreur
     if "type" in out_df.columns and (out_df["type"] == "ERROR").any():
         err_path = os.path.splitext(args.output_csv)[0] + "_errors.csv"
         out_df[out_df["type"] == "ERROR"][["patient_id", "error"]].to_csv(err_path, index=False)

@@ -50,7 +50,7 @@ def infer_band_from_feature(feat: str) -> str:
 
     f = feat.lower()
 
-    # bandes nominales
+    # 1) Bandes fréquentielles nominales reconnues directement dans le nom
     if "delta" in f:
         return "delta"
     if "theta" in f:
@@ -64,18 +64,18 @@ def infer_band_from_feature(feat: str) -> str:
     if "gamma_haut" in f:
         return "gamma_haut"
 
-    # pattern numérique : ex "85_95hz" ou "85-95hz"
+    # 2) Détection d’une bande numérique explicite : ex. 85_95Hz ou 85-95Hz
     m = re.search(r"(\d+\.?\d*)[._-](\d+\.?\d*)hz", f)
     if m:
         lo = float(m.group(1))
         hi = float(m.group(2))
         return f"{lo:.1f}–{hi:.1f}Hz"
 
-    # features globales sur [0.5–80] Hz
+    # 3) Features spectrales/globales couvrant la bande complète 0.5–80 Hz
     if any(kw in f for kw in ["spec_entropy", "spec_centroid", "peak_freq", "rms", "zc"]):
         return "0.5–80.0Hz"
 
-    # fallback
+    # 4) Cas par défaut si aucune bande ne peut être inférée
     return "broadband"
 
 
@@ -105,7 +105,7 @@ def main(cfg):
             f"les colonnes 'feature' et 'mean_abs_shap'. Colonnes trouvées : {list(df_shap.columns)}"
         )
 
-    # Merge éventuel avec permutation importance (si dispo)
+    # 1) Fusion optionnelle avec la permutation importance
     if perm_path.exists():
         log.info(f"Lecture permutation importance : {perm_path}")
         df_perm = pd.read_csv(perm_path)
@@ -118,7 +118,7 @@ def main(cfg):
         log.info("permutation_importance.csv introuvable >>> seules les stats SHAP seront utilisées.")
         df = df_shap.copy()
 
-    # ---------- Gestion de la colonne 'band' ----------
+    # 2) Vérification / reconstruction de la colonne de bande fréquentielle
     if "band" in df.columns:
         # On ne modifie que les 'other'
         df["band"] = df["band"].astype(str)
@@ -131,7 +131,7 @@ def main(cfg):
         log.warning("Colonne 'band' absente, reconstruction des bandes à partir des noms de features.")
         df["band"] = df["feature"].apply(infer_band_from_feature)
 
-    # ---------- Stats par bande ----------
+    # 3) Calcul des statistiques agrégées par bande
     band_stats = (
         df.groupby("band")
           .agg(
@@ -147,7 +147,7 @@ def main(cfg):
     band_stats.to_csv(band_path, index=False)
     log.info(f"Stats SHAP par bande écrites dans {band_path}")
 
-    # ---------- Top-k features ----------
+    # 4) Export des top-k features les plus contributives
     top_k = int(cfg.get("top_k", 20))
     df_top = df.sort_values("mean_abs_shap", ascending=False).head(top_k)
     top_path = out_dir / "shap_top_features.csv"

@@ -115,7 +115,7 @@ from src.utils.logging import get_logger
 
 
 # ------------------------------------------------------------------
-# Helpers
+# Fonctions utilitaires pour la sélection de l’explainer et du dataset
 # ------------------------------------------------------------------
 
 def _is_tree_model(model: Any) -> bool:

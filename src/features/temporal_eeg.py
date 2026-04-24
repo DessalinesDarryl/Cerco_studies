@@ -1,35 +1,65 @@
-# src/features/temporal_eeg.py
+"""Features temporelles pour signaux EEG.
+
+Le module regroupe des descripteurs de dynamique temporelle (Hjorth,
+zéro-crossing, moments statistiques) calculés par canal/epoch.
+"""
+
 import numpy as np
 import mne
 from scipy.stats import kurtosis, skew
 
 
+# ======================================================================
+# Fonctions utilitaires : taux de zéro-crossing et paramètres Hjorth
+# ======================================================================
+
 def _zero_crossing_rate(sig):
+    """Retourne le taux de changements de signe dans le signal."""
     return ((sig[:-1] * sig[1:]) < 0).mean()
 
 
 def _hjorth_parameters(sig):
-    # Activity : variance
+    """Calcule les paramètres de Hjorth (activité, mobilité, complexité).
+
+    Retours
+    -------
+    activity, mobility, complexity : float
+    """
+    # Activité = variance du signal
     activity = np.var(sig)
-    # Mobility : sqrt(var(derivative)/var(sig))
+    
+    # Mobilité = racine du ratio variance(dérivée)/variance(signal)
     diff1 = np.diff(sig)
     var_diff1 = np.var(diff1)
     mobility = np.sqrt(var_diff1 / (activity + 1e-20))
-    # Complexity : mobility(diff1)/mobility(sig)
+    
+    # Complexité = ratio mobilité(dérivée)/mobilité(signal)
     diff2 = np.diff(diff1)
     var_diff2 = np.var(diff2)
     mobility_diff = np.sqrt(var_diff2 / (var_diff1 + 1e-20))
     complexity = mobility_diff / (mobility + 1e-20)
+    
     return activity, mobility, complexity
 
 
+# ======================================================================
+# Extraction de features temporelles EEG
+# ======================================================================
+
 def compute_temporal_eeg_features(epochs: mne.Epochs):
-    """
-    Caractéristiques temporelles EEG par epoch et par canal :
-    - mean, median, var, std, energy, rms
-    - kurtosis, skewness
-    - max, min, amplitude, zero-crossing rate
-    - Hjorth activity, mobility, complexity
+    """Extrait 15 features temporelles par canal EEG.
+
+    Features
+    --------
+    - Statistiques : mean, median, var, std, energy, rms
+    - Moments : kurtosis, skewness
+    - Morphologie : max, min, amplitude
+    - Dynamique : zero-crossing rate, Hjorth (activity, mobility, complexity)
+
+    Retours
+    -------
+    X : ndarray, shape (n_epochs, n_channels * 15)
+    names : list of str
     """
     picks = mne.pick_types(epochs.info, eeg=True, exclude=[])
     if len(picks) == 0:
@@ -45,20 +75,27 @@ def compute_temporal_eeg_features(epochs: mne.Epochs):
         ch_name = epochs.ch_names[ch_idx]
         sig = data[:, ch_idx, :]  # (n_epochs, n_times)
 
+        # 1) Statistiques de base
         mean = sig.mean(axis=-1)
         median = np.median(sig, axis=-1)
         var = sig.var(axis=-1)
         std = sig.std(axis=-1)
         energy = (sig**2).sum(axis=-1)
         rms = np.sqrt((sig**2).mean(axis=-1))
+        
+        # 2) Moments statistiques
         kurt = kurtosis(sig, axis=-1, fisher=True, bias=False)
         skewn = skew(sig, axis=-1, bias=False)
+        
+        # 3) Morphologie du signal
         maxv = sig.max(axis=-1)
         minv = sig.min(axis=-1)
         ampl = maxv - minv
 
+        # 4) Dynamique temporelle
         zcr = np.array([_zero_crossing_rate(s) for s in sig])
 
+        # 5) Paramètres de Hjorth
         hj_act = np.zeros(n_epochs)
         hj_mob = np.zeros(n_epochs)
         hj_com = np.zeros(n_epochs)
@@ -68,7 +105,7 @@ def compute_temporal_eeg_features(epochs: mne.Epochs):
             hj_mob[i] = m
             hj_com[i] = c
 
-        # empiler pour ce canal
+        # Concaténation des 15 features pour ce canal
         ch_feats = np.vstack([
             mean, median, var, std, energy, rms,
             kurt, skewn, maxv, minv, ampl,

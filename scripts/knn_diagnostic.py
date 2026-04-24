@@ -42,6 +42,7 @@ def knn_diagnostic(
     patient_col: str = "patient_id",
     k: int = 5,
 ):
+    # 1) Extraction de la matrice de features et des labels
     y = df[label_col].values
 
     X = df[feature_cols].values
@@ -50,21 +51,23 @@ def knn_diagnostic(
     log.info(f"Nombre total de NaN dans X : {n_nan}")
 
 
-    # 1) Imputation robuste (OBLIGATOIRE pour KNN)
+    # 2) Imputation robuste des valeurs manquantes
     imputer = SimpleImputer(strategy="median")
     X = imputer.fit_transform(X)
 
     assert not np.isnan(X).any(), "NaN restants après imputation"
 
-    # 2) Normalisation (ESSENTIEL)
+    # 3) Standardisation des features
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
 
 
+    # 4) Recherche des plus proches voisins dans l’espace normalisé
     nn = NearestNeighbors(n_neighbors=k + 1, metric="euclidean")
     nn.fit(X)
     distances, indices = nn.kneighbors(X)
 
+    # 5) Calcul des distances intra-classe et inter-classe pour chaque patient
     rows = []
 
     for i in range(len(df)):
@@ -87,6 +90,7 @@ def knn_diagnostic(
         })
 
     out = pd.DataFrame(rows)
+    # 6) Ratio de séparabilité : plus il est faible, meilleure est la séparation
     out["separation_ratio"] = out["intra_distance"] / out["inter_distance"]
     return out
 
@@ -104,6 +108,7 @@ def main():
     df = pd.read_csv(args.features_csv)
     assert "patient_id" in df.columns
 
+    # Sélection des features numériques utilisées pour le diagnostic
     feature_cols = [
         c for c in df.columns
         if c not in ("patient_id", args.label_col, "label_str")

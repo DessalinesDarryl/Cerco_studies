@@ -102,7 +102,7 @@ from src.features.spectral_eeg import compute_spectral_eeg_features
 
 
 # ======================================================
-# EEG FEATURES
+# Extraction des features EEG par epoch
 # ======================================================
 def compute_time_eeg_features(epochs: mne.Epochs) -> tuple[Optional[np.ndarray], List[str]]:
     """
@@ -146,36 +146,35 @@ def compute_time_eeg_features(epochs: mne.Epochs) -> tuple[Optional[np.ndarray],
     if len(picks) == 0:
         return None, []
 
-    # data: (n_epochs, n_ch, n_times)
+    # Structure des données : (n_epochs, n_channels, n_times)
     data = epochs.get_data()[:, picks, :]
 
-    # Stats de base
+    # 1) Statistiques temporelles de base
     mean = data.mean(axis=-1)
     std = data.std(axis=-1)
     var = data.var(axis=-1)
     rms = np.sqrt((data ** 2).mean(axis=-1))
 
-    # Zero crossing count (nombre de changements de signe)
-    # On prend sign(data) puis on compte les changements de signe successifs.
+    # 2) Nombre de changements de signe (zero-crossings)
     zc = ((np.diff(np.sign(data), axis=-1) != 0)).sum(axis=-1)
 
-    # Skewness & Kurtosis (sur l'axe temps)
+    # 3) Asymétrie et kurtosis sur l’axe temporel
     skw = skew(data, axis=-1, nan_policy="omit")
     krt = kurtosis(data, axis=-1, nan_policy="omit")
 
-    # Peak-to-peak amplitude
+    # 4) Amplitude peak-to-peak
     ptp = np.ptp(data, axis=-1)
 
-    # Line length (somme des variations absolues)
+    # 5) Line length (somme des variations absolues)
     ll = np.sum(np.abs(np.diff(data, axis=-1)), axis=-1)
 
-    # Stack features: (n_epochs, n_ch, n_features)
+    # 6) Empilement final : (n_epochs, n_channels, n_features)
     feats = np.stack([mean, std, var, rms, zc, skw, krt, ptp, ll], axis=2)
 
     n_epochs, n_ch, n_f = feats.shape
     feats = feats.reshape(n_epochs, n_ch * n_f)
 
-    # Noms (alignés avec l'ordre des channels 'picks')
+    # 7) Construction des noms de features, alignés avec l’ordre des canaux EEG
     names: List[str] = []
     for ch_idx in picks:
         ch = epochs.ch_names[ch_idx]

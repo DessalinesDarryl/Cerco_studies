@@ -40,15 +40,15 @@ import mne
 
 
 # ======================================================================
-# 1) Montage bipolaire gp2
+# 1) Construction du montage bipolaire gp2
 # ======================================================================
 
 @dataclass
 class Montage:
     name: str
-    # Liste de triplets (anode, cathode, nouveau_nom)
+    # Liste des triplets (anode, cathode, nouveau_nom)
     pairs: List[Tuple[str, str, str]]
-    # Canaux “raw” à garder tels quels (EMG/ECG/ronflement, etc.)
+    # Canaux conservés tels quels (EMG, ECG, EOG, ronflement, etc.)
     keep_raw: List[str]
 
 
@@ -85,7 +85,7 @@ def apply_montage_gp2(raw: mne.io.BaseRaw, base_name: str) -> mne.io.BaseRaw:
     ch_names_bip = []
     ch_types_bip = []
 
-    # Construire les canaux bipolaires définis par MONTAGE_GP2
+    # 1) Construction des dérivations bipolaires définies dans `MONTAGE_GP2`
     for anode, cathode, new_name in MONTAGE_GP2.pairs:
         if anode not in raw_in.ch_names or cathode not in raw_in.ch_names:
             print(f"[{base_name}] Skip {new_name} : canal manquant ({anode} ou {cathode})")
@@ -105,7 +105,7 @@ def apply_montage_gp2(raw: mne.io.BaseRaw, base_name: str) -> mne.io.BaseRaw:
         ch_names_bip.append(new_name)
         ch_types_bip.append("eeg")
 
-    # Ajouter les canaux "raw" conservés tels quels
+    # 2) Conservation des canaux auxiliaires sous leur forme d'origine
     for ch in MONTAGE_GP2.keep_raw:
         if ch not in raw_in.ch_names:
             continue
@@ -116,7 +116,7 @@ def apply_montage_gp2(raw: mne.io.BaseRaw, base_name: str) -> mne.io.BaseRaw:
         ch_types_bip.append(raw_in.get_channel_types(picks=[idx])[0])
 
     if not data_bip:
-        # Aucun canal trouvé pour ce montage -> on renvoie un clone du raw original
+        # Aucun canal exploitable pour le montage : on renvoie une copie du Raw initial.
         return raw_in
 
     data_bip = np.vstack(data_bip)
@@ -128,7 +128,7 @@ def apply_montage_gp2(raw: mne.io.BaseRaw, base_name: str) -> mne.io.BaseRaw:
     )
     raw_bip = mne.io.RawArray(data_bip, info_new, verbose=False)
 
-    # Conserver les annotations existantes en les reconstruisant avec orig_time=None
+    # 3) Restauration des annotations existantes sur le nouveau `RawArray`
     if raw_in.annotations is not None and len(raw_in.annotations) > 0:
         ann_old = raw_in.annotations
         ann_existing = mne.Annotations(
@@ -143,7 +143,7 @@ def apply_montage_gp2(raw: mne.io.BaseRaw, base_name: str) -> mne.io.BaseRaw:
 
 
 # ======================================================================
-# 2) Filtres EEG / EMG
+# 2) Filtres EEG et EMG
 # ======================================================================
 
 def filter_eeg(raw: mne.io.BaseRaw, l_freq=0.5, h_freq=80.0, notch=50.0):
@@ -165,11 +165,11 @@ def filter_emg(raw: mne.io.BaseRaw, hp=30.0, lp=100.0, notch=50.0):
 
 
 # ======================================================================
-# 3) Hypnogramme : parsing (txt EXP + csv) + upsample + conversion REM
+# 3) Lecture de l'hypnogramme, conversion YASA et upsampling
 # ======================================================================
 
 YASA_CODE = {"W": 0, "N1": 1, "N2": 2, "N3": 3, "REM": 4}
-# Certains exports "EXP" utilisent un code perso : 1=Wake, 2=REM, 3=N1, 4=N2, 5=N3
+# Certains exports `EXP` utilisent un codage propriétaire : 1=Wake, 2=REM, 3=N1, 4=N2, 5=N3.
 EXP_NUM_TO_YASA = {1: 0, 2: 4, 3: 1, 4: 2, 5: 3}
 
 
@@ -540,13 +540,13 @@ def _check_required_gp2_channels(raw: mne.io.BaseRaw, base_name: str):
             missing.add(cathode)
 
     if missing:
-        # message parsable côté preprocess.py
+        # Message volontairement structuré pour être interprété côté `scripts/preprocess.py`.
         missing_str = ",".join(sorted(missing))
         raise RuntimeError(f"MISSING_CHANNELS:{base_name}:{missing_str}")
 
 
 # ======================================================================
-# 5) Orchestrateur : PREPROCESS COMPLET
+# 5) Orchestration complète du prétraitement
 # ======================================================================
 
 def preprocess_record(
@@ -558,15 +558,17 @@ def preprocess_record(
     yasa_params: Optional[dict] = None,
 ) -> mne.io.BaseRaw:
     """
-    Prétraitement complet d'un enregistrement :
+    Exécute le prétraitement complet d'un enregistrement.
 
-    0. Correction des noms et vérification des canaux nécessaires au montage gp2
-    1. Montages bipolaire gp2
-    2. Filtres EEG (0.5-80 + notch 50) et EMG (30-100 + notch 50)
-    3. Hypnogramme (txt/EXP/csv) -> codes YASA par epoch + epoch_len
-    4. Annotation REM (à partir des codes epoch)
-    5. Upsampling hypno -> par échantillon
-    6. Détection artéfacts YASA sur EEG + annotation "ARTEFACT"
+    Étapes
+    ------
+    0. normalisation des noms de canaux et vérification des canaux requis
+    1. application du montage bipolaire gp2
+    2. filtrage EEG (0.5-80 Hz + notch) et EMG (30-100 Hz + notch)
+    3. chargement optionnel de l'hypnogramme et conversion vers les codes YASA
+    4. annotation des segments REM dans `raw.annotations`
+    5. upsampling de l'hypnogramme au niveau échantillon
+    6. détection puis annotation des fenêtres d'artéfacts EEG
 
     Paramètres:
       - base_name : identifiant patient/fichier, utilisé pour retrouver l'hypnogramme
@@ -579,40 +581,37 @@ def preprocess_record(
     emg_params = emg_params or dict(hp=30.0, lp=100.0, notch=50.0)
     yasa_params = yasa_params or dict(win_sec=4.0, method="covar", threshold=3.0, include="sleep")
 
-    # 0) vérification des canaux + correction 
-
-    # correction
+    # 0) Normalisation des noms de canaux puis vérification du montage requis
     rename_dict = {ch: ch.replace("EEG ", "") for ch in raw.ch_names if ch.startswith("EEG ")}
     if rename_dict:
         raw.rename_channels(rename_dict)
         print(f"[{base_name}] Canaux renommés : {rename_dict}")
 
-    # vérification
     _check_required_gp2_channels(raw, base_name)
 
-    # 1) montage gp2
+    # 1) Application du montage bipolaire gp2
     raw = apply_montage_gp2(raw, base_name)
 
 
-    # 2) filtres EEG / EMG
+    # 2) Application des filtres EEG et EMG
     eeg_picks = filter_eeg(raw, **eeg_params)
     _ = filter_emg(raw, **emg_params)
 
-    # 3) hypnogramme (optionnel)
+    # 3) Chargement optionnel de l'hypnogramme
     hypno_epochs, epoch_len = load_hypnogram(base_name, hypno_root) if hypno_root is not None else (None, None)
 
-    # 4) annotations REM à partir des codes epoch (si dispo)
+    # 4) Ajout des annotations REM si l'hypnogramme est disponible
     if hypno_epochs is not None and epoch_len is not None:
         add_rem_annotations(raw, hypno_epochs, epoch_len)
 
-    # 5) upsample hypno -> par échantillon (pour YASA) si dispo
+    # 5) Upsampling de l'hypnogramme au niveau échantillon pour YASA
     hypno_samples = None
     if hypno_epochs is not None and epoch_len is not None:
         sf = float(raw.info["sfreq"])
         n_samples = raw.n_times
         hypno_samples = upsample_hypno_to_data(hypno_epochs, epoch_len, n_samples, sf)
 
-    # 6) détection + annotation artéfacts
+    # 6) Détection et annotation des artéfacts EEG
     try:
         _, art_windows = detect_artifacts_windows(
             raw,
@@ -624,7 +623,7 @@ def preprocess_record(
         )
         raw = annotate_artifacts(raw, art_windows, desc="ARTEFACT")
     except Exception:
-        # YASA non dispo ou autre erreur -> pas d'annotations ARTEFACT
+        # En cas d'échec, le pipeline continue sans annotations d'artéfacts.
         print("Pas d'annotation ARTEFACT : YASA n'est probablement pas installé.")
         pass
 

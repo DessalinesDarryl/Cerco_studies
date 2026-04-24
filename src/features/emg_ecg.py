@@ -1,4 +1,9 @@
-# src/features/emg_ecg.py
+"""Features de base pour signaux EMG et ECG.
+
+Le module fournit des descripteurs simples (RMS, énergie, etc.)
+utilisés comme briques de base dans le pipeline de features.
+"""
+
 import numpy as np, pandas as pd
 def emg_basic_features(epoch_array, sfreq):
     # Placeholder: RMS

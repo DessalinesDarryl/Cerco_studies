@@ -65,13 +65,13 @@ def load_dataset(cfg, bundle, log):
             f"Colonnes dispo : {list(df.columns)}"
         )
 
-    # Filtrer les lignes sans label
+    # 1) Filtrage des lignes sans label exploitable
     before = df.shape[0]
     df = df.dropna(subset=[label_col])
     after = df.shape[0]
     log.info(f"Lignes avec label ({label_col}) : {before} -> {after}")
 
-    # y : on force en int si possible, sinon factorisation
+    # 2) Construction du vecteur y (cast numérique ou factorisation)
     if np.issubdtype(df[label_col].dtype, np.number):
         df[label_col] = df[label_col].astype(int)
         y = df[label_col].to_numpy(dtype=int)
@@ -80,7 +80,7 @@ def load_dataset(cfg, bundle, log):
         y = df[label_col].to_numpy(dtype=int)
         log.info(f"Labels factorisés automatiquement depuis '{label_col}' : {dict(enumerate(uniques))}")
 
-    # Features utilisées pendant le training
+    # 3) Reconstruction stricte des features utilisées à l’entraînement
     feat_cols = bundle["features"]
     missing = [c for c in feat_cols if c not in df.columns]
     if missing:
@@ -99,6 +99,7 @@ def build_class_names(model, bundle, log):
     Construit les noms de classes dans l'ordre de model.classes_.
     Si bundle['label_map'] est dispo (str -> int), on le renverse pour avoir int -> str.
     """
+    # Les noms doivent être alignés avec l’ordre interne des classes du modèle
     classes = model.classes_
     label_map = bundle.get("label_map", None)
 
@@ -116,28 +117,28 @@ def build_class_names(model, bundle, log):
 def main(cfg):
     log = get_logger("plot_metrics")
 
-    # ---- Paths ----
+    # 1) Lecture des chemins d’entrée/sortie
     ckpt = Path(cfg["ckpt_path"])
     fig_dir = Path(cfg["fig_dir"])
     fig_dir.mkdir(parents=True, exist_ok=True)
 
-    # ---- Load model bundle ----
+    # 2) Chargement du bundle modèle
     log.info(f"Loading model checkpoint : {ckpt}")
     bundle = joblib.load(ckpt)
     model = bundle["model"]
 
-    # ---- Dataset (X, y) ----
+    # 3) Chargement du dataset et reconstruction de X, y
     X, y, df = load_dataset(cfg, bundle, log)
 
-    # ---- Class names alignés avec model.classes_ ----
+    # 4) Construction des noms de classes alignés avec model.classes_
     class_names = build_class_names(model, bundle, log)
 
-    # ---- Prédictions ----
+    # 5) Calcul des prédictions et probabilités
     log.info("Calcul des prédictions et probabilités...")
     y_pred = model.predict(X)
     y_proba = model.predict_proba(X)
 
-    # ---- Confusion matrix ----
+    # 6) Génération de la matrice de confusion
     out_cm = fig_dir / "confusion_matrix.png"
     log.info(f"Saving confusion matrix → {out_cm}")
 
@@ -148,7 +149,7 @@ def main(cfg):
         out_path=out_cm,
     )
 
-    # ---- ROC multiclasses ----
+    # 7) Génération des courbes ROC multiclasses
     out_roc = fig_dir / "roc_multiclass.png"
     log.info(f"Saving ROC curves → {out_roc}")
 

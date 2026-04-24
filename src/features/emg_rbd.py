@@ -104,7 +104,7 @@ import pandas as pd
 
 
 # =====================================================================
-# Chemins / Patterns (adapter si besoin)
+# Configuration des chemins et patterns de fichiers
 # =====================================================================
 GP2_ROOT = "/home/darryld/documents/EEG/preprocessed/XAI/data"
 RAW_ROOT = "/home/darryld/documents/EEG/raw"
@@ -124,7 +124,7 @@ IntervalSamp = Tuple[int, int]  # (start_sample, end_sample)
 
 
 # =====================================================================
-# Structures de données
+# Structures de données pour représenter le sleep scoring
 # =====================================================================
 @dataclass
 class Episode:
@@ -140,7 +140,7 @@ class Episode:
 
 
 # =====================================================================
-# Discovery: dossiers patients / enregistrements / hypnogrammes
+# Découverte des fichiers : patients, enregistrements, hypnogrammes
 # =====================================================================
 def find_patient_dirs(input_dir: str) -> List[str]:
     """Retourne les sous-dossiers patients présents dans input_dir (triés)."""

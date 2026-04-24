@@ -35,7 +35,7 @@ from src.utils.logging import get_logger
 def main(cfg):
     log = get_logger("infer")
 
-    # 1) Config
+    # 1) Lecture des chemins et paramètres d’inférence
     features_csv = Path(cfg["features_csv"])  # ex: data/processed/features/dataset_final.csv
     ckpt_path = Path(cfg["ckpt_path"])       # ex: models/checkpoint_rf.joblib
     out_csv = Path(cfg["out_csv"])           # ex: outputs/infer/predictions_rf.csv
@@ -43,7 +43,7 @@ def main(cfg):
 
     out_csv.parent.mkdir(parents=True, exist_ok=True)
 
-    # 2) Chargement features
+    # 2) Chargement du dataset de features
     if not features_csv.exists():
         raise FileNotFoundError(f"features_csv introuvable : {features_csv}")
     df = pd.read_csv(features_csv)
@@ -53,7 +53,7 @@ def main(cfg):
 
     log.info(f"Features (infer) : {df.shape[0]} lignes, {df.shape[1]} colonnes.")
 
-    # 3) Chargement checkpoint RF
+    # 3) Chargement du checkpoint entraîné
     if not ckpt_path.exists():
         raise FileNotFoundError(f"Checkpoint introuvable : {ckpt_path}")
     bundle = joblib.load(ckpt_path)
@@ -62,7 +62,7 @@ def main(cfg):
     feat_cols = bundle["features"]
     label_map = bundle.get("label_map", None)  # dict texte -> int, si dispo
 
-    # 4) Sélection des features comme au train
+    # 4) Reconstruction stricte des features utilisées à l’entraînement
     missing_feats = [c for c in feat_cols if c not in df.columns]
     if missing_feats:
         raise ValueError(
@@ -71,23 +71,23 @@ def main(cfg):
 
     X = df[feat_cols].values.astype(float)
 
-    # 5) Prédictions
+    # 5) Calcul des prédictions et probabilités
     log.info(f"Prédiction sur {X.shape[0]} échantillons avec {X.shape[1]} features.")
     y_pred = model.predict(X)
 
-    # Probas si disponibles
+    # Probabilités de classe si le modèle les expose
     if hasattr(model, "predict_proba"):
         proba = model.predict_proba(X)
     else:
         proba = None
         log.warning("Le modèle ne supporte pas predict_proba -> pas de colonnes de probabilité.")
 
-    # 6) Construction DataFrame de sortie
+    # 6) Construction du tableau de sortie
     out = pd.DataFrame()
     out["patient_id"] = df["patient_id"]
     out["y_pred"] = y_pred
 
-    # Si on a un label_map texte -> int, on peut reconstituer un y_pred_str
+    # Si un label_map est disponible, on reconstruit le label texte prédit
     inv_label_map = None
     if label_map is not None:
         inv_label_map = {v: k for k, v in label_map.items()}
@@ -96,7 +96,7 @@ def main(cfg):
     else:
         log.info("Pas de label_map dans le checkpoint -> pas de y_pred_str.")
 
-    # Colonnes de probas
+    # Ajout des colonnes de probabilité par classe
     if proba is not None:
         n_classes = proba.shape[1]
         # On tente d'utiliser les noms de classes du label_map si dispo
@@ -111,7 +111,7 @@ def main(cfg):
             for cls_id in range(n_classes):
                 out[f"p_class_{cls_id}"] = proba[:, cls_id]
 
-    # 7) Sauvegarde
+    # 7) Sauvegarde du fichier de prédictions
     out.to_csv(out_csv, index=False)
     log.info(f"Prédictions sauvegardées dans {out_csv}")
 
