@@ -1,8 +1,8 @@
-This folder follows the requested architecture for pipeline outputs.
+This folder follows the requested architecture for pre-ML pipeline outputs.
 
-- eeg/boxplots: figures for EEG distributions.
-- eeg/csv: tabular EEG metrics and exports.
-- emg/csv: tabular EMG and RSWA exports.
+- eeg/boxplots: optional exploratory figures (no ML metrics).
+- eeg/csv: EEG feature tables before model training.
+- emg/csv: EMG and RSWA tables before model training.
 
 Use scripts in scripts/script_ok/eeg and scripts/script_ok/emg
-to copy outputs from the current pipeline locations.
+to export pre-ML outputs from data/processed.
