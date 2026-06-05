@@ -106,8 +106,8 @@ import pandas as pd
 # =====================================================================
 # Configuration des chemins et patterns de fichiers
 # =====================================================================
-GP2_ROOT = "/home/darryld/documents/EEG/preprocessed/XAI/data"
-RAW_ROOT = "/home/darryld/documents/EEG/raw"
+GP2_ROOT = "data/processed/preprocessed"
+RAW_ROOT = "data/raw"
 
 FIF_GLOB_PATTERNS = ["*_art_annotated.fif", "*.fif"]
 HYPNO_CANDIDATES = ["{pid}_hypnoEXP.txt", "{pid}_hypnoEXP.csv", "{pid}_hypno.txt", "{pid}_hypnogram.txt"]

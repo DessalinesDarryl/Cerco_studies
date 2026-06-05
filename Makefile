@@ -4,8 +4,6 @@
 #
 # Ce Makefile sert de "table de commandes" (pipeline CLI) pour enchaîner :
 #   1) Préparation des données (préproc EEG -> epochs REM -> features EEG/EMG -> dataset final)
-#   2) Entraînement de modèles (tabulaires et deep)
-#   3) Évaluation (ROC / confusion matrix) + XAI + stats + rapport
 #
 # Il vise 2 objectifs :
 #   - Reproductibilité : relancer les mêmes commandes avec les mêmes configs YAML.
@@ -41,7 +39,7 @@ PY=python
 # => Tant que les scripts n'ont pas une option --raw-root / --proc-root,
 # ces variables sont "superflues".
 RAW_ROOT ?= ../documents/EEG/raw
-PROC_ROOT ?= ../documents/EEG/preprocessed/XAI/data
+PROC_ROOT ?= data/processed/preprocessed
 
 # Dossier de logs (toutes les sorties STDOUT/STDERR y sont enregistrées).
 LOG_DIR = data/logs

@@ -51,8 +51,8 @@ import mne
 mne.set_config("MNE_MEMMAP_MIN_SIZE", "1M", set_env=True)
 
 # ---------- Paramètres par défaut ----------
-DATA_DIR_DEFAULT  = "/home/darryld/documents/EEG/preprocessed/bipolaire/1bis_RBD/method_95percentile"
-OUT_ROOT_DEFAULT  = "/home/darryld/documents/EEG/results"
+DATA_DIR_DEFAULT  = "data/processed/preprocessed"
+OUT_ROOT_DEFAULT  = "results"
 
 BANDS = {
     "Delta": (0.5, 4.0),

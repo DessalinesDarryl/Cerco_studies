@@ -1,4 +1,4 @@
-in_root: /home/darryld/documents/EEG/preprocessed/XAI/rem_epochs/
+in_root: data/processed/rem_epochs
 out_csv: data/processed/features/features.csv
 rbd_emg_csv: data/processed/rbd/rbd_emg_events_and_summary_4s_per_channel.csv
 

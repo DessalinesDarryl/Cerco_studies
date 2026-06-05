@@ -8,15 +8,20 @@ import os
 import random
 
 import numpy as np
-import torch
+
+try:
+    import torch
+except ImportError:  # Optional for pre-ML workflows.
+    torch = None
 
 
 def set_seed(seed: int = 42):
-    """Fixe les graines Python, NumPy et PyTorch pour améliorer la reproductibilité."""
+    """Fixe les graines Python/NumPy et PyTorch si disponible."""
     random.seed(seed)
     np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
+    if torch is not None:
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
     os.environ["PYTHONHASHSEED"] = str(seed)
