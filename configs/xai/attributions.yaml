@@ -1,8 +1,8 @@
-model_path: models/checkpoint_rf.joblib
+model_path: data/models/checkpoint_rf.joblib
 features_csv: data/processed/features/dataset_final.csv
 label_col: "label_id"
 
-out_dir: outputs/xai/attributions
+out_dir: data/outputs/xai/attributions
 
 do_permutation: true
 n_perm_repeats: 30

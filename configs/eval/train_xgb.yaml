@@ -3,9 +3,9 @@ label_col: label_id
 
 model_type: xgb
 
-out_dir: models
+out_dir: data/models
 ckpt_name: checkpoint_xgb.joblib
-metrics_out: outputs/stats/train_metrics_xgb.csv
+metrics_out: data/outputs/stats/train_metrics_xgb.csv
 
 cv:
   n_splits: 5

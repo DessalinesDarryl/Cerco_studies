@@ -3,9 +3,9 @@ label_col: label_id
 
 model_type: knn
 
-out_dir: models
+out_dir: data/models
 ckpt_name: checkpoint_knn.joblib
-metrics_out: outputs/stats/train_metrics_knn.csv
+metrics_out: data/outputs/stats/train_metrics_knn.csv
 
 cv:
   n_splits: 5

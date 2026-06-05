@@ -44,7 +44,7 @@ RAW_ROOT ?= ../documents/EEG/raw
 PROC_ROOT ?= ../documents/EEG/preprocessed/XAI/data
 
 # Dossier de logs (toutes les sorties STDOUT/STDERR y sont enregistrées).
-LOG_DIR = logs
+LOG_DIR = data/logs
 
 # Nombre de workers par défaut pour les scripts qui supportent --n_workers.
 # Surcharge typique:
@@ -288,10 +288,10 @@ stats: | $(LOG_DIR)
 # Ici les chemins sont passés en CLI (pas via YAML).
 report: | $(LOG_DIR)
 	$(PY) scripts/build_reports.py \
-		--xai-root outputs/xai \
-		--stats-root outputs/stats \
-		--fig-root outputs/figures \
-		--out outputs/reports \
+		--xai-root data/outputs/xai \
+		--stats-root data/outputs/stats \
+		--fig-root data/outputs/figures \
+		--out data/outputs/reports \
 		2>&1 | tee $(LOG_DIR)/logs_report.txt
 
 

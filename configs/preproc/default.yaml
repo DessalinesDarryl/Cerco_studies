@@ -1,6 +1,6 @@
-raw_root: /home/darryld/documents/EEG/raw
-out_root: /home/darryld/documents/EEG/preprocessed/XAI/data
-hypno_root: /home/darryld/documents/EEG/raw   
+raw_root: data/raw/donnee_cerco/data_raw_fif
+out_root: data/processed/preprocessed
+hypno_root: data/raw/donnee_cerco/data_raw_fif   
 
 eeg:
   l_freq: 0.5

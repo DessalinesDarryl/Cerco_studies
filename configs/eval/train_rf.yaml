@@ -3,9 +3,9 @@ label_col: label_id
 
 model_type: rf
 
-out_dir: models
+out_dir: data/models
 ckpt_name: checkpoint_rf.joblib
-metrics_out: outputs/stats/train_metrics_rf.csv
+metrics_out: data/outputs/stats/train_metrics_rf.csv
 
 cv:
   n_splits: 5

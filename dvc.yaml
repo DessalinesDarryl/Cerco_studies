@@ -37,8 +37,8 @@ stages:
       - data/processed/features/features.csv
       - data/BDD_RBD_patients_updated.xlsx
     outs:
-      - models/checkpoint_rf.joblib
-      - outputs/reports/metrics_rf.json
+      - data/models/checkpoint_rf.joblib
+      - data/outputs/reports/metrics_rf.json
 
 
   xai:
@@ -46,7 +46,7 @@ stages:
     deps:
       - scripts/xai_attributions.py
       - configs/xai/attributions.yaml
-      - models/checkpoint.pt
+      - data/models/checkpoint.pt
       - data/processed/rem_epochs/
     outs:
-      - outputs/xai/
+      - data/outputs/xai/

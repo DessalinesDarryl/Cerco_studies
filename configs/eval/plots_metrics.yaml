@@ -1,9 +1,9 @@
 # configs/eval/plots_metrics.yaml
 
-ckpt_path: models/checkpoint_rf.joblib
+ckpt_path: data/models/checkpoint_rf.joblib
 
 features_csv: data/processed/features/dataset_final.csv
 
 label_col: "label_id"       
 
-fig_dir: outputs/figures/metrics
+fig_dir: data/outputs/figures/metrics

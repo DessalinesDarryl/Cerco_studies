@@ -3,9 +3,9 @@ label_col: label_id
 
 model_type: rnn
 
-out_dir: models
+out_dir: data/models
 ckpt_name: checkpoint_rnn.pt
-metrics_out: outputs/stats/train_metrics_rnn.csv
+metrics_out: data/outputs/stats/train_metrics_rnn.csv
 
 cv:
   n_splits: 5

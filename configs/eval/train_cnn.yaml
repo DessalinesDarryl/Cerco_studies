@@ -3,9 +3,9 @@ label_col: label_id
 
 model_type: cnn
 
-out_dir: models
+out_dir: data/models
 ckpt_name: checkpoint_cnn.pt
-metrics_out: outputs/stats/train_metrics_cnn.csv
+metrics_out: data/outputs/stats/train_metrics_cnn.csv
 
 cv:
   n_splits: 5
