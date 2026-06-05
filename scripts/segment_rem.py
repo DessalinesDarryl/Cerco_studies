@@ -10,7 +10,7 @@ Ce script extrait des **époques REM** (par défaut 4 secondes, non chevauchante
 comme artefacts.
 
 L’idée est de produire un fichier Epochs par patient, prêt à être utilisé
-ensuite pour l’extraction de features / RSWA / classification, sans recourir à
+ensuite pour l’extraction de features / RSWA / analyses aval, sans recourir à
 une concaténation de segments.
 
 Entrées attendues

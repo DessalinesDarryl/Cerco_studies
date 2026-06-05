@@ -1,8 +1,8 @@
-# RBD EEG/EMG Pipeline (Pre-ML)
+# RBD EEG/EMG Pipeline (Preprocessing + Features)
 
 ## Overview
 
-This branch contains only the pipeline steps before machine learning:
+This branch contains only the steps up to dataset assembly:
 
 - EEG/EMG preprocessing
 - clean REM segmentation
@@ -10,7 +10,7 @@ This branch contains only the pipeline steps before machine learning:
 - EEG feature extraction
 - dataset assembly
 
-All model training, inference, XAI, and reporting components were removed from this branch.
+All downstream components were removed from this branch.
 
 ## Current Structure
 
@@ -70,7 +70,7 @@ run_pipeline.sh
 pip install -r requirements.txt
 ```
 
-### 2) Run full pre-ML pipeline
+### 2) Run full pipeline
 
 ```bash
 bash run_pipeline.sh prepa_data
@@ -139,5 +139,5 @@ bash scripts/script_ok/emg/run_emg.sh
 
 ## Notes
 
-- This branch is intentionally pre-ML only.
-- If you need the training/XAI/reporting stack, use another branch or reintroduce those components explicitly.
+- This branch intentionally stops at dataset creation.
+- If you need downstream stages, use another branch or reintroduce those components explicitly.
