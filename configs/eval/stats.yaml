@@ -1,4 +1,0 @@
-# configs/eval/stats.yaml
-xai_root: data/outputs/xai
-out_dir: data/outputs/stats
-top_k: 20
