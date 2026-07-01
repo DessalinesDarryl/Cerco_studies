@@ -1,0 +1,17 @@
+2026-07-01 04:20:05,856 | INFO | 76 fichiers trouvés. Calcul du PSD (Welch 4s/50%) avec 4 worker(s).
+2026-07-01 04:20:58,934 | INFO | PSD calculé pour 76 patients (0 erreurs).
+2026-07-01 04:20:58,934 | INFO | Masquage notch : [50.0] Hz (± 1.0 Hz) -> 10 points masqués sur 400
+2026-07-01 04:20:58,954 | INFO | [Fp1-T3] Patients par groupe : {'SYN': 19, 'Narco': 11, 'TCSPi': 39, 'EAI': 7}
+2026-07-01 04:21:00,322 | INFO | [Fp1-C3] Patients par groupe : {'SYN': 19, 'Narco': 11, 'TCSPi': 39, 'EAI': 7}
+2026-07-01 04:21:00,787 | INFO | [T3-O1] Patients par groupe : {'SYN': 19, 'Narco': 11, 'TCSPi': 39, 'EAI': 7}
+2026-07-01 04:21:01,240 | INFO | [Fp2-T4] Patients par groupe : {'SYN': 19, 'Narco': 11, 'TCSPi': 39, 'EAI': 7}
+2026-07-01 04:21:01,748 | INFO | [Fp2-C4] Patients par groupe : {'SYN': 19, 'Narco': 11, 'TCSPi': 39, 'EAI': 7}
+2026-07-01 04:21:02,297 | INFO | [T4-O2] Patients par groupe : {'SYN': 19, 'Narco': 11, 'TCSPi': 39, 'EAI': 7}
+2026-07-01 04:21:02,787 | INFO | [Fp1-A1] Patients par groupe : {'SYN': 19, 'Narco': 11, 'TCSPi': 39, 'EAI': 7}
+2026-07-01 04:21:03,228 | INFO | [Fp2-A1] Patients par groupe : {'SYN': 19, 'Narco': 11, 'TCSPi': 39, 'EAI': 7}
+2026-07-01 04:21:03,699 | INFO | [T3-A1] Patients par groupe : {'SYN': 19, 'Narco': 11, 'TCSPi': 39, 'EAI': 7}
+2026-07-01 04:21:04,347 | INFO | [C3-A1] Patients par groupe : {'SYN': 19, 'Narco': 11, 'TCSPi': 39, 'EAI': 7}
+2026-07-01 04:21:04,790 | INFO | [T4-A1] Patients par groupe : {'SYN': 19, 'Narco': 11, 'TCSPi': 39, 'EAI': 7}
+2026-07-01 04:21:05,150 | INFO | [C4-A1] Patients par groupe : {'SYN': 19, 'Narco': 11, 'TCSPi': 39, 'EAI': 7}
+2026-07-01 04:21:05,516 | INFO | Figures PSD écrites dans c:\dev\Cerco_studies\data\visualisation\eeg\psd_by_group
+2026-07-01 04:21:05,516 | INFO | Terminé.

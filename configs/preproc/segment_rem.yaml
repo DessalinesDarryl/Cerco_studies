@@ -1,3 +1,0 @@
-in_root: data/processed/preprocessed
-out_root: data/processed/rem_epochs
-epoch_len_s: 4.0
