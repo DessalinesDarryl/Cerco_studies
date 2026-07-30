@@ -56,7 +56,7 @@ Dépendances requises :
 
 REM_EPO_ROOT = r"c:\dev\Cerco_studies\data\rem_epo"
 LABELS_TXT   = r"c:\dev\Cerco_studies\data\patients_label.txt"
-OUTPUT_ROOT  = r"c:\dev\Cerco_studies\data\visualisation2\eeg\tfr"
+OUTPUT_ROOT  = r"c:\dev\Cerco_studies\data\visu3\eeg\tfr"
 
 STAGE_LABEL = "REM"   # pour l'arborescence de sortie et les titres (extensible à N2/N3 plus tard)
 
