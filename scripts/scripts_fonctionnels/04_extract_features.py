@@ -15,7 +15,13 @@ Ce qu'il fait :
     2. Calcul des features temporelles EEG (mean, std, rms, zero-crossings, etc.)
     3. Calcul des features spectrales EEG (puissances par bande, ratios, entropie...)
     4. Agrégation au niveau patient (moyenne + écart-type sur les epochs)
-  Puis fusion avec les features EMG/EOG issues de 03_segment_rswa.py (optionnel).
+  Puis fusion avec les features EMG/EOG issues de 03_segment_rswa.py (optionnel) :
+    - fractions/ratios déjà présents (rswa_fraction, phasic_ratio, tonic_ratio, tonic_eog)
+    - *** NOUVEAU *** débits d'événements par minute de sommeil REM :
+        - tonic_events_per_min  : nb d'époques 4s classées "tonique" (même critère
+          que le flag rswa : tonic_ratio>1.3 OU tonic_eog) / minutes de REM
+        - phasic_events_per_min : nb de bursts phasiques détectés (lignes type="PHASIC"
+          dans le CSV de 03_segment_rswa.py) / minutes de REM
 
 Sortie :
   - OUTPUT_CSV : un CSV (1 ligne par patient) avec toutes les features EEG + EMG
@@ -51,6 +57,8 @@ OUTPUT_CSV : CSV features patient-level (1 ligne par patient)
                emg_rswa_fraction_mean            — fraction RSWA (si EMG fourni)
                emg_phasic_ratio_mean             — ratio phasique moyen
                emg_tonic_ratio_mean              — ratio tonique moyen
+               emg_tonic_events_per_min_mean     — débit d'époques toniques / min de REM
+               emg_phasic_events_per_min_mean    — débit de bursts phasiques / min de REM
                ... (une colonne _mean + _std par feature epoch-level)
  
 DÉPENDANCES PIPELINE
@@ -243,7 +251,8 @@ def _aggregate_patient(X: np.ndarray, names: List[str]) -> Dict[str, float]:
  
  
 # ============================================================================
-# FEATURES EMG PATIENT-LEVEL (inchangé)
+# FEATURES EMG PATIENT-LEVEL
+# *** MODIFIÉ *** : ajout de tonic_events_per_min et phasic_events_per_min
 # ============================================================================
  
 def _load_emg_features_patient_level(rbd_csv: Optional[Path], log) -> Optional[pd.DataFrame]:
@@ -251,13 +260,13 @@ def _load_emg_features_patient_level(rbd_csv: Optional[Path], log) -> Optional[p
         log.warning("CSV EMG introuvable > EMG ignoré.")
         return None
  
-    df = pd.read_csv(rbd_csv)
+    df_all = pd.read_csv(rbd_csv)
  
-    if "type" not in df.columns:
+    if "type" not in df_all.columns:
         log.warning("CSV EMG sans colonne 'type' > EMG ignoré.")
         return None
  
-    df = df[df["type"] == "REM_EPOCH_4S"].copy()
+    df = df_all[df_all["type"] == "REM_EPOCH_4S"].copy()
     if df.empty:
         log.warning("CSV EMG sans lignes REM_EPOCH_4S > EMG ignoré.")
         return None
@@ -271,6 +280,16 @@ def _load_emg_features_patient_level(rbd_csv: Optional[Path], log) -> Optional[p
         log.warning("CSV EMG sans colonnes patient_id/channel > EMG ignoré.")
         return None
  
+    # --- Durée de sommeil REM (en minutes) par patient x canal ---
+    # Sert de dénominateur commun aux deux débits d'événements (tonique/phasique).
+    # epoch_len_sec vaut 4.0 pour chaque epoch REM_EPOCH_4S (cf. 03_segment_rswa.py) ;
+    # on additionne les durées réelles plutôt que de supposer un nombre fixe d'epochs.
+    epoch_len_col = df["epoch_len_sec"] if "epoch_len_sec" in df.columns else pd.Series(4.0, index=df.index)
+    rem_minutes = (df.assign(_epoch_len=epoch_len_col)
+                     .groupby(["patient_id", "channel"])["_epoch_len"]
+                     .sum() / 60.0)
+    rem_minutes = rem_minutes.rename("rem_minutes").reset_index()
+
     agg_dict = {}
     for col, agg, out in [("rswa", "mean", "rswa_fraction"),
                            ("phasic_ratio", "mean", "phasic_ratio_mean"),
@@ -280,12 +299,45 @@ def _load_emg_features_patient_level(rbd_csv: Optional[Path], log) -> Optional[p
             agg_dict[out] = (col, agg)
  
     agg_ch = df.groupby(["patient_id", "channel"]).agg(**agg_dict).reset_index()
+    agg_ch = agg_ch.merge(rem_minutes, on=["patient_id", "channel"], how="left")
+
+    # --- Débit d'époques "toniques" par minute de REM ---
+    # Même critère que le flag rswa : tonic_ratio > 1.3 OU tonic_eog == True.
+    # (contrairement à rswa_fraction qui est une PROPORTION d'epochs, ceci est un
+    # DÉBIT rapporté à la durée réelle de REM, donc comparable entre patients
+    # ayant des quantités de sommeil REM différentes)
+    if "rswa" in df.columns:
+        n_tonic = (df[df["rswa"] == True]
+                   .groupby(["patient_id", "channel"]).size()
+                   .rename("n_tonic_events").reset_index())
+        agg_ch = agg_ch.merge(n_tonic, on=["patient_id", "channel"], how="left")
+        agg_ch["n_tonic_events"] = agg_ch["n_tonic_events"].fillna(0.0)
+        agg_ch["tonic_events_per_min"] = (agg_ch["n_tonic_events"]
+                                           / agg_ch["rem_minutes"].replace(0, np.nan))
+    else:
+        agg_ch["tonic_events_per_min"] = np.nan
+
+    # --- Débit d'événements phasiques (bursts détectés) par minute de REM ---
+    # Les événements phasiques sont des lignes type="PHASIC" distinctes dans le CSV
+    # (avec start_sec/end_sec/duration_sec), à ne pas confondre avec les epochs 4s.
+    df_phasic = df_all[df_all["type"] == "PHASIC"]
+    if not df_phasic.empty and {"patient_id", "channel"}.issubset(df_phasic.columns):
+        n_phasic = (df_phasic.groupby(["patient_id", "channel"]).size()
+                    .rename("n_phasic_events").reset_index())
+        agg_ch = agg_ch.merge(n_phasic, on=["patient_id", "channel"], how="left")
+        agg_ch["n_phasic_events"] = agg_ch["n_phasic_events"].fillna(0.0)
+        agg_ch["phasic_events_per_min"] = (agg_ch["n_phasic_events"]
+                                            / agg_ch["rem_minutes"].replace(0, np.nan))
+    else:
+        agg_ch["phasic_events_per_min"] = np.nan
  
     pat_dict = {}
     for src, dst in [("rswa_fraction", "emg_rswa_fraction_mean"),
                      ("phasic_ratio_mean", "emg_phasic_ratio_mean"),
                      ("tonic_ratio_mean", "emg_tonic_ratio_mean"),
-                     ("tonic_eog_fraction", "emg_tonic_eog_fraction_mean")]:
+                     ("tonic_eog_fraction", "emg_tonic_eog_fraction_mean"),
+                     ("tonic_events_per_min", "emg_tonic_events_per_min_mean"),
+                     ("phasic_events_per_min", "emg_phasic_events_per_min_mean")]:
         if src in agg_ch.columns:
             pat_dict[dst] = (src, "mean")
  

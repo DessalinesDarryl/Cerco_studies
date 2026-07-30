@@ -20,7 +20,6 @@ Ce qu'il fait :
 
 Choix retenus (cf. échange) :
   - 1 figure par canal (12 figures séparées)
-  - Échelle linéaire en µV²/Hz
   - Bande d'incertitude = moyenne ± écart-type (SD) inter-patients
 
 Comment utiliser ce script :
@@ -42,12 +41,12 @@ OUTPUT_FIGS : 1 figure PSD par canal EEG bipolaire (FIG_FORMAT, DPI réglables)
 """
 
 # ============================================================================
-# PARAMÈTRES  <<<  À MODIFIER SELON VOTRE CONFIGURATION
+# PARAMÈTRES  <<<  À MODIFIER SELON LA CONFIGURATION SOUAHAITÉE  >>>
 # ============================================================================
  
 REM_EPO_ROOT = r"c:\dev\Cerco_studies\data\rem_epo"
 LABELS_TXT   = r"c:\dev\Cerco_studies\data\patients_label.txt"
-OUTPUT_FIGS  = r"c:\dev\Cerco_studies\data\visualisation\eeg\psd_by_group"
+OUTPUT_FIGS  = r"c:\dev\Cerco_studies\data\visualisation3\eeg\psd_by_group"
  
 SAVE_FIGS  = True
 FIG_FORMAT = "pdf"   # "pdf" ou "svg" (vectoriel) ; "png" pour un rendu plus rapide
@@ -62,7 +61,7 @@ COMMON_FREQS = None                                  # calculée dans main() une
  
 NOTCH_FREQS = [50.0]        # fréquence(s) de bruit secteur à masquer (ajouter 100.0 si harmonique visible)
 NOTCH_HALFWIDTH_HZ = 1.0    # demi-largeur de la bande masquée autour de chaque fréquence (Hz)
-
+ 
 N_WORKERS = 4   # calcul du PSD par patient en parallèle
  
 PALETTE = {
@@ -71,7 +70,17 @@ PALETTE = {
     "SYN":   "#44AA99",
     "TCSPi": "#BEBEBE",
 }
-GROUP_ORDER = ["SYN", "Narco", "TCSPi", "EAI"]
+# Ordre d'affichage voulu : EAI > Narco > SYN > TCSPi
+GROUP_ORDER = ["EAI", "Narco", "SYN", "TCSPi"]
+ 
+# Libellés affichés (légendes) - les codes internes ci-dessus restent utilisés
+# pour la fusion avec patients_label.txt et le filtrage des données.
+DISPLAY_LABELS = {
+    "SYN":   "Syn",
+    "Narco": "Narco",
+    "TCSPi": "iRBD",
+    "EAI":   "AI",
+}
  
 BIPOLAR_CHANNELS = [
     "Fp1-T3", "Fp1-C3", "T3-O1",
@@ -215,19 +224,25 @@ def _process_one_patient(fpath_str: str, common_freqs: np.ndarray):
 # ============================================================================
 # PLOT - 1 figure par canal, en dB / axe X log (cf. script de référence)
 # ============================================================================
+ 
 def _interp_nan_gap(freqs: np.ndarray, y: np.ndarray) -> np.ndarray:
-    """Comble les trous NaN par interpolation linéaire - affichage uniquement,
-    le calcul stats reste sur les données masquées."""
+    """Comble les trous NaN par interpolation linéaire à partir des points valides
+    voisins - utilisé uniquement pour l'affichage (le calcul stats reste sur les
+    données masquées, donc le notch n'influence jamais la moyenne/l'écart-type)."""
     y = y.copy()
     nan_mask = np.isnan(y)
     if nan_mask.any() and (~nan_mask).sum() >= 2:
         y[nan_mask] = np.interp(freqs[nan_mask], freqs[~nan_mask], y[~nan_mask])
     return y
-
+ 
+ 
 def _plot_channel(channel: str, freqs: np.ndarray,
-                   group_curves_db: Dict[str, np.ndarray], group_n: Dict[str, int]):
+                   group_curves_db: Dict[str, np.ndarray], group_n: Dict[str, int],
+                   filename: Optional[str] = None):
     """
     group_curves_db[group] : array (n_patients_du_groupe, n_freqs), déjà en dB.
+    channel : utilisé pour le titre ET, si filename n'est pas fourni, pour le nom de fichier.
+    filename : nom de fichier explicite (sans extension) - utile pour la figure globale.
     """
     import matplotlib
     matplotlib.use("Agg")
@@ -241,15 +256,18 @@ def _plot_channel(channel: str, freqs: np.ndarray,
             continue
         data_db = group_curves_db[group]         # (n_patients, n_freqs), en dB
         mean_curve = np.nanmean(data_db, axis=0)
-        sd_curve   = np.nanstd(data_db, axis=0)
+        p10_curve  = np.nanpercentile(data_db, 10, axis=0)
+        p90_curve  = np.nanpercentile(data_db, 90, axis=0)
  
+        # Comble le trou du notch UNIQUEMENT pour l'affichage (ligne + bande continues)
         mean_curve_plot = _interp_nan_gap(freqs, mean_curve)
-        lower_plot = _interp_nan_gap(freqs, mean_curve - sd_curve)
-        upper_plot = _interp_nan_gap(freqs, mean_curve + sd_curve)
-
+        lower_plot = _interp_nan_gap(freqs, p10_curve)
+        upper_plot = _interp_nan_gap(freqs, p90_curve)
+ 
         color = PALETTE.get(group, None)
         n = group_n.get(group, data_db.shape[0])
-        ax.plot(freqs, mean_curve_plot, color=color, linewidth=1.8, label=f"{group} (n={n})")
+        display_name = DISPLAY_LABELS.get(group, group)
+        ax.plot(freqs, mean_curve_plot, color=color, linewidth=1.8, label=f"{display_name} (n={n})")
         ax.fill_between(freqs, lower_plot, upper_plot,
                          color=color, alpha=0.15, linewidth=0)
  
@@ -262,19 +280,20 @@ def _plot_channel(channel: str, freqs: np.ndarray,
     ax.grid(True, which="major", alpha=0.25)
     ax.grid(True, which="minor", alpha=0.07)
  
-    ax.set_xlabel("Fréquence (Hz)")
+    ax.set_xlabel("Frequency (Hz)")
     ax.set_ylabel("PSD (dB re µV²/Hz)")
-    ax.set_title(f"PSD moyen par groupe - {channel}\n(moyenne ± écart-type)")
+    ax.set_title(f"Mean PSD during REM sleep - {channel}\n(mean ± p10-p90)")
     ax.legend(frameon=False, fontsize=9)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     plt.tight_layout()
  
     if SAVE_FIGS:
-        save_path = Path(OUTPUT_FIGS) / f"psd_{channel.replace('-', '')}.{FIG_FORMAT}"
+        fname = filename or f"psd_{channel.replace('-', '')}"
+        save_path = Path(OUTPUT_FIGS) / f"{fname}.{FIG_FORMAT}"
         fig.savefig(save_path, dpi=DPI, bbox_inches="tight")
     plt.close(fig)
- 
+
  
 # ============================================================================
 # POINT D'ENTRÉE PRINCIPAL
@@ -386,6 +405,35 @@ def main() -> None:
  
         log.info(f"[{channel}] Patients par groupe : {group_n}")
         _plot_channel(channel, COMMON_FREQS, group_curves_db, group_n)
+ 
+    # --- Figure globale : moyenne inter-canaux par patient, puis moyenne par groupe ---
+    # (1 patient = 1 courbe, obtenue en moyennant ses canaux disponibles AVANT
+    # d'agréger entre patients - évite qu'un patient avec plus de canaux pèse plus)
+    log.info("Calcul de la figure PSD globale (moyenne de tous les canaux)...")
+    group_curves_global: Dict[str, List[np.ndarray]] = {g: [] for g in GROUP_ORDER}
+ 
+    for pid, info in per_patient.items():
+        group = info["group"]
+        if group is None:
+            continue
+        patient_global = np.nanmean(info["psd"], axis=0)   # moyenne sur les canaux présents, (n_freqs,)
+        group_curves_global[group].append(patient_global)
+ 
+    group_curves_global_db: Dict[str, np.ndarray] = {}
+    group_n_global: Dict[str, int] = {}
+    for g, v in group_curves_global.items():
+        group_n_global[g] = len(v)
+        if len(v) >= 2:
+            lin = np.stack(v)
+            group_curves_global_db[g] = 10.0 * np.log10(np.maximum(lin, eps))
+ 
+    if group_curves_global_db:
+        log.info(f"[GLOBAL] Patients par groupe : {group_n_global}")
+        _plot_channel("All channels", COMMON_FREQS,
+                      group_curves_global_db, group_n_global,
+                      filename="psd_GLOBAL_all_channels")
+    else:
+        log.warning("[GLOBAL] Pas assez de patients par groupe (<2) - figure globale ignorée.")
  
     log.info(f"Figures PSD écrites dans {OUTPUT_FIGS}")
     log.info("Terminé.")
