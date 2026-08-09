@@ -1,0 +1,15 @@
+feature,KMO
+interval_cv,0.5059100512353624
+mean_relative_amplitude,0.5060972156435419
+max_relative_amplitude,0.5191690940629706
+medium_density_per_min,0.6042331998164685
+phasic_tonic_ratio,0.643151708433559
+interval_variance,0.6512291119146083
+progression_index,0.6849545924305859
+duration_max,0.6874163064913226
+long_density_per_min,0.7096006861874671
+short_density_per_min,0.7150339656228073
+duration_median,0.748736951180933
+episode_count,0.7520051732309087
+interval_median,0.8356438535199379
+AI_atonia_index,0.8466667280104972

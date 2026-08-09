@@ -1,0 +1,292 @@
+2026-08-09 22:48:40,369 | INFO | Etapes demandees : [1, 2, 3, 4, 5]
+2026-08-09 22:48:40,369 | INFO | ======================================================================
+2026-08-09 22:48:40,370 | INFO | ETAPE 1 : Extraction par patient
+2026-08-09 22:48:40,370 | INFO | ======================================================================
+2026-08-09 22:48:40,383 | INFO | [Etape 1] 111 labels charges depuis c:\dev\Cerco_studies\patients_label.txt
+2026-08-09 22:48:40,479 | INFO | [Etape 1] 76 enregistrements patients trouves sous c:\dev\raw\data_raw_fif
+2026-08-09 22:48:40,558 | INFO | [Etape 1] 76 patients a traiter avec 8 worker(s).
+09-Aug-26 22:49:17 | WARNING | Hypnogram is SHORTER than data by 13.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:49:17 | WARNING | Hypnogram is SHORTER than data by 133.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:49:17 | WARNING | Hypnogram is SHORTER than data by 12.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:49:17 | WARNING | Hypnogram is SHORTER than data by 10.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:49:18 | WARNING | Hypnogram is SHORTER than data by 32.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:49:18 | WARNING | Hypnogram is SHORTER than data by 25.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:49:20 | WARNING | Hypnogram is SHORTER than data by 52.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:49:21 | WARNING | Hypnogram is LONGER than data by 294.00 seconds. Cropping hypnogram to match data.size.
+09-Aug-26 22:49:21 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:49:21 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:49:21 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:49:21 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:49:22 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:49:22 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:49:25 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:49:25,441 | INFO | [Etape 1][BJ138] OK - AI=0.847 (ambiguous), episodes=28, artefacts=1.5%
+09-Aug-26 22:49:25 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:49:29,828 | INFO | [Etape 1][BA171] OK - AI=0.822 (ambiguous), episodes=96, artefacts=0.9%
+2026-08-09 22:49:30,070 | INFO | [Etape 1][AN166] OK - AI=0.906 (normal), episodes=90, artefacts=1.5%
+2026-08-09 22:49:30,124 | INFO | [Etape 1][BF181] OK - AI=0.382 (abnormal), episodes=216, artefacts=0.0%
+2026-08-09 22:49:30,195 | INFO | [Etape 1][BA152] OK - AI=0.697 (abnormal), episodes=115, artefacts=0.8%
+2026-08-09 22:49:30,430 | INFO | [Etape 1][BB114] OK - AI=0.433 (abnormal), episodes=191, artefacts=0.3%
+2026-08-09 22:49:33,347 | INFO | [Etape 1][AE129] OK - AI=0.749 (abnormal), episodes=477, artefacts=3.2%
+2026-08-09 22:49:33,522 | INFO | [Etape 1][BDRE44] OK - AI=0.884 (ambiguous), episodes=233, artefacts=3.1%
+09-Aug-26 22:49:40 | WARNING | Hypnogram is LONGER than data by 146.00 seconds. Cropping hypnogram to match data.size.
+09-Aug-26 22:49:43 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:49:44 | WARNING | Hypnogram is SHORTER than data by 17.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:49:44 | WARNING | Hypnogram is SHORTER than data by 10.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:49:46 | WARNING | Hypnogram is SHORTER than data by 22.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:49:47 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:49:47 | WARNING | Hypnogram is SHORTER than data by 20.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:49:47 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:49:47 | WARNING | Hypnogram is SHORTER than data by 15.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:49:49 | WARNING | Hypnogram is SHORTER than data by 6.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+2026-08-09 22:49:50,627 | INFO | [Etape 1][CC175] OK - AI=0.917 (normal), episodes=60, artefacts=2.6%
+2026-08-09 22:49:50,840 | INFO | [Etape 1][BO60] OK - AI=0.379 (abnormal), episodes=88, artefacts=0.8%
+09-Aug-26 22:49:50 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:49:50,974 | INFO | [Etape 1][CD28] OK - AI=0.225 (abnormal), episodes=187, artefacts=0.0%
+09-Aug-26 22:49:51 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:49:51 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:49:52 | WARNING | Hypnogram is LONGER than data by 265.00 seconds. Cropping hypnogram to match data.size.
+09-Aug-26 22:49:53 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:49:54,193 | INFO | [Etape 1][CJP53] OK - AI=0.673 (abnormal), episodes=192, artefacts=0.5%
+2026-08-09 22:49:54,503 | INFO | [Etape 1][CB165] OK - AI=0.962 (normal), episodes=67, artefacts=2.2%
+2026-08-09 22:49:54,964 | INFO | [Etape 1][CD164] OK - AI=0.954 (normal), episodes=155, artefacts=1.5%
+09-Aug-26 22:49:55 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:49:57,115 | INFO | [Etape 1][CA169] OK - AI=0.621 (abnormal), episodes=345, artefacts=0.9%
+2026-08-09 22:49:59,721 | INFO | [Etape 1][CJL159] OK - AI=0.914 (normal), episodes=51, artefacts=2.9%
+09-Aug-26 22:50:05 | WARNING | Hypnogram is SHORTER than data by 7.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:50:06 | WARNING | Hypnogram is SHORTER than data by 5.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:50:07 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:50:08 | WARNING | Hypnogram is SHORTER than data by 12.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:50:09 | WARNING | Hypnogram is SHORTER than data by 25.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:50:09 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:50:09 | WARNING | Hypnogram is SHORTER than data by 11.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:50:10 | WARNING | Hypnogram is SHORTER than data by 7.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+2026-08-09 22:50:12,140 | INFO | [Etape 1][CP155] OK - AI=0.563 (abnormal), episodes=85, artefacts=1.0%
+09-Aug-26 22:50:12 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:50:12 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:50:13,179 | INFO | [Etape 1][CS131] OK - AI=0.982 (normal), episodes=50, artefacts=2.4%
+09-Aug-26 22:50:13 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:50:13 | WARNING | Hypnogram is SHORTER than data by 2.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:50:13 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:50:16,268 | INFO | [Etape 1][CS147] OK - AI=0.838 (ambiguous), episodes=48, artefacts=2.7%
+2026-08-09 22:50:16,442 | INFO | [Etape 1][DA174] OK - AI=0.536 (abnormal), episodes=417, artefacts=0.0%
+09-Aug-26 22:50:16 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:50:17,329 | INFO | [Etape 1][DA110] OK - AI=0.637 (abnormal), episodes=157, artefacts=0.9%
+2026-08-09 22:50:17,437 | INFO | [Etape 1][CM161] OK - AI=0.320 (abnormal), episodes=69, artefacts=0.4%
+2026-08-09 22:50:19,919 | INFO | [Etape 1][DI136] OK - AI=0.908 (normal), episodes=169, artefacts=2.6%
+09-Aug-26 22:50:20 | WARNING | Hypnogram is SHORTER than data by 19.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:50:23 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:50:28,273 | INFO | [Etape 1][DJ137] OK - AI=0.953 (normal), episodes=139, artefacts=2.0%
+09-Aug-26 22:50:28 | WARNING | Hypnogram is SHORTER than data by 25.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:50:29 | WARNING | Hypnogram is LONGER than data by 1866.00 seconds. Cropping hypnogram to match data.size.
+09-Aug-26 22:50:30 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:50:31 | WARNING | Hypnogram is SHORTER than data by 11.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:50:32 | WARNING | Hypnogram is SHORTER than data by 23.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:50:32 | WARNING | Hypnogram is SHORTER than data by 17.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:50:33 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:50:34,556 | INFO | [Etape 1][EF130] OK - AI=0.969 (normal), episodes=79, artefacts=0.7%
+09-Aug-26 22:50:34 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:50:35 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:50:35 | WARNING | Hypnogram is SHORTER than data by 7.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:50:35 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:50:36 | WARNING | Hypnogram is SHORTER than data by 26.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+2026-08-09 22:50:37,218 | INFO | [Etape 1][DSJ112] OK - AI=0.927 (normal), episodes=51, artefacts=2.7%
+2026-08-09 22:50:37,795 | INFO | [Etape 1][GH163] OK - AI=0.146 (abnormal), episodes=24, artefacts=0.0%
+09-Aug-26 22:50:38 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:50:38,395 | INFO | [Etape 1][FP144] OK - AI=0.983 (normal), episodes=35, artefacts=1.6%
+2026-08-09 22:50:38,883 | INFO | [Etape 1][GD170] OK - AI=0.702 (abnormal), episodes=165, artefacts=0.1%
+09-Aug-26 22:50:39 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:50:42,307 | INFO | [Etape 1][GR108] OK - AI=0.858 (ambiguous), episodes=75, artefacts=1.3%
+2026-08-09 22:50:43,842 | INFO | [Etape 1][GS191] OK - AI=0.551 (abnormal), episodes=128, artefacts=0.0%
+09-Aug-26 22:50:48 | WARNING | Hypnogram is LONGER than data by 196.00 seconds. Cropping hypnogram to match data.size.
+09-Aug-26 22:50:51 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:50:53 | WARNING | Hypnogram is SHORTER than data by 22.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+2026-08-09 22:50:55,016 | INFO | [Etape 1][GX111] OK - AI=0.074 (abnormal), episodes=78, artefacts=0.0%
+09-Aug-26 22:50:56 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:50:57 | WARNING | Hypnogram is SHORTER than data by 9.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:50:57 | WARNING | Hypnogram is SHORTER than data by 23.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:50:57 | WARNING | Hypnogram is LONGER than data by 167.00 seconds. Cropping hypnogram to match data.size.
+09-Aug-26 22:50:58 | WARNING | Hypnogram is SHORTER than data by 26.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:51:00 | WARNING | Hypnogram is SHORTER than data by 27.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:51:01 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:51:01,649 | INFO | [Etape 1][HG167] OK - AI=0.842 (ambiguous), episodes=54, artefacts=3.2%
+09-Aug-26 22:51:01 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:51:02 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:51:02 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:51:04 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:51:05,948 | INFO | [Etape 1][LF126] OK - AI=0.449 (abnormal), episodes=53, artefacts=1.2%
+2026-08-09 22:51:06,023 | INFO | [Etape 1][JP141] OK - AI=0.610 (abnormal), episodes=111, artefacts=0.1%
+2026-08-09 22:51:06,256 | INFO | [Etape 1][JLJ177] OK - AI=0.961 (normal), episodes=97, artefacts=3.0%
+2026-08-09 22:51:07,036 | INFO | [Etape 1][IS179] OK - AI=0.926 (normal), episodes=189, artefacts=1.7%
+09-Aug-26 22:51:08 | WARNING | Hypnogram is SHORTER than data by 36.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+2026-08-09 22:51:09,315 | INFO | [Etape 1][JB173] OK - AI=0.896 (ambiguous), episodes=197, artefacts=2.1%
+09-Aug-26 22:51:13 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:51:16 | WARNING | Hypnogram is LONGER than data by 200.00 seconds. Cropping hypnogram to match data.size.
+2026-08-09 22:51:17,383 | INFO | [Etape 1][KH113] OK - AI=0.522 (abnormal), episodes=154, artefacts=0.7%
+09-Aug-26 22:51:18 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:51:21 | WARNING | Hypnogram is SHORTER than data by 5.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:51:22 | WARNING | Hypnogram is SHORTER than data by 3.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+2026-08-09 22:51:22,274 | INFO | [Etape 1][LJ41] OK - AI=0.756 (abnormal), episodes=190, artefacts=1.3%
+09-Aug-26 22:51:22 | WARNING | Hypnogram is SHORTER than data by 27.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:51:22 | WARNING | Hypnogram is SHORTER than data by 477.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:51:23 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:51:24 | WARNING | Hypnogram is SHORTER than data by 6.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:51:25 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:51:26 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:51:26 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:51:28 | WARNING | Hypnogram is SHORTER than data by 18.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+2026-08-09 22:51:28,683 | INFO | [Etape 1][MA27] OK - AI=0.880 (ambiguous), episodes=235, artefacts=1.2%
+2026-08-09 22:51:28,837 | INFO | [Etape 1][MFJ160] OK - AI=0.880 (ambiguous), episodes=28, artefacts=2.1%
+09-Aug-26 22:51:28 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:51:29,819 | INFO | [Etape 1][MG16] OK - AI=0.859 (ambiguous), episodes=36, artefacts=1.7%
+2026-08-09 22:51:30,083 | INFO | [Etape 1][MC154] OK - AI=0.857 (ambiguous), episodes=117, artefacts=2.7%
+09-Aug-26 22:51:32 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:51:33,823 | INFO | [Etape 1][LS162] OK - AI=0.746 (abnormal), episodes=316, artefacts=2.4%
+09-Aug-26 22:51:34 | WARNING | Hypnogram is SHORTER than data by 16.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+2026-08-09 22:51:35,775 | INFO | [Etape 1][MHTK39] OK - AI=0.893 (ambiguous), episodes=100, artefacts=0.4%
+09-Aug-26 22:51:36 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:51:40 | WARNING | Hypnogram is SHORTER than data by 29.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+2026-08-09 22:51:40,583 | INFO | [Etape 1][ML135] OK - AI=0.833 (ambiguous), episodes=259, artefacts=1.8%
+09-Aug-26 22:51:42 | WARNING | Hypnogram is SHORTER than data by 20.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:51:42 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:51:44 | WARNING | Hypnogram is LONGER than data by 235.00 seconds. Cropping hypnogram to match data.size.
+09-Aug-26 22:51:45 | WARNING | Hypnogram is SHORTER than data by 10.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:51:45 | WARNING | Hypnogram is SHORTER than data by 12.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:51:46 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:51:47,271 | INFO | [Etape 1][MM109] OK - AI=0.665 (abnormal), episodes=169, artefacts=0.4%
+09-Aug-26 22:51:47 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:51:48 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:51:48 | WARNING | Hypnogram is SHORTER than data by 30.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:51:49 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:51:49,538 | INFO | [Etape 1][MN143] OK - AI=0.919 (normal), episodes=80, artefacts=1.5%
+2026-08-09 22:51:51,368 | INFO | [Etape 1][MN26] OK - AI=0.743 (abnormal), episodes=217, artefacts=2.0%
+09-Aug-26 22:51:51 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:51:51 | WARNING | Hypnogram is LONGER than data by 194.00 seconds. Cropping hypnogram to match data.size.
+2026-08-09 22:51:51,930 | INFO | [Etape 1][MRM132] OK - AI=0.690 (abnormal), episodes=123, artefacts=1.2%
+2026-08-09 22:51:52,853 | INFO | [Etape 1][MP150] OK - AI=0.553 (abnormal), episodes=228, artefacts=0.0%
+09-Aug-26 22:51:54 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:51:54,838 | INFO | [Etape 1][MS128] OK - AI=0.922 (normal), episodes=65, artefacts=1.5%
+09-Aug-26 22:51:56 | WARNING | Hypnogram is SHORTER than data by 11.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+2026-08-09 22:51:57,365 | INFO | [Etape 1][NAL43] OK - AI=0.892 (ambiguous), episodes=129, artefacts=2.1%
+09-Aug-26 22:51:58 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:52:01,100 | INFO | [Etape 1][NGA157] OK - AI=0.912 (normal), episodes=71, artefacts=2.5%
+09-Aug-26 22:52:02 | WARNING | Hypnogram is SHORTER than data by 6.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:04 | WARNING | Hypnogram is SHORTER than data by 28.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:05 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:52:05 | WARNING | Hypnogram is SHORTER than data by 36.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:05 | WARNING | Hypnogram is LONGER than data by 152.00 seconds. Cropping hypnogram to match data.size.
+09-Aug-26 22:52:08 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:52:09 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:52:09 | WARNING | Hypnogram is SHORTER than data by 28.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:09 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:52:10,267 | INFO | [Etape 1][PA139] OK - AI=0.487 (abnormal), episodes=342, artefacts=0.4%
+2026-08-09 22:52:11,274 | INFO | [Etape 1][PF133] OK - AI=0.966 (normal), episodes=29, artefacts=3.0%
+09-Aug-26 22:52:11 | WARNING | Hypnogram is SHORTER than data by 26.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:12 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:52:12,892 | INFO | [Etape 1][PJC140] OK - AI=0.967 (normal), episodes=41, artefacts=2.0%
+09-Aug-26 22:52:13 | WARNING | Hypnogram is SHORTER than data by 23.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+2026-08-09 22:52:13,736 | INFO | [Etape 1][PJL153] OK - AI=0.870 (ambiguous), episodes=131, artefacts=1.9%
+09-Aug-26 22:52:14 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:52:16,048 | INFO | [Etape 1][RD158] OK - AI=0.198 (abnormal), episodes=201, artefacts=0.7%
+09-Aug-26 22:52:16 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:52:17,846 | INFO | [Etape 1][RB103] OK - AI=0.722 (abnormal), episodes=112, artefacts=2.1%
+2026-08-09 22:52:18,796 | INFO | [Etape 1][RG156] OK - AI=0.249 (abnormal), episodes=47, artefacts=0.4%
+09-Aug-26 22:52:19 | WARNING | Hypnogram is SHORTER than data by 7.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:20 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:52:23,354 | INFO | [Etape 1][RH146] OK - AI=0.939 (normal), episodes=129, artefacts=0.5%
+09-Aug-26 22:52:26 | WARNING | Hypnogram is SHORTER than data by 13.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:26 | WARNING | Hypnogram is SHORTER than data by 16.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:29 | WARNING | Hypnogram is SHORTER than data by 20.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:29 | WARNING | Hypnogram is LONGER than data by 213.00 seconds. Cropping hypnogram to match data.size.
+09-Aug-26 22:52:30 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:52:30 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:52:31 | WARNING | Hypnogram is SHORTER than data by 38.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:32 | WARNING | Hypnogram is SHORTER than data by 18.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:34 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:52:34 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:52:34 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:52:35,060 | INFO | [Etape 1][SB176] OK - AI=0.634 (abnormal), episodes=346, artefacts=0.7%
+2026-08-09 22:52:35,279 | INFO | [Etape 1][RJP148] OK - AI=0.281 (abnormal), episodes=307, artefacts=0.0%
+09-Aug-26 22:52:36 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:52:36 | WARNING | Hypnogram is SHORTER than data by 26.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+2026-08-09 22:52:37,249 | INFO | [Etape 1][SB178] OK - AI=0.899 (ambiguous), episodes=26, artefacts=2.8%
+2026-08-09 22:52:38,029 | INFO | [Etape 1][SJP172] OK - AI=0.823 (ambiguous), episodes=145, artefacts=2.2%
+2026-08-09 22:52:39,104 | INFO | [Etape 1][RJ42] OK - AI=0.699 (abnormal), episodes=292, artefacts=1.0%
+2026-08-09 22:52:39,369 | INFO | [Etape 1][SD134] OK - AI=0.742 (abnormal), episodes=101, artefacts=0.2%
+09-Aug-26 22:52:40 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:52:41 | WARNING | Hypnogram is SHORTER than data by 30.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+2026-08-09 22:52:43,449 | INFO | [Etape 1][TJ127] OK - AI=0.356 (abnormal), episodes=52, artefacts=1.0%
+09-Aug-26 22:52:44 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:52:47,059 | INFO | [Etape 1][TLM168] OK - AI=0.896 (ambiguous), episodes=162, artefacts=2.3%
+09-Aug-26 22:52:48 | WARNING | Hypnogram is SHORTER than data by 26.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:49 | WARNING | Hypnogram is SHORTER than data by 11.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:49 | WARNING | Hypnogram is SHORTER than data by 21.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:50 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:52:50 | WARNING | Hypnogram is SHORTER than data by 149.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:51 | WARNING | Hypnogram is SHORTER than data by 20.00 seconds. Padding hypnogram with Unscored (UNS) to match data.size.
+09-Aug-26 22:52:51 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:52:51 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+09-Aug-26 22:52:52 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:52:52,571 | INFO | [Etape 1][TM142] OK - AI=0.660 (abnormal), episodes=182, artefacts=1.8%
+2026-08-09 22:52:53,562 | INFO | [Etape 1][VJ149] OK - AI=0.706 (abnormal), episodes=83, artefacts=0.0%
+09-Aug-26 22:52:53 | WARNING | Must have at least 4 channels for method='covar'. Automatically switching to method='std'.
+2026-08-09 22:52:53,580 | INFO | [Etape 1][TO145] OK - AI=0.842 (ambiguous), episodes=103, artefacts=2.4%
+2026-08-09 22:52:54,261 | INFO | [Etape 1][VA182] OK - AI=0.911 (normal), episodes=70, artefacts=2.3%
+2026-08-09 22:52:55,135 | INFO | [Etape 1][TM151] OK - AI=0.426 (abnormal), episodes=177, artefacts=0.0%
+2026-08-09 22:52:56,611 | INFO | [Etape 1] Termine : 76 patients OK, 0 en erreur.
+2026-08-09 22:52:56,618 | INFO | ======================================================================
+2026-08-09 22:52:56,618 | INFO | ETAPE 2 : Assemblage de la cohorte
+2026-08-09 22:52:56,618 | INFO | ======================================================================
+2026-08-09 22:52:56,905 | INFO | [Etape 2] Cohorte assemblee (76 patients, 76 fichiers) -> C:\dev\Cerco_studies\results\cohort\cohort_metrics_real.csv
+2026-08-09 22:52:56,909 | INFO | ======================================================================
+2026-08-09 22:52:56,909 | INFO | ETAPE 3 : Reduction de dimension
+2026-08-09 22:52:56,909 | INFO | ======================================================================
+2026-08-09 22:52:59,128 | INFO | [Etape 3] Reduction de dimension sur 21 variables...
+C:\dev\Cerco_studies\.venv_clean\Lib\site-packages\statsmodels\stats\outliers_influence.py:197: RuntimeWarning: divide by zero encountered in scalar divide
+  vif = 1. / (1. - r_squared_i)
+2026-08-09 22:52:59,668 | INFO | [Etape 3] Rapport sauvegarde sous C:\dev\Cerco_studies\results
+2026-08-09 22:52:59,669 | INFO | [Etape 3] Variables retenues : ['AI_atonia_index', 'episode_count', 'duration_median', 'duration_max', 'interval_median', 'interval_variance', 'interval_cv', 'mean_relative_amplitude', 'max_relative_amplitude', 'short_density_per_min', 'medium_density_per_min', 'long_density_per_min', 'phasic_tonic_ratio', 'progression_index']
+2026-08-09 22:52:59,670 | INFO | ======================================================================
+2026-08-09 22:52:59,670 | INFO | ETAPE 4 : Score composite de severite
+2026-08-09 22:52:59,670 | INFO | ======================================================================
+2026-08-09 22:52:59,674 | ERROR | [Etape 4] CONTROL_LABEL est a None -> pas de groupe controle defini, le score composite necessite une reference controle. Etape ignoree.
+2026-08-09 22:52:59,674 | ERROR | Etape 4 (Score composite de severite) a echoue ou a ete ignoree -> arret.
+Paires fortement correlees (|rho| >= 0.80) :
+                   var1                   var2       rho
+ phasic_density_per_min          interval_mean -0.996972
+           pct_any_RSWA              pct_tonic  0.995625
+          interval_mean      interval_variance  0.965953
+ phasic_density_per_min      interval_variance -0.965632
+      pct_epochs_phasic phasic_density_per_min  0.951114
+      pct_epochs_phasic          interval_mean -0.943971
+      pct_epochs_phasic      interval_variance -0.927355
+      pct_epochs_phasic   long_density_per_min  0.894299
+        AI_atonia_index              pct_tonic -0.889706
+ phasic_density_per_min   long_density_per_min  0.889296
+      pct_epochs_phasic           pct_any_RSWA  0.886999
+          interval_mean   long_density_per_min -0.885707
+          duration_mean            duration_sd  0.878201
+        AI_atonia_index           pct_any_RSWA -0.877649
+      interval_variance   long_density_per_min -0.864880
+      pct_epochs_phasic              pct_tonic  0.862775
+          interval_mean  short_density_per_min -0.851332
+ phasic_density_per_min  short_density_per_min  0.850561
+          interval_mean        interval_median  0.847234
+ phasic_density_per_min        interval_median -0.837654
+           pct_any_RSWA      interval_variance -0.834751
+           pct_any_RSWA phasic_density_per_min  0.825783
+           pct_any_RSWA          interval_mean -0.822726
+mean_relative_amplitude max_relative_amplitude  0.817635
+      interval_variance  short_density_per_min -0.815258
+              pct_tonic      interval_variance -0.807382
+              pct_tonic phasic_density_per_min  0.801558
+Retrait de 'phasic_density_per_min' (VIF=inf > 5.0)
+Retrait de 'pct_any_RSWA' (VIF=1364.49 > 5.0)
+Retrait de 'pct_epochs_phasic' (VIF=81.55 > 5.0)
+Retrait de 'interval_mean' (VIF=49.80 > 5.0)
+Retrait de 'duration_mean' (VIF=23.53 > 5.0)
+Retrait de 'pct_tonic' (VIF=11.75 > 5.0)
+Retrait de 'duration_sd' (VIF=5.73 > 5.0)
+
+KMO global (variables retenues) : 0.679
+Test de Bartlett : chi2=840.15, dof=91, p=0

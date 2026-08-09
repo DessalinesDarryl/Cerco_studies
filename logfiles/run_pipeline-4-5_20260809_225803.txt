@@ -1,0 +1,12 @@
+2026-08-09 22:58:04,839 | INFO | Etapes demandees : [4, 5]
+2026-08-09 22:58:04,839 | INFO | ======================================================================
+2026-08-09 22:58:04,839 | INFO | ETAPE 4 : Score composite de severite
+2026-08-09 22:58:04,839 | INFO | ======================================================================
+2026-08-09 22:58:06,442 | WARNING | [Etape 4] Aucun sujet avec diagnosis == 'TCSPi' dans C:\dev\Cerco_studies\results\cohort\cohort_metrics_real.csv -> score composite DESACTIVE -- ce n'est PAS une erreur, l'etape 5 comparera les groupes cliniques entre eux sans reference controle.
+2026-08-09 22:58:06,442 | INFO | ======================================================================
+2026-08-09 22:58:06,442 | INFO | ETAPE 5 : Comparaison statistique
+2026-08-09 22:58:06,442 | INFO | ======================================================================
+2026-08-09 22:58:06,442 | WARNING | [Etape 5] Pas de score composite dans la cohorte (etape 4 non executee ou pas de controle) -> comparaison sur les variables individuelles uniquement.
+2026-08-09 22:58:06,442 | WARNING | [Etape 5] Pas de groupe controle -> ROC desactive ; Kruskal-Wallis + Mann-Whitney pairwise entre groupes cliniques presents.
+2026-08-09 22:58:06,856 | INFO | [Etape 5] Comparaison statistique sauvegardee -> [WindowsPath('C:/dev/Cerco_studies/results/statistics/kruskal_wallis.csv'), WindowsPath('C:/dev/Cerco_studies/results/statistics/mann_whitney_bonferroni.csv'), WindowsPath('C:/dev/Cerco_studies/results/statistics/roc_vs_controls.csv')]
+2026-08-09 22:58:06,856 | INFO | Pipeline termine (etapes demandees executees avec succes).

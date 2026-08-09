@@ -1,0 +1,11 @@
+2026-08-09 23:00:52,418 | INFO | Etapes demandees : [4, 5]
+2026-08-09 23:00:52,418 | INFO | ======================================================================
+2026-08-09 23:00:52,418 | INFO | ETAPE 4 : Score composite de severite
+2026-08-09 23:00:52,418 | INFO | ======================================================================
+2026-08-09 23:00:54,030 | INFO | [Etape 4] Score composite ajoute (variance PC1 = 31.36%) -> C:\dev\Cerco_studies\results\cohort\cohort_metrics_real.csv
+2026-08-09 23:00:54,030 | INFO | ======================================================================
+2026-08-09 23:00:54,031 | INFO | ETAPE 5 : Comparaison statistique
+2026-08-09 23:00:54,031 | INFO | ======================================================================
+2026-08-09 23:00:54,037 | INFO | [Etape 5] Groupe controle 'TCSP' present -> Kruskal-Wallis + Mann-Whitney + ROC-vs-controles.
+2026-08-09 23:03:24,980 | INFO | [Etape 5] Comparaison statistique sauvegardee -> [WindowsPath('C:/dev/Cerco_studies/results/statistics/kruskal_wallis.csv'), WindowsPath('C:/dev/Cerco_studies/results/statistics/mann_whitney_bonferroni.csv'), WindowsPath('C:/dev/Cerco_studies/results/statistics/roc_vs_controls.csv')]
+2026-08-09 23:03:24,982 | INFO | Pipeline termine (etapes demandees executees avec succes).

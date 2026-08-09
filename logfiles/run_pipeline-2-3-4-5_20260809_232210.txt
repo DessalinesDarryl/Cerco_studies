@@ -1,0 +1,62 @@
+2026-08-09 23:22:11,606 | INFO | Etapes demandees : [2, 3, 4, 5]
+2026-08-09 23:22:11,606 | INFO | ======================================================================
+2026-08-09 23:22:11,606 | INFO | ETAPE 2 : Assemblage de la cohorte
+2026-08-09 23:22:11,606 | INFO | ======================================================================
+2026-08-09 23:22:11,864 | INFO | [Etape 2] Cohorte assemblee (76 patients, 76 fichiers) -> C:\dev\Cerco_studies\results\cohort\cohort_metrics_real.csv
+2026-08-09 23:22:11,869 | INFO | ======================================================================
+2026-08-09 23:22:11,869 | INFO | ETAPE 3 : Reduction de dimension
+2026-08-09 23:22:11,869 | INFO | ======================================================================
+2026-08-09 23:22:13,679 | INFO | [Etape 3] Reduction de dimension sur 21 variables...
+C:\dev\Cerco_studies\.venv_clean\Lib\site-packages\statsmodels\stats\outliers_influence.py:197: RuntimeWarning: divide by zero encountered in scalar divide
+  vif = 1. / (1. - r_squared_i)
+2026-08-09 23:22:14,240 | INFO | [Etape 3] Rapport sauvegarde sous C:\dev\Cerco_studies\results
+2026-08-09 23:22:14,240 | INFO | [Etape 3] Variables retenues : ['AI_atonia_index', 'episode_count', 'duration_median', 'duration_max', 'interval_median', 'interval_variance', 'interval_cv', 'mean_relative_amplitude', 'max_relative_amplitude', 'short_density_per_min', 'medium_density_per_min', 'long_density_per_min', 'phasic_tonic_ratio', 'progression_index']
+2026-08-09 23:22:14,240 | INFO | ======================================================================
+2026-08-09 23:22:14,240 | INFO | ETAPE 4 : Score composite de severite
+2026-08-09 23:22:14,240 | INFO | ======================================================================
+2026-08-09 23:22:14,278 | INFO | [Etape 4] Score composite ajoute (variance PC1 = 31.36%) -> C:\dev\Cerco_studies\results\cohort\cohort_metrics_real.csv
+2026-08-09 23:22:14,278 | INFO | ======================================================================
+2026-08-09 23:22:14,278 | INFO | ETAPE 5 : Comparaison statistique
+2026-08-09 23:22:14,278 | INFO | ======================================================================
+2026-08-09 23:22:14,280 | INFO | [Etape 5] Groupe controle 'iRBD' present -> Kruskal-Wallis + Mann-Whitney + ROC-vs-controles.
+2026-08-09 23:24:24,105 | INFO | [Etape 5] Comparaison statistique sauvegardee -> [WindowsPath('C:/dev/Cerco_studies/results/statistics/kruskal_wallis.csv'), WindowsPath('C:/dev/Cerco_studies/results/statistics/mann_whitney_bonferroni.csv'), WindowsPath('C:/dev/Cerco_studies/results/statistics/roc_vs_controls.csv')]
+2026-08-09 23:24:24,106 | INFO | Pipeline termine (etapes demandees executees avec succes).
+Paires fortement correlees (|rho| >= 0.80) :
+                   var1                   var2       rho
+ phasic_density_per_min          interval_mean -0.996972
+           pct_any_RSWA              pct_tonic  0.995625
+          interval_mean      interval_variance  0.965953
+ phasic_density_per_min      interval_variance -0.965632
+      pct_epochs_phasic phasic_density_per_min  0.951114
+      pct_epochs_phasic          interval_mean -0.943971
+      pct_epochs_phasic      interval_variance -0.927355
+      pct_epochs_phasic   long_density_per_min  0.894299
+        AI_atonia_index              pct_tonic -0.889706
+ phasic_density_per_min   long_density_per_min  0.889296
+      pct_epochs_phasic           pct_any_RSWA  0.886999
+          interval_mean   long_density_per_min -0.885707
+          duration_mean            duration_sd  0.878201
+        AI_atonia_index           pct_any_RSWA -0.877649
+      interval_variance   long_density_per_min -0.864880
+      pct_epochs_phasic              pct_tonic  0.862775
+          interval_mean  short_density_per_min -0.851332
+ phasic_density_per_min  short_density_per_min  0.850561
+          interval_mean        interval_median  0.847234
+ phasic_density_per_min        interval_median -0.837654
+           pct_any_RSWA      interval_variance -0.834751
+           pct_any_RSWA phasic_density_per_min  0.825783
+           pct_any_RSWA          interval_mean -0.822726
+mean_relative_amplitude max_relative_amplitude  0.817635
+      interval_variance  short_density_per_min -0.815258
+              pct_tonic      interval_variance -0.807382
+              pct_tonic phasic_density_per_min  0.801558
+Retrait de 'phasic_density_per_min' (VIF=inf > 5.0)
+Retrait de 'pct_any_RSWA' (VIF=1364.49 > 5.0)
+Retrait de 'pct_epochs_phasic' (VIF=81.55 > 5.0)
+Retrait de 'interval_mean' (VIF=49.80 > 5.0)
+Retrait de 'duration_mean' (VIF=23.53 > 5.0)
+Retrait de 'pct_tonic' (VIF=11.75 > 5.0)
+Retrait de 'duration_sd' (VIF=5.73 > 5.0)
+
+KMO global (variables retenues) : 0.679
+Test de Bartlett : chi2=840.15, dof=91, p=0

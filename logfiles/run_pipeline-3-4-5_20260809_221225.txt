@@ -1,0 +1,60 @@
+2026-08-09 22:12:26,367 | INFO | Etapes demandees : [3, 4, 5]
+2026-08-09 22:12:26,371 | INFO | ======================================================================
+2026-08-09 22:12:26,371 | INFO | ETAPE 3 : Reduction de dimension
+2026-08-09 22:12:26,371 | INFO | ======================================================================
+2026-08-09 22:12:29,270 | INFO | [Etape 3] Reduction de dimension sur 21 variables...
+Paires fortement correlees (|rho| >= 0.80) :
+                   var1                   var2       rho
+ phasic_density_per_min          interval_mean -0.990909
+           pct_any_RSWA              pct_tonic  0.972727
+ phasic_density_per_min      interval_variance -0.963636
+          interval_mean        interval_median  0.954545
+          interval_mean      interval_variance  0.954545
+          interval_mean   long_density_per_min -0.954545
+      pct_epochs_phasic          interval_mean -0.936364
+ phasic_density_per_min        interval_median -0.936364
+ phasic_density_per_min   long_density_per_min  0.927273
+      pct_epochs_phasic           pct_any_RSWA  0.927273
+        interval_median   long_density_per_min -0.909091
+      pct_epochs_phasic phasic_density_per_min  0.900000
+            duration_sd           duration_max  0.891883
+        AI_atonia_index      pct_epochs_phasic -0.890909
+        AI_atonia_index           pct_any_RSWA -0.890909
+      pct_epochs_phasic        interval_median -0.890909
+      pct_epochs_phasic   long_density_per_min  0.890909
+        AI_atonia_index              pct_tonic -0.881818
+      pct_epochs_phasic      interval_variance -0.881818
+        interval_median      interval_variance  0.881818
+          duration_mean            duration_sd  0.881818
+            duration_sd medium_density_per_min  0.863636
+        AI_atonia_index        interval_median  0.863636
+      pct_epochs_phasic              pct_tonic  0.863636
+      interval_variance   long_density_per_min -0.854545
+          duration_mean medium_density_per_min  0.845455
+          duration_mean        duration_median  0.837283
+           pct_any_RSWA          duration_mean  0.827273
+              pct_tonic          duration_mean  0.818182
+      interval_variance            interval_cv  0.818182
+mean_relative_amplitude max_relative_amplitude  0.818182
+           pct_any_RSWA          interval_mean -0.809091
+              pct_tonic     phasic_tonic_ratio -0.809091
+           pct_any_RSWA medium_density_per_min  0.800000
+        AI_atonia_index          interval_mean  0.800000
+Traceback (most recent call last):
+  File "C:\dev\Cerco_studies\scripts\run_pipeline.py", line 493, in <module>
+    main()
+  File "C:\dev\Cerco_studies\scripts\run_pipeline.py", line 484, in main
+    ok = func(log)
+         ^^^^^^^^^
+  File "C:\dev\Cerco_studies\scripts\run_pipeline.py", line 331, in step3_dimensionality_reduction
+    report = full_dimensionality_reduction_report(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\dev\Cerco_studies\scripts\multicollinearity_pca.py", line 389, in full_dimensionality_reduction_report
+    vif_result = iterative_vif_reduction(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\dev\Cerco_studies\scripts\multicollinearity_pca.py", line 182, in iterative_vif_reduction
+    vif_df = compute_vif(
+             ^^^^^^^^^^^^
+  File "C:\dev\Cerco_studies\scripts\multicollinearity_pca.py", line 152, in compute_vif
+    raise ValueError(
+ValueError: Echantillon trop petit pour un VIF stable (11 observations completes pour 21 variables). Envisagez impute_missing=True, ou reduisez le nombre de variables candidates.

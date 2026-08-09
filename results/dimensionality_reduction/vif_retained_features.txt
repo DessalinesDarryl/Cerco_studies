@@ -1,0 +1,14 @@
+AI_atonia_index
+episode_count
+duration_median
+duration_max
+interval_median
+interval_variance
+interval_cv
+mean_relative_amplitude
+max_relative_amplitude
+short_density_per_min
+medium_density_per_min
+long_density_per_min
+phasic_tonic_ratio
+progression_index
